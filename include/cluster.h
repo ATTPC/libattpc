@@ -1,27 +1,30 @@
-#pragma once
+#ifndef HC_CLUSTER_H
+#define HC_CLUSTER_H
 
 #include <vector>
 #include <pcl/io/io.h>
 
-class Cluster
-{
-protected:
-    size_t pointIndexCount;
-    std::vector<pcl::PointIndicesPtr> clusters;
-    mutable Eigen::ArrayXXi relationshipMatrix;
+namespace hc {
 
-    void calculateRelationshipMatrixIfNecessary() const;
+    class Cluster
+    {
+    protected:
+        size_t pointIndexCount;
+        std::vector<pcl::PointIndicesPtr> clusters;
+        mutable Eigen::ArrayXXi relationshipMatrix;
 
-public:
-    Cluster();
-    Cluster(std::string const &filepath);
-    Cluster(std::vector<pcl::PointIndicesPtr> const &clusters, size_t pointIndexCount);
+        void calculateRelationshipMatrixIfNecessary() const;
 
-    void save(std::string filepath, std::string comment = "") const;
-    void load(std::string filepath);
+    public:
+        Cluster() {};
+        Cluster(std::vector<pcl::PointIndicesPtr> const &clusters, size_t pointIndexCount);
 
-    std::vector<pcl::PointIndicesPtr> const &getClusters() const;
-    size_t getPointIndexCount() const;
+        std::vector<pcl::PointIndicesPtr> const &getClusters() const;
+        size_t getPointIndexCount() const;
 
-    int operator-(Cluster const &rhs) const;
-};
+        int operator-(Cluster const &rhs) const;
+    };
+
+}
+
+#endif
