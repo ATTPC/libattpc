@@ -16,6 +16,6 @@ include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
-add_library(clustering src/cluster.cpp src/hc.cpp src/mst.cpp src/smoothenCloud.cpp)
+add_library(clustering src/cluster.cpp src/hc.cpp src/mst.cpp src/smoothenCloud.cpp src/conversions.cpp src/HTripletClustering.cpp)
 target_link_libraries(clustering ${PCL_LIBRARIES})
 set_property(TARGET clustering PROPERTY CXX_STANDARD 14)
