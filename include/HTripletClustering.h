@@ -34,9 +34,9 @@ namespace hc {
 
         HTripletClustering();
 
-        void generateSmoothedCloud();
-        void generateTriplets();
-        cluster_history calculateHc();
+        cloud_type smoothCloud(cloud_type::ConstPtr cloud) const;
+        std::vector<Triplet> generateTriplets(cloud_type::ConstPtr cloud) const;
+        cluster_history calculateHc(cloud_type::ConstPtr cloud, const std::vector<Triplet>& triplets) const;
 
 
     private:
@@ -48,10 +48,6 @@ namespace hc {
         float genTripletsMaxError;
         float bestClusterDistanceDelta;
         bool smoothUsingMedian;
-
-        cloud_type::ConstPtr xyziCloud;
-        cloud_type::Ptr smoothCloud;
-        std::vector<Triplet> triplets;
 
         std::unique_ptr<ClusterMetric> clusterMetric;
         std::unique_ptr<TripletMetric> tripletMetric;

@@ -10,13 +10,15 @@ namespace hc {
     , tripletMetric(std::make_unique<SpiralTripletMetric>())
     {}
 
-    void HTripletClustering::generateSmoothedCloud()
+    HTripletClustering::cloud_type HTripletClustering::smoothCloud(cloud_type::ConstPtr cloud) const
     {
+        cloud_type smoothCloud;
+
         pcl::KdTreeFLANN<pcl::PointXYZI> kdtree;
 
-        kdtree.setInputCloud(xyziCloud);
+        kdtree.setInputCloud(cloud);
 
-        for(size_t i = 0; i < xyziCloud->size(); ++i)
+        for(size_t i = 0; i < cloud->size(); ++i)
         {
             pcl::PointXYZI newPoint;
 
@@ -24,10 +26,10 @@ namespace hc {
             pcl::PointXYZI centroidPoint;
             std::vector<int> pointIdxNKNSearch;
             std::vector<float> pointNKNSquaredDistance;
-            int found = kdtree.radiusSearch(*xyziCloud, (int)i, smoothRadius, pointIdxNKNSearch, pointNKNSquaredDistance);
+            int found = kdtree.radiusSearch(*cloud, (int)i, smoothRadius, pointIdxNKNSearch, pointNKNSquaredDistance);
 
             for(int j = 0; j < found; ++j) {
-                centroid.add((*xyziCloud)[pointIdxNKNSearch[j]]);
+                centroid.add((*cloud)[pointIdxNKNSearch[j]]);
             }
 
             centroid.get(centroidPoint);
@@ -39,7 +41,7 @@ namespace hc {
                 std::vector<float> zList;
 
                 for(int j = 0; j < found; ++j) {
-                    pcl::PointXYZI const &point = (*xyziCloud)[pointIdxNKNSearch[j]];
+                    pcl::PointXYZI const &point = (*cloud)[pointIdxNKNSearch[j]];
 
                     xList.push_back(point.x);
                     yList.push_back(point.y);
@@ -61,18 +63,22 @@ namespace hc {
             else
                 newPoint = centroidPoint;
 
-            smoothCloud->push_back(newPoint);
+            smoothCloud.push_back(newPoint);
         }
+
+        return smoothCloud;
     }
 
-    void HTripletClustering::generateTriplets()
+    std::vector<Triplet> HTripletClustering::generateTriplets(cloud_type::ConstPtr cloud) const
     {
         pcl::KdTreeFLANN<pcl::PointXYZI> kdtree;
-        kdtree.setInputCloud(xyziCloud);
+        kdtree.setInputCloud(cloud);
 
-        for(size_t pointIndexB = 0; pointIndexB < xyziCloud->size(); ++pointIndexB)
+        std::vector<Triplet> triplets;
+
+        for(size_t pointIndexB = 0; pointIndexB < cloud->size(); ++pointIndexB)
         {
-            auto const &pointB = (*xyziCloud)[pointIndexB];
+            auto const &pointB = (*cloud)[pointIndexB];
             Eigen::Vector3f pointBEigen(pointB.x, pointB.y, pointB.z);
 
             std::vector<Triplet> tripletCandidates;
@@ -81,12 +87,12 @@ namespace hc {
             nnIndices.reserve(genTripletsNnCandidates);
             std::vector<float> nnbSquaredDistances;
             nnbSquaredDistances.reserve(genTripletsNnCandidates);
-            int const nnFound = kdtree.nearestKSearch(*xyziCloud, (int)pointIndexB, (int)genTripletsNnCandidates, nnIndices, nnbSquaredDistances);
+            int const nnFound = kdtree.nearestKSearch(*cloud, (int)pointIndexB, (int)genTripletsNnCandidates, nnIndices, nnbSquaredDistances);
 
             for(size_t pointIndexIndexA = 0; pointIndexIndexA < nnFound; ++pointIndexIndexA)
             {
                 size_t const pointIndexA = nnIndices[pointIndexIndexA];
-                auto const &pointA = (*xyziCloud)[pointIndexA];
+                auto const &pointA = (*cloud)[pointIndexA];
                 Eigen::Vector3f pointAEigen(pointA.x, pointA.y, pointA.z);
 
                 Eigen::Vector3f directionAB = pointBEigen - pointAEigen;
@@ -95,7 +101,7 @@ namespace hc {
                 for(size_t pointIndexIndexC = pointIndexIndexA + 1; pointIndexIndexC < nnFound; ++pointIndexIndexC)
                 {
                     size_t const pointIndexC = nnIndices[pointIndexIndexC];
-                    auto const &pointC = (*xyziCloud)[pointIndexC];
+                    auto const &pointC = (*cloud)[pointIndexC];
                     Eigen::Vector3f pointCEigen(pointC.x, pointC.y, pointC.z);
 
                     Eigen::Vector3f directionBC = pointCEigen - pointBEigen;
@@ -138,6 +144,8 @@ namespace hc {
                 triplets.push_back(tripletCandidates[i]);
             }
         }
+
+        return triplets;
     }
 
     static Eigen::MatrixXf calculateDistanceMatrix(pcl::PointCloud<pcl::PointXYZI>::ConstPtr cloud,
@@ -161,14 +169,14 @@ namespace hc {
         return result;
     }
 
-    cluster_history HTripletClustering::calculateHc()
+    cluster_history HTripletClustering::calculateHc(cloud_type::ConstPtr cloud, const std::vector<Triplet>& triplets) const
     {
         cluster_history result;
 
         result.triplets = triplets;
 
         // calculate distance-Matrix
-        Eigen::MatrixXf distanceMatrix = calculateDistanceMatrix(smoothCloud, result.triplets, tripletMetric);
+        Eigen::MatrixXf distanceMatrix = calculateDistanceMatrix(cloud, result.triplets, tripletMetric);
 
         cluster_group currentGeneration;
 
@@ -191,7 +199,7 @@ namespace hc {
             {
                 for (size_t j = i + 1; j < currentGeneration.clusters.size(); ++j)
                 {
-                    float const clusterDistance = (*clusterMetric)(currentGeneration.clusters[i], currentGeneration.clusters[j], distanceMatrix, smoothCloud);
+                    float const clusterDistance = (*clusterMetric)(currentGeneration.clusters[i], currentGeneration.clusters[j], distanceMatrix, cloud);
 
                     if (clusterDistance < bestClusterDistance)
                     {
