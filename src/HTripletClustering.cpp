@@ -240,5 +240,35 @@ namespace hc {
         return result;
     }
 
+    cluster_group HTripletClustering::findBestClusterGroup(const cluster_history& history) const
+    {
+        float lastBestClusterDistance = history.history[0].bestClusterDistance;
+
+        for (const cluster_group& clusterGroup : history.history)
+        {
+            const float bestClusterDistanceChange = clusterGroup.bestClusterDistance - lastBestClusterDistance;
+            lastBestClusterDistance = clusterGroup.bestClusterDistance;
+
+            if (bestClusterDistanceChange > bestClusterDistanceDelta) {
+                return clusterGroup;
+            }
+        }
+
+        return history.history[history.history.size() - 1];
+    }
+
+    cluster_group HTripletClustering::cleanupClusterGroup(cluster_group const &clusterGroup) const
+    {
+        cluster_group cleanedGroup;
+        cleanedGroup.bestClusterDistance = clusterGroup.bestClusterDistance;
+        cleanedGroup.clusters.resize(clusterGroup.clusters.size());
+
+        auto newEnd = std::copy_if(clusterGroup.clusters.cbegin(), clusterGroup.clusters.cend(), cleanedGroup.clusters.begin(), [&](cluster const &cluster) {
+            return cluster.size() >= cleanupMinTriplets;
+        });
+        cleanedGroup.clusters.resize(std::distance(cleanedGroup.clusters.begin(), newEnd));
+
+        return cleanedGroup;
+    }
 
 }

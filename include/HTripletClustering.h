@@ -37,6 +37,8 @@ namespace hc {
         cloud_type smoothCloud(cloud_type::ConstPtr cloud) const;
         std::vector<Triplet> generateTriplets(cloud_type::ConstPtr cloud) const;
         cluster_history calculateHc(cloud_type::ConstPtr cloud, const std::vector<Triplet>& triplets) const;
+        cluster_group findBestClusterGroup(const cluster_history& history) const;
+        cluster_group cleanupClusterGroup(cluster_group const &clusterGroup) const;
 
 
     private:
