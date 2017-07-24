@@ -5,6 +5,11 @@
 #include "HTripletClustering.h"
 
 namespace hc {
+    HTripletClustering::HTripletClustering()
+    : clusterMetric(std::make_unique<SingleLinkClusterMetric>())
+    , tripletMetric(std::make_unique<SpiralTripletMetric>())
+    {}
+
     void HTripletClustering::generateSmoothedCloud()
     {
         pcl::KdTreeFLANN<pcl::PointXYZI> kdtree;
@@ -133,6 +138,98 @@ namespace hc {
                 triplets.push_back(tripletCandidates[i]);
             }
         }
+    }
+
+    static Eigen::MatrixXf calculateDistanceMatrix(pcl::PointCloud<pcl::PointXYZI>::ConstPtr cloud,
+                                                   std::vector<Triplet> const &triplets,
+                                                   const std::unique_ptr<TripletMetric> &tripletMetric)
+    {
+        size_t const tripletSize = triplets.size();
+        Eigen::MatrixXf result(tripletSize, tripletSize);
+
+        for (size_t i = 0; i < tripletSize; ++i)
+        {
+            result(i, i) = 0.0f;
+
+            for (size_t j = i + 1; j < tripletSize; ++j)
+            {
+                result(i, j) = (*tripletMetric)(triplets[i], triplets[j], cloud);
+                result(j, i) = result(i, j);
+            }
+        }
+
+        return result;
+    }
+
+    cluster_history HTripletClustering::calculateHc()
+    {
+        cluster_history result;
+
+        result.triplets = triplets;
+
+        // calculate distance-Matrix
+        Eigen::MatrixXf distanceMatrix = calculateDistanceMatrix(smoothCloud, result.triplets, tripletMetric);
+
+        cluster_group currentGeneration;
+
+        // init first generation
+        for(size_t i = 0; i < result.triplets.size(); ++i)
+        {
+            cluster newCluster;
+            newCluster.push_back(i);
+            currentGeneration.clusters.push_back(newCluster);
+        }
+
+        // merge until only one cluster left
+        while (currentGeneration.clusters.size() > 1)
+        {
+            float bestClusterDistance = std::numeric_limits<float>::infinity();
+            std::pair<size_t, size_t> bestClusterPair;
+
+            // find best cluster-pair
+            for (size_t i = 0; i < currentGeneration.clusters.size(); ++i)
+            {
+                for (size_t j = i + 1; j < currentGeneration.clusters.size(); ++j)
+                {
+                    float const clusterDistance = (*clusterMetric)(currentGeneration.clusters[i], currentGeneration.clusters[j], distanceMatrix, smoothCloud);
+
+                    if (clusterDistance < bestClusterDistance)
+                    {
+                        bestClusterDistance = clusterDistance;
+                        bestClusterPair = std::pair<size_t, size_t>(i, j);
+                    }
+                }
+            }
+
+            // merge cluster-pair
+            cluster merged(currentGeneration.clusters[bestClusterPair.first]);
+            merged.insert(merged.cend(), currentGeneration.clusters[bestClusterPair.second].cbegin(), currentGeneration.clusters[bestClusterPair.second].cend());
+
+            // set best cluster distance for current generation and add to results
+            currentGeneration.bestClusterDistance = bestClusterDistance;
+            result.history.push_back(currentGeneration);
+
+            // copy data to next generation
+            cluster_group nextGeneration;
+            nextGeneration.clusters.reserve(currentGeneration.clusters.size() - 1);
+
+            for (size_t i = 0; i < currentGeneration.clusters.size(); ++i)
+            {
+                if (i != bestClusterPair.first && i != bestClusterPair.second)
+                    nextGeneration.clusters.push_back(currentGeneration.clusters[i]);
+            }
+
+            nextGeneration.clusters.push_back(merged);
+
+            // overwrite current generation
+            currentGeneration = nextGeneration;
+        }
+
+        // set last cluster distance and add to results
+        currentGeneration.bestClusterDistance = std::numeric_limits<float>::infinity();
+        result.history.push_back(currentGeneration);
+
+        return result;
     }
 
 

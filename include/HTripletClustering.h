@@ -7,8 +7,26 @@
 #include <pcl/common/centroid.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include "Triplet.h"
+#include "metrics/ClusterMetric.h"
+#include "metrics/SingleLinkClusterMetric.h"
+#include "metrics/TripletMetric.h"
+#include "metrics/SpiralTripletMetric.h"
 
 namespace hc {
+    typedef std::vector<size_t> cluster;
+
+    struct cluster_group
+    {
+        std::vector<cluster> clusters;
+        float bestClusterDistance;
+    };
+
+    struct cluster_history
+    {
+        std::vector<Triplet> triplets;
+        std::vector<cluster_group> history;
+    };
+
     class HTripletClustering {
     public:
         using point_type = pcl::PointXYZI;
@@ -18,6 +36,7 @@ namespace hc {
 
         void generateSmoothedCloud();
         void generateTriplets();
+        cluster_history calculateHc();
 
 
     private:
@@ -33,6 +52,9 @@ namespace hc {
         cloud_type::ConstPtr xyziCloud;
         cloud_type::Ptr smoothCloud;
         std::vector<Triplet> triplets;
+
+        std::unique_ptr<ClusterMetric> clusterMetric;
+        std::unique_ptr<TripletMetric> tripletMetric;
     };
 }
 
