@@ -1,30 +1,33 @@
-#ifndef HC_CLUSTER_H
-#define HC_CLUSTER_H
+#ifndef ATTPC_CLUSTERING_CLUSTER_H
+#define ATTPC_CLUSTERING_CLUSTER_H
 
 #include <vector>
 #include <pcl/io/io.h>
 
-namespace hc {
+namespace attpc {
+namespace clustering {
 
-    class Cluster
-    {
-    protected:
-        size_t pointIndexCount;
-        std::vector<pcl::PointIndicesPtr> clusters;
-        mutable Eigen::ArrayXXi relationshipMatrix;
+class Cluster {
+protected:
+    size_t pointIndexCount;
+    std::vector<pcl::PointIndicesPtr> clusters;
+    mutable Eigen::ArrayXXi relationshipMatrix;
 
-        void calculateRelationshipMatrixIfNecessary() const;
+    void calculateRelationshipMatrixIfNecessary() const;
 
-    public:
-        Cluster() {};
-        Cluster(std::vector<pcl::PointIndicesPtr> const &clusters, size_t pointIndexCount);
+public:
+    Cluster() {};
 
-        std::vector<pcl::PointIndicesPtr> const &getClusters() const;
-        size_t getPointIndexCount() const;
+    Cluster(std::vector<pcl::PointIndicesPtr> const& clusters, size_t pointIndexCount);
 
-        int operator-(Cluster const &rhs) const;
-    };
+    std::vector<pcl::PointIndicesPtr> const& getClusters() const;
+
+    size_t getPointIndexCount() const;
+
+    int operator-(Cluster const& rhs) const;
+};
 
 }
+}
 
-#endif
+#endif //ATTPC_CLUSTERING_CLUSTER_H

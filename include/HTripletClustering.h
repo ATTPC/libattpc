@@ -1,5 +1,5 @@
-#ifndef HC_CLUSTERING_H
-#define HC_CLUSTERING_H
+#ifndef ATTPC_CLUSTERING_HTRIPLETCLUSTERING_H
+#define ATTPC_CLUSTERING_HTRIPLETCLUSTERING_H
 
 #include <memory>
 #include <vector>
@@ -13,48 +13,56 @@
 #include "metrics/TripletMetric.h"
 #include "metrics/SpiralTripletMetric.h"
 
-namespace hc {
-    typedef std::vector<size_t> cluster;
+namespace attpc {
+namespace clustering {
 
-    struct cluster_group
-    {
-        std::vector<cluster> clusters;
-        float bestClusterDistance;
-    };
+typedef std::vector<size_t> cluster;
 
-    struct cluster_history
-    {
-        std::vector<Triplet> triplets;
-        std::vector<cluster_group> history;
-    };
+struct cluster_group {
+    std::vector<cluster> clusters;
+    float bestClusterDistance;
+};
 
-    class HTripletClustering {
-    public:
-        using point_type = pcl::PointXYZI;
-        using cloud_type = pcl::PointCloud<point_type>;
+struct cluster_history {
+    std::vector<Triplet> triplets;
+    std::vector<cluster_group> history;
+};
 
-        HTripletClustering();
+class HTripletClustering {
+public:
+    using point_type = pcl::PointXYZI;
+    using cloud_type = pcl::PointCloud<point_type>;
 
-        cloud_type smoothCloud(cloud_type::ConstPtr cloud) const;
-        std::vector<Triplet> generateTriplets(cloud_type::ConstPtr cloud) const;
-        cluster_history calculateHc(cloud_type::ConstPtr cloud, const std::vector<Triplet>& triplets) const;
-        cluster_group findBestClusterGroup(const cluster_history& history) const;
-        cluster_group cleanupClusterGroup(cluster_group const &clusterGroup) const;
-        Cluster makeCluster(const std::vector<Triplet>& triplets, const cluster_group& clusterGroup, size_t pointIndexCount) const;
+    HTripletClustering();
 
-    private:
-        float cloudScaleModifier;
-        size_t genTripletsNnCandidates;
-        size_t genTripletsNBest;
-        size_t cleanupMinTriplets;
-        float smoothRadius;
-        float genTripletsMaxError;
-        float bestClusterDistanceDelta;
-        bool smoothUsingMedian;
+    cloud_type smoothCloud(cloud_type::ConstPtr cloud) const;
 
-        std::unique_ptr<ClusterMetric> clusterMetric;
-        std::unique_ptr<TripletMetric> tripletMetric;
-    };
+    std::vector<Triplet> generateTriplets(cloud_type::ConstPtr cloud) const;
+
+    cluster_history calculateHc(cloud_type::ConstPtr cloud, const std::vector<Triplet>& triplets) const;
+
+    cluster_group findBestClusterGroup(const cluster_history& history) const;
+
+    cluster_group cleanupClusterGroup(cluster_group const& clusterGroup) const;
+
+    Cluster
+    makeCluster(const std::vector<Triplet>& triplets, const cluster_group& clusterGroup, size_t pointIndexCount) const;
+
+private:
+    float cloudScaleModifier;
+    size_t genTripletsNnCandidates;
+    size_t genTripletsNBest;
+    size_t cleanupMinTriplets;
+    float smoothRadius;
+    float genTripletsMaxError;
+    float bestClusterDistanceDelta;
+    bool smoothUsingMedian;
+
+    std::unique_ptr<ClusterMetric> clusterMetric;
+    std::unique_ptr<TripletMetric> tripletMetric;
+};
+
+}
 }
 
-#endif
+#endif //ATTPC_CLUSTERING_HTRIPLETCLUSTERING_H

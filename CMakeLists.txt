@@ -1,10 +1,13 @@
 cmake_minimum_required(VERSION 3.1)
 
-project(cloud_viewer)
-
+project(attpc_clustering)
 
 include(CMakeToolsHelpers OPTIONAL)
 find_package(PCL 1.2 REQUIRED COMPONENTS common)
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
+
 find_package(OpenMP)
 if (OPENMP_FOUND)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
@@ -12,12 +15,16 @@ if (OPENMP_FOUND)
 endif()
 
 include_directories(include)
-include_directories(${PCL_INCLUDE_DIRS})
-link_directories(${PCL_LIBRARY_DIRS})
-add_definitions(${PCL_DEFINITIONS})
 
-add_library(clustering src/Cluster.cpp src/conversions.cpp
-        src/HTripletClustering.cpp src/metrics/CompleteLinkClusterMetric.cpp src/metrics/SingleLinkClusterMetric.cpp
-        src/metrics/SpiralTripletMetric.cpp)
-target_link_libraries(clustering ${PCL_LIBRARIES})
-set_property(TARGET clustering PROPERTY CXX_STANDARD 14)
+set(SRC_FILES
+    src/Cluster.cpp
+    src/conversions.cpp
+    src/HTripletClustering.cpp
+    src/metrics/CompleteLinkClusterMetric.cpp
+    src/metrics/SingleLinkClusterMetric.cpp
+    src/metrics/SpiralTripletMetric.cpp
+)
+
+add_library(attpc_clustering ${SRC_FILES})
+target_link_libraries(attpc_clustering ${PCL_LIBRARIES})
+set_property(TARGET attpc_clustering PROPERTY CXX_STANDARD 14)

@@ -4,14 +4,21 @@
 
 #include "metrics/SpiralTripletMetric.h"
 
-float hc::SpiralTripletMetric::operator()(const hc::Triplet& lhs, const hc::Triplet& rhs,
-                                          pcl::PointCloud<pcl::PointXYZI>::ConstPtr cloud)
-{
-    float const perpendicularDistanceA = (rhs.center - (lhs.center + lhs.direction.dot(rhs.center - lhs.center) * lhs.direction)).squaredNorm();
-    float const perpendicularDistanceB = (lhs.center - (rhs.center + rhs.direction.dot(lhs.center - rhs.center) * rhs.direction)).squaredNorm();
+namespace attpc {
+namespace clustering {
+
+float SpiralTripletMetric::operator()(const Triplet& lhs, const Triplet& rhs,
+                                      pcl::PointCloud<pcl::PointXYZI>::ConstPtr cloud) {
+    float const perpendicularDistanceA = (rhs.center - (lhs.center + lhs.direction.dot(rhs.center - lhs.center) *
+                                                                     lhs.direction)).squaredNorm();
+    float const perpendicularDistanceB = (lhs.center - (rhs.center + rhs.direction.dot(lhs.center - rhs.center) *
+                                                                     rhs.direction)).squaredNorm();
 
     float const angle = 1.0f - std::abs(lhs.direction.dot(rhs.direction));
 
     // squared distances!
     return std::max(perpendicularDistanceA, perpendicularDistanceB) + std::pow(2.0f, 1.0f + 12.0f * angle);
+}
+
+}
 }

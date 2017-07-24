@@ -4,15 +4,15 @@
 
 #include "metrics/SingleLinkClusterMetric.h"
 
-float hc::SingleLinkClusterMetric::operator()(const hc::cluster& lhs, const hc::cluster& rhs, Eigen::MatrixXf const& d,
-                                              pcl::PointCloud<pcl::PointXYZI>::ConstPtr cloud)
-{
+namespace attpc {
+namespace clustering {
+
+float SingleLinkClusterMetric::operator()(const cluster& lhs, const cluster& rhs, Eigen::MatrixXf const& d,
+                                          pcl::PointCloud<pcl::PointXYZI>::ConstPtr cloud) {
     float result = std::numeric_limits<float>::infinity();
 
-    for (size_t const &a : lhs)
-    {
-        for (size_t const &b : rhs)
-        {
+    for (size_t const& a : lhs) {
+        for (size_t const& b : rhs) {
             float distance = d(a, b);
 
             if (distance < result)
@@ -21,4 +21,7 @@ float hc::SingleLinkClusterMetric::operator()(const hc::cluster& lhs, const hc::
     }
 
     return result;
+}
+
+}
 }
