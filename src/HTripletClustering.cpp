@@ -271,4 +271,33 @@ namespace hc {
         return cleanedGroup;
     }
 
+    Cluster HTripletClustering::makeCluster(const std::vector<Triplet>& triplets, const cluster_group& clusterGroup, size_t pointIndexCount) const
+    {
+        std::vector<pcl::PointIndicesPtr> result;
+
+        for (auto const &currentCluster : clusterGroup.clusters)
+        {
+            pcl::PointIndicesPtr pointIndices(new pcl::PointIndices());
+
+            // add point indices
+            for (auto const &currentTripletIndex : currentCluster)
+            {
+                Triplet const &currentTriplet = triplets[currentTripletIndex];
+
+                pointIndices->indices.push_back((int)currentTriplet.pointIndexA);
+                pointIndices->indices.push_back((int)currentTriplet.pointIndexB);
+                pointIndices->indices.push_back((int)currentTriplet.pointIndexC);
+            }
+
+            // sort point-indices and remove duplikates
+            std::sort(pointIndices->indices.begin(), pointIndices->indices.end());
+            auto newEnd = std::unique(pointIndices->indices.begin(), pointIndices->indices.end());
+            pointIndices->indices.resize(std::distance(pointIndices->indices.begin(), newEnd));
+
+            result.push_back(pointIndices);
+        }
+
+        return Cluster(result, pointIndexCount);
+    }
+
 }

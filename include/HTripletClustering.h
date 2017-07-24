@@ -7,6 +7,7 @@
 #include <pcl/common/centroid.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include "Triplet.h"
+#include "cluster.h"
 #include "metrics/ClusterMetric.h"
 #include "metrics/SingleLinkClusterMetric.h"
 #include "metrics/TripletMetric.h"
@@ -39,7 +40,7 @@ namespace hc {
         cluster_history calculateHc(cloud_type::ConstPtr cloud, const std::vector<Triplet>& triplets) const;
         cluster_group findBestClusterGroup(const cluster_history& history) const;
         cluster_group cleanupClusterGroup(cluster_group const &clusterGroup) const;
-
+        Cluster makeCluster(const std::vector<Triplet>& triplets, const cluster_group& clusterGroup, size_t pointIndexCount) const;
 
     private:
         float cloudScaleModifier;
