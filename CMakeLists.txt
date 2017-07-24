@@ -16,7 +16,7 @@ include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
-add_library(clustering src/cluster.cpp src/hc.cpp src/mst.cpp src/smoothenCloud.cpp src/conversions.cpp
+add_library(clustering src/Cluster.cpp src/conversions.cpp
         src/HTripletClustering.cpp src/metrics/CompleteLinkClusterMetric.cpp src/metrics/SingleLinkClusterMetric.cpp
         src/metrics/SpiralTripletMetric.cpp)
 target_link_libraries(clustering ${PCL_LIBRARIES})

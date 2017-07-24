@@ -7,7 +7,7 @@
 #include <pcl/common/centroid.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include "Triplet.h"
-#include "cluster.h"
+#include "Cluster.h"
 #include "metrics/ClusterMetric.h"
 #include "metrics/SingleLinkClusterMetric.h"
 #include "metrics/TripletMetric.h"
