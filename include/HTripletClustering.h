@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <pcl/common/common.h>
+#include <pcl/common/centroid.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include "Triplet.h"
 
@@ -15,6 +16,7 @@ namespace hc {
 
         HTripletClustering();
 
+        void generateSmoothedCloud();
         void generateTriplets();
 
 
@@ -26,8 +28,10 @@ namespace hc {
         float smoothRadius;
         float genTripletsMaxError;
         float bestClusterDistanceDelta;
+        bool smoothUsingMedian;
 
         cloud_type::ConstPtr xyziCloud;
+        cloud_type::Ptr smoothCloud;
         std::vector<Triplet> triplets;
     };
 }

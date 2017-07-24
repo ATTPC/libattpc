@@ -5,6 +5,61 @@
 #include "HTripletClustering.h"
 
 namespace hc {
+    void HTripletClustering::generateSmoothedCloud()
+    {
+        pcl::KdTreeFLANN<pcl::PointXYZI> kdtree;
+
+        kdtree.setInputCloud(xyziCloud);
+
+        for(size_t i = 0; i < xyziCloud->size(); ++i)
+        {
+            pcl::PointXYZI newPoint;
+
+            pcl::CentroidPoint<pcl::PointXYZI> centroid;
+            pcl::PointXYZI centroidPoint;
+            std::vector<int> pointIdxNKNSearch;
+            std::vector<float> pointNKNSquaredDistance;
+            int found = kdtree.radiusSearch(*xyziCloud, (int)i, smoothRadius, pointIdxNKNSearch, pointNKNSquaredDistance);
+
+            for(int j = 0; j < found; ++j) {
+                centroid.add((*xyziCloud)[pointIdxNKNSearch[j]]);
+            }
+
+            centroid.get(centroidPoint);
+
+            if(smoothUsingMedian)
+            {
+                std::vector<float> xList;
+                std::vector<float> yList;
+                std::vector<float> zList;
+
+                for(int j = 0; j < found; ++j) {
+                    pcl::PointXYZI const &point = (*xyziCloud)[pointIdxNKNSearch[j]];
+
+                    xList.push_back(point.x);
+                    yList.push_back(point.y);
+                    zList.push_back(point.z);
+                }
+
+                auto xMedianIt = xList.begin() + (xList.size() / 2);
+                std::nth_element(xList.begin(), xMedianIt, xList.end());
+                newPoint.x = *xMedianIt;
+
+                auto yMedianIt = yList.begin() + (yList.size() / 2);
+                std::nth_element(yList.begin(), yMedianIt, yList.end());
+                newPoint.y = *yMedianIt;
+
+                auto zMedianIt = zList.begin() + (zList.size() / 2);
+                std::nth_element(zList.begin(), zMedianIt, zList.end());
+                newPoint.z = *zMedianIt;
+            }
+            else
+                newPoint = centroidPoint;
+
+            smoothCloud->push_back(newPoint);
+        }
+    }
+
     void HTripletClustering::generateTriplets()
     {
         pcl::KdTreeFLANN<pcl::PointXYZI> kdtree;
@@ -79,4 +134,6 @@ namespace hc {
             }
         }
     }
+
+
 }
