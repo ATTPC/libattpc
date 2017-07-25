@@ -7,8 +7,7 @@
 namespace attpc {
 namespace clustering {
 
-float SpiralTripletMetric::operator()(const Triplet& lhs, const Triplet& rhs,
-                                      pcl::PointCloud<pcl::PointXYZI>::ConstPtr cloud) {
+float SpiralTripletMetric::operator()(const Triplet& lhs, const Triplet& rhs) {
     float const perpendicularDistanceA = (rhs.center - (lhs.center + lhs.direction.dot(rhs.center - lhs.center) *
                                                                      lhs.direction)).squaredNorm();
     float const perpendicularDistanceB = (lhs.center - (rhs.center + rhs.direction.dot(lhs.center - rhs.center) *

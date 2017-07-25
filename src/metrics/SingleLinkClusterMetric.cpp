@@ -7,8 +7,7 @@
 namespace attpc {
 namespace clustering {
 
-float SingleLinkClusterMetric::operator()(const cluster& lhs, const cluster& rhs, Eigen::MatrixXf const& d,
-                                          pcl::PointCloud<pcl::PointXYZI>::ConstPtr cloud) {
+float SingleLinkClusterMetric::operator()(const cluster& lhs, const cluster& rhs, Eigen::MatrixXf const& d) {
     float result = std::numeric_limits<float>::infinity();
 
     for (size_t const& a : lhs) {

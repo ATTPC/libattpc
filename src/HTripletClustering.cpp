@@ -142,24 +142,6 @@ std::vector<Triplet> HTripletClustering::generateTriplets(cloud_type::ConstPtr c
     return triplets;
 }
 
-static Eigen::MatrixXf calculateDistanceMatrix(pcl::PointCloud<pcl::PointXYZI>::ConstPtr cloud,
-                                               std::vector<Triplet> const& triplets,
-                                               const std::unique_ptr<TripletMetric>& tripletMetric) {
-    size_t const tripletSize = triplets.size();
-    Eigen::MatrixXf result(tripletSize, tripletSize);
-
-    for (size_t i = 0; i < tripletSize; ++i) {
-        result(i, i) = 0.0f;
-
-        for (size_t j = i + 1; j < tripletSize; ++j) {
-            result(i, j) = (*tripletMetric)(triplets[i], triplets[j], cloud);
-            result(j, i) = result(i, j);
-        }
-    }
-
-    return result;
-}
-
 cluster_history
 HTripletClustering::calculateHc(cloud_type::ConstPtr cloud, const std::vector<Triplet>& triplets) const {
     cluster_history result;
@@ -167,7 +149,7 @@ HTripletClustering::calculateHc(cloud_type::ConstPtr cloud, const std::vector<Tr
     result.triplets = triplets;
 
     // calculate distance-Matrix
-    Eigen::MatrixXf distanceMatrix = calculateDistanceMatrix(cloud, result.triplets, tripletMetric);
+    Eigen::MatrixXf distanceMatrix = calculateDistanceMatrix(result.triplets, *tripletMetric);
 
     cluster_group currentGeneration;
 
@@ -187,7 +169,7 @@ HTripletClustering::calculateHc(cloud_type::ConstPtr cloud, const std::vector<Tr
         for (size_t i = 0; i < currentGeneration.clusters.size(); ++i) {
             for (size_t j = i + 1; j < currentGeneration.clusters.size(); ++j) {
                 float const clusterDistance = (*clusterMetric)(currentGeneration.clusters[i],
-                                                               currentGeneration.clusters[j], distanceMatrix, cloud);
+                                                               currentGeneration.clusters[j], distanceMatrix);
 
                 if (clusterDistance < bestClusterDistance) {
                     bestClusterDistance = clusterDistance;

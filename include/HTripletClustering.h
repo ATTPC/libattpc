@@ -12,6 +12,7 @@
 #include "metrics/SingleLinkClusterMetric.h"
 #include "metrics/TripletMetric.h"
 #include "metrics/SpiralTripletMetric.h"
+#include "utilities.h"
 
 namespace attpc {
 namespace clustering {

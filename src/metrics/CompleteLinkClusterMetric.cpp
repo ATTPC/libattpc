@@ -7,8 +7,7 @@
 namespace attpc {
 namespace clustering {
 
-float CompleteLinkClusterMetric::operator()(const cluster& lhs, const cluster& rhs, const Eigen::MatrixXf& d,
-                                            pcl::PointCloud<pcl::PointXYZI>::ConstPtr cloud) {
+float CompleteLinkClusterMetric::operator()(const cluster& lhs, const cluster& rhs, const Eigen::MatrixXf& d) {
     float result = 0.0f;
 
     for (size_t const& a : lhs) {

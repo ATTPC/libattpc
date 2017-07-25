@@ -16,7 +16,7 @@ namespace clustering {
 class SpiralTripletMetric : public TripletMetric {
 public:
     float
-    operator()(Triplet const& lhs, Triplet const& rhs, pcl::PointCloud<pcl::PointXYZI>::ConstPtr cloud) override;
+    operator()(Triplet const& lhs, Triplet const& rhs) override;
 };
 
 }

@@ -12,8 +12,14 @@ namespace clustering {
 
 class SingleLinkClusterMetric : public ClusterMetric {
 public:
-    float operator()(cluster const& lhs, cluster const& rhs, Eigen::MatrixXf const& d,
-                     pcl::PointCloud<pcl::PointXYZI>::ConstPtr cloud) override;
+    /**
+     * A metric for comparing two clusters using a single-linkage criterion.
+     * @param lhs The first cluster to compare.
+     * @param rhs The second cluster to compare.
+     * @param d The distance matrix between points in the data.
+     * @return The distance between the two clusters.
+     */
+    float operator()(cluster const& lhs, cluster const& rhs, Eigen::MatrixXf const& d) override;
 };
 
 }

@@ -18,7 +18,7 @@ include_directories(include)
 
 set(SRC_FILES
     src/Cluster.cpp
-    src/conversions.cpp
+        src/utilities.cpp
     src/HTripletClustering.cpp
     src/metrics/CompleteLinkClusterMetric.cpp
     src/metrics/SingleLinkClusterMetric.cpp
@@ -28,3 +28,12 @@ set(SRC_FILES
 add_library(attpc_clustering ${SRC_FILES})
 target_link_libraries(attpc_clustering ${PCL_LIBRARIES})
 set_property(TARGET attpc_clustering PROPERTY CXX_STANDARD 14)
+
+# Set up unit tests
+set(TEST_SRC_FILES
+    test/catch_main.cpp
+)
+
+add_executable(test_attpc_clustering ${TEST_SRC_FILES})
+target_link_libraries(test_attpc_clustering attpc_clustering)
+set_property(TARGET test_attpc_clustering PROPERTY CXX_STANDARD 14)
