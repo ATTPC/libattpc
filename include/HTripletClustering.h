@@ -8,16 +8,11 @@
 #include <pcl/kdtree/kdtree_flann.h>
 #include "Triplet.h"
 #include "Cluster.h"
-#include "metrics/ClusterMetric.h"
-#include "metrics/SingleLinkClusterMetric.h"
-#include "metrics/TripletMetric.h"
-#include "metrics/SpiralTripletMetric.h"
+#include "metrics.h"
 #include "utilities.h"
 
 namespace attpc {
 namespace clustering {
-
-typedef std::vector<size_t> cluster;
 
 struct cluster_group {
     std::vector<cluster> clusters;
@@ -59,8 +54,8 @@ private:
     float bestClusterDistanceDelta;
     bool smoothUsingMedian;
 
-    std::unique_ptr<ClusterMetric> clusterMetric;
-    std::unique_ptr<TripletMetric> tripletMetric;
+    ClusterMetric clusterMetric;
+    TripletMetric tripletMetric;
 };
 
 }

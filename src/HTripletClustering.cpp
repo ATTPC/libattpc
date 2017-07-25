@@ -8,8 +8,8 @@ namespace attpc {
 namespace clustering {
 
 HTripletClustering::HTripletClustering()
-        : clusterMetric(std::make_unique<SingleLinkClusterMetric>()),
-          tripletMetric(std::make_unique<SpiralTripletMetric>()) {}
+        : clusterMetric(singleLinkClusterMetric)
+        , tripletMetric(spiralTripletMetric) {}
 
 HTripletClustering::cloud_type HTripletClustering::smoothCloud(cloud_type::ConstPtr cloud) const {
     cloud_type smoothCloud;
@@ -149,7 +149,7 @@ HTripletClustering::calculateHc(cloud_type::ConstPtr cloud, const std::vector<Tr
     result.triplets = triplets;
 
     // calculate distance-Matrix
-    Eigen::MatrixXf distanceMatrix = calculateDistanceMatrix(result.triplets, *tripletMetric);
+    Eigen::MatrixXf distanceMatrix = calculateDistanceMatrix(result.triplets, tripletMetric);
 
     cluster_group currentGeneration;
 
@@ -168,8 +168,8 @@ HTripletClustering::calculateHc(cloud_type::ConstPtr cloud, const std::vector<Tr
         // find best cluster-pair
         for (size_t i = 0; i < currentGeneration.clusters.size(); ++i) {
             for (size_t j = i + 1; j < currentGeneration.clusters.size(); ++j) {
-                float const clusterDistance = (*clusterMetric)(currentGeneration.clusters[i],
-                                                               currentGeneration.clusters[j], distanceMatrix);
+                float const clusterDistance = clusterMetric(currentGeneration.clusters[i],
+                                                            currentGeneration.clusters[j], distanceMatrix);
 
                 if (clusterDistance < bestClusterDistance) {
                     bestClusterDistance = clusterDistance;

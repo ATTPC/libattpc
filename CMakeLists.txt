@@ -18,11 +18,9 @@ include_directories(include)
 
 set(SRC_FILES
     src/Cluster.cpp
-        src/utilities.cpp
+    src/utilities.cpp
     src/HTripletClustering.cpp
-    src/metrics/CompleteLinkClusterMetric.cpp
-    src/metrics/SingleLinkClusterMetric.cpp
-    src/metrics/SpiralTripletMetric.cpp
+    src/metrics.cpp
 )
 
 add_library(attpc_clustering ${SRC_FILES})

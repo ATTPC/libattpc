@@ -5,7 +5,6 @@
 #include <Eigen/Core>
 #include <memory>
 #include <functional>
-#include "metrics/TripletMetric.h"
 
 namespace attpc {
 namespace clustering {
