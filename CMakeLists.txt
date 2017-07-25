@@ -31,6 +31,7 @@ set_property(TARGET attpc_clustering PROPERTY CXX_STANDARD 14)
 set(TEST_SRC_FILES
     test/catch_main.cpp
     test/test_utilities.cpp
+    test/test_metrics.cpp
 )
 
 add_executable(test_attpc_clustering ${TEST_SRC_FILES})
