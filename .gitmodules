@@ -1,0 +1,12 @@
+[submodule "libs/mergers"]
+	path = libs/mergers
+	url = https://github.com/attpc/libattpc-mergers.git
+[submodule "libs/transform"]
+	path = libs/transform
+	url = https://github.com/attpc/libattpc-transform.git
+[submodule "libs/cleaning"]
+	path = libs/cleaning
+	url = https://github.com/attpc/libattpc-cleaning.git
+[submodule "libs/fitters"]
+	path = libs/fitters
+	url = https://github.com/attpc/libattpc-fitters.git
