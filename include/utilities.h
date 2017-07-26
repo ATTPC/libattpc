@@ -1,5 +1,5 @@
-#ifndef ATTPC_CLUSTERING_CONVERSIONS_H
-#define ATTPC_CLUSTERING_CONVERSIONS_H
+#ifndef ATTPC_CLEANING_CONVERSIONS_H
+#define ATTPC_CLEANING_CONVERSIONS_H
 
 #include <pcl/common/common.h>
 #include <Eigen/Core>
@@ -7,7 +7,7 @@
 #include <functional>
 
 namespace attpc {
-namespace clustering {
+namespace cleaning {
 
 pcl::PointCloud<pcl::PointXYZI> pointCloudFromCArray(
         const float *const data,
@@ -34,4 +34,4 @@ Eigen::MatrixXf calculateDistanceMatrix(std::vector<T> const& points, const std:
 }
 }
 
-#endif //ATTPC_CLUSTERING_CONVERSIONS_H
+#endif //ATTPC_CLEANING_CONVERSIONS_H

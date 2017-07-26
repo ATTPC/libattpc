@@ -6,7 +6,7 @@
 
 
 namespace attpc {
-namespace clustering {
+namespace cleaning {
 
 float singleLinkClusterMetric(const cluster& lhs, const cluster& rhs, Eigen::MatrixXf const& d) {
     float result = std::numeric_limits<float>::infinity();

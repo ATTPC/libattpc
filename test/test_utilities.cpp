@@ -19,7 +19,7 @@ TEST_CASE("Can calculate distance matrix", "[utilities]") {
         data.emplace_back(i, i, i);
     }
 
-    Eigen::MatrixXf distMat = attpc::clustering::calculateDistanceMatrix<Eigen::Vector3f>(data, euclideanMetric);
+    Eigen::MatrixXf distMat = attpc::cleaning::calculateDistanceMatrix<Eigen::Vector3f>(data, euclideanMetric);
 
     SECTION("Distance matrix is symmetric") {
         REQUIRE(distMat == distMat.transpose());

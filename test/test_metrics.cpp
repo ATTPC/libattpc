@@ -8,7 +8,7 @@
 #include "metrics.h"
 #include "utilities.h"
 
-namespace atc = attpc::clustering;
+namespace atc = attpc::cleaning;
 
 static float euclideanMetric(const Eigen::Vector3f& a, const Eigen::Vector3f& b) {
     return (a - b).norm();
@@ -23,7 +23,7 @@ public:
             points.emplace_back(i, 2*i, 3*i);
         }
 
-        distanceMatrix = attpc::clustering::calculateDistanceMatrix<Eigen::Vector3f>(points, euclideanMetric);
+        distanceMatrix = attpc::cleaning::calculateDistanceMatrix<Eigen::Vector3f>(points, euclideanMetric);
     }
 
 public:

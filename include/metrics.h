@@ -2,8 +2,8 @@
 // Created by Joshua Bradt on 7/25/17.
 //
 
-#ifndef ATTPC_CLUSTERING_METRICS_H
-#define ATTPC_CLUSTERING_METRICS_H
+#ifndef ATTPC_CLEANING_METRICS_H
+#define ATTPC_CLEANING_METRICS_H
 
 #include <functional>
 #include <vector>
@@ -13,7 +13,7 @@
 
 
 namespace attpc {
-namespace clustering {
+namespace cleaning {
 
 using cluster = std::vector<size_t>;
 
@@ -43,4 +43,4 @@ float spiralTripletMetric(const Triplet& lhs, const Triplet& rhs);
 }
 }
 
-#endif //ATTPC_CLUSTERING_METRICS_H
+#endif //ATTPC_CLEANING_METRICS_H

@@ -1,11 +1,11 @@
-#ifndef ATTPC_CLUSTERING_CLUSTER_H
-#define ATTPC_CLUSTERING_CLUSTER_H
+#ifndef ATTPC_CLEANING_CLUSTER_H
+#define ATTPC_CLEANING_CLUSTER_H
 
 #include <vector>
 #include <pcl/io/io.h>
 
 namespace attpc {
-namespace clustering {
+namespace cleaning {
 
 class Cluster {
 protected:
@@ -30,4 +30,4 @@ public:
 }
 }
 
-#endif //ATTPC_CLUSTERING_CLUSTER_H
+#endif //ATTPC_CLEANING_CLUSTER_H

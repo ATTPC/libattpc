@@ -2,14 +2,14 @@
 // Created by Joshua Bradt on 7/24/17.
 //
 
-#ifndef ATTPC_CLUSTERING_TRIPLET_H
-#define ATTPC_CLUSTERING_TRIPLET_H
+#ifndef ATTPC_CLEANING_TRIPLET_H
+#define ATTPC_CLEANING_TRIPLET_H
 
 #include <cstddef>
 #include <Eigen/Core>
 
 namespace attpc {
-namespace clustering {
+namespace cleaning {
 
 class Triplet {
 public:
@@ -25,4 +25,4 @@ public:
 }
 
 
-#endif //ATTPC_CLUSTERING_TRIPLET_H
+#endif //ATTPC_CLEANING_TRIPLET_H

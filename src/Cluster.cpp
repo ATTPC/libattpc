@@ -7,7 +7,7 @@
 #include <boost/algorithm/string/replace.hpp>
 
 namespace attpc {
-namespace clustering {
+namespace cleaning {
 
 void Cluster::calculateRelationshipMatrixIfNecessary() const {
     if (this->relationshipMatrix.size() == 0) {

@@ -5,7 +5,7 @@
 #include "HTripletClustering.h"
 
 namespace attpc {
-namespace clustering {
+namespace cleaning {
 
 HTripletClustering::HTripletClustering()
         : clusterMetric(singleLinkClusterMetric)

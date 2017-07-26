@@ -1,7 +1,7 @@
 #include "utilities.h"
 
 namespace attpc {
-namespace clustering {
+namespace cleaning {
 
 pcl::PointCloud<pcl::PointXYZI> pointCloudFromCArray(
         const float *const data,

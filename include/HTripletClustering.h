@@ -1,5 +1,5 @@
-#ifndef ATTPC_CLUSTERING_HTRIPLETCLUSTERING_H
-#define ATTPC_CLUSTERING_HTRIPLETCLUSTERING_H
+#ifndef ATTPC_CLEANING_HTRIPLETCLUSTERING_H
+#define ATTPC_CLEANING_HTRIPLETCLUSTERING_H
 
 #include <memory>
 #include <vector>
@@ -12,7 +12,7 @@
 #include "utilities.h"
 
 namespace attpc {
-namespace clustering {
+namespace cleaning {
 
 struct cluster_group {
     std::vector<cluster> clusters;
@@ -61,4 +61,4 @@ private:
 }
 }
 
-#endif //ATTPC_CLUSTERING_HTRIPLETCLUSTERING_H
+#endif //ATTPC_CLEANING_HTRIPLETCLUSTERING_H
