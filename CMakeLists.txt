@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 
-project(attpc_clustering)
+project(attpc_cleaning)
 
 include(CMakeToolsHelpers OPTIONAL)
 find_package(PCL 1.2 REQUIRED COMPONENTS common)
@@ -23,7 +23,7 @@ set(SRC_FILES
     src/metrics.cpp
 )
 
-add_library(attpc_clustering ${SRC_FILES})
+add_library(attpc_clustering SHARED ${SRC_FILES})
 target_link_libraries(attpc_clustering ${PCL_LIBRARIES})
 set_property(TARGET attpc_clustering PROPERTY CXX_STANDARD 14)
 
@@ -34,6 +34,6 @@ set(TEST_SRC_FILES
     test/test_metrics.cpp
 )
 
-add_executable(test_attpc_clustering ${TEST_SRC_FILES})
+add_executable(test_attpc_clustering EXCLUDE_FROM_ALL ${TEST_SRC_FILES})
 target_link_libraries(test_attpc_clustering attpc_clustering)
 set_property(TARGET test_attpc_clustering PROPERTY CXX_STANDARD 14)
