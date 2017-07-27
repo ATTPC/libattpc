@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.1)
 project(attpc_cleaning)
 
 include(CMakeToolsHelpers OPTIONAL)
-find_package(PCL 1.2 REQUIRED COMPONENTS common kdtree)
+find_package(PCL 1.2 REQUIRED COMPONENTS common kdtree io)
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})

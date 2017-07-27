@@ -11,6 +11,22 @@ HTripletClustering::HTripletClustering()
         : clusterMetric(singleLinkClusterMetric)
         , tripletMetric(spiralTripletMetric) {}
 
+HTripletClustering::HTripletClustering(const HTripletClusteringConfig& config) {
+    setParamsFromConfig(config);
+}
+
+void HTripletClustering::setParamsFromConfig(const HTripletClusteringConfig& config) {
+    genTripletsNnCandidates = config.genTripletsNnCandidates;
+    genTripletsNBest = config.genTripletsNBest;
+    cleanupMinTriplets = config.cleanupMinTriplets;
+    smoothRadius = config.smoothRadius;
+    genTripletsMaxError = config.genTripletsMaxError;
+    bestClusterDistanceDelta = config.bestClusterDistanceDelta;
+    smoothUsingMedian = config.smoothUsingMedian;
+    clusterMetric = config.clusterMetric;
+    tripletMetric = config.tripletMetric;
+}
+
 HTripletClustering::cloud_type HTripletClustering::smoothCloud(cloud_type::ConstPtr cloud) const {
     cloud_type smoothCloud;
 

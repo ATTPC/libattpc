@@ -24,12 +24,29 @@ struct cluster_history {
     std::vector<cluster_group> history;
 };
 
+struct HTripletClusteringConfig {
+    size_t genTripletsNnCandidates;
+    size_t genTripletsNBest;
+    size_t cleanupMinTriplets;
+    float smoothRadius;
+    float genTripletsMaxError;
+    float bestClusterDistanceDelta;
+    bool smoothUsingMedian;
+
+    ClusterMetric clusterMetric;
+    TripletMetric tripletMetric;
+};
+
 class HTripletClustering {
 public:
     using point_type = pcl::PointXYZI;
     using cloud_type = pcl::PointCloud<point_type>;
 
     HTripletClustering();
+
+    HTripletClustering(const HTripletClusteringConfig& config);
+
+    void setParamsFromConfig(const HTripletClusteringConfig& config);
 
     cloud_type smoothCloud(cloud_type::ConstPtr cloud) const;
 
@@ -45,7 +62,6 @@ public:
     makeCluster(const std::vector<Triplet>& triplets, const cluster_group& clusterGroup, size_t pointIndexCount) const;
 
 private:
-    float cloudScaleModifier;
     size_t genTripletsNnCandidates;
     size_t genTripletsNBest;
     size_t cleanupMinTriplets;
