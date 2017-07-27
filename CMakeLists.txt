@@ -20,6 +20,9 @@ set(SRC_FILES
     src/Cluster.cpp
     src/utilities.cpp
     src/HTripletClustering.cpp
+    src/HoughTransform.cpp
+    src/LinearHoughTransform.cpp
+    src/CircularHoughTransform.cpp
     src/metrics.cpp
 )
 
