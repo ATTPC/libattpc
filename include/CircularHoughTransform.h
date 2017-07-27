@@ -14,6 +14,8 @@ class CircularHoughTransform : public HoughTransform {
 public:
     CircularHoughTransform(const int numBins_, const int maxRadiusValue_, const int rowOffset_ = 5);
 
+    Eigen::Vector2d findCenter(const Eigen::ArrayXXd& data) const;
+
 protected:
     double radiusFunction(const Eigen::ArrayXXd& data, const Eigen::Index rowIdx, const double costh,
                           const double sinth) const override;

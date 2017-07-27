@@ -36,5 +36,13 @@ Eigen::ArrayXXf HoughTransform::findHoughSpace(const Eigen::ArrayXXd& data) cons
     }
 }
 
+double HoughTransform::findRadiusFromBin(const Eigen::Index bin) const {
+    return bin * 2 * maxRadiusValue / numBins - maxRadiusValue;
+}
+
+double HoughTransform::findAngleFromBin(const Eigen::Index bin) const {
+    return bin * M_PI / numBins;
+}
+
 }
 }

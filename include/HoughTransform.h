@@ -17,6 +17,9 @@ public:
 
     Eigen::ArrayXXf findHoughSpace(const Eigen::ArrayXXd& data) const;
 
+    virtual double findRadiusFromBin(const Eigen::Index bin) const;
+    virtual double findAngleFromBin(const Eigen::Index bin) const;
+
 protected:
     virtual double radiusFunction(const Eigen::ArrayXXd& data, const Eigen::Index rowIdx,
                                   const double costh, const double sinth) const = 0;
