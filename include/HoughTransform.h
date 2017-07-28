@@ -15,10 +15,14 @@ class HoughTransform {
 public:
     HoughTransform(const int numBins_, const int maxRadiusValue_);
 
-    Eigen::ArrayXXf findHoughSpace(const Eigen::ArrayXXd& data) const;
+    Eigen::ArrayXXd findHoughSpace(const Eigen::ArrayXXd& data) const;
 
     virtual double findRadiusFromBin(const Eigen::Index bin) const;
+    virtual Eigen::Index findBinFromRadius(const double radius) const;
+
     virtual double findAngleFromBin(const Eigen::Index bin) const;
+    virtual Eigen::Index findBinFromAngle(const double angle) const;
+
 
 protected:
     virtual double radiusFunction(const Eigen::ArrayXXd& data, const Eigen::Index rowIdx,
