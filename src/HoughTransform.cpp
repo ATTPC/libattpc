@@ -18,7 +18,7 @@ Eigen::ArrayXXd HoughTransform::findHoughSpace(const Eigen::ArrayXXd& data) cons
 
     Eigen::ArrayXXd result = Eigen::ArrayXXd::Zero(numBins, numBins);
 
-    #pragma omp parallel for
+
     for (int thetaIdx = 0; thetaIdx < numBins; thetaIdx++) {
         double theta = thetaIdx * thetaStep;
         // Precompute sin and cos here so they aren't done nrows times for each theta
@@ -51,7 +51,7 @@ double HoughTransform::findAngleFromBin(const Eigen::Index bin) const {
 }
 
 Eigen::Index HoughTransform::findBinFromAngle(const double angle) const {
-    return angle * numBins / M_PI;
+    return std::floor(angle * (numBins / M_PI));
 }
 
 }

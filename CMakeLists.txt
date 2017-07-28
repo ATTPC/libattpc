@@ -24,6 +24,7 @@ set(SRC_FILES
     src/LinearHoughTransform.cpp
     src/CircularHoughTransform.cpp
     src/metrics.cpp
+    src/HoughSpiralCleaner.cpp
 )
 
 add_library(attpc_clustering SHARED ${SRC_FILES})
@@ -35,6 +36,7 @@ set(TEST_SRC_FILES
     test/catch_main.cpp
     test/test_utilities.cpp
     test/test_metrics.cpp
+    test/test_LinearHoughTransform.cpp
 )
 
 add_executable(test_attpc_clustering EXCLUDE_FROM_ALL ${TEST_SRC_FILES})
