@@ -8,10 +8,8 @@ namespace attpc {
 namespace cleaning {
 
 CircularHoughTransform::CircularHoughTransform(const int numBins_, const int maxRadiusValue_, const int rowOffset_)
-: HoughTransform(numBins_, maxRadiusValue_)
-{
-    rowOffset = rowOffset_;
-}
+: HoughTransform(numBins_, maxRadiusValue_, rowOffset_)
+{}
 
 Eigen::Vector2d CircularHoughTransform::findCenter(const Eigen::ArrayXXd& data) const {
     Eigen::ArrayXXd houghSpace = findHoughSpace(data);

@@ -13,13 +13,13 @@ namespace cleaning {
 
 class HoughTransform {
 public:
-    HoughTransform(const int numBins_, const int maxRadiusValue_);
+    HoughTransform(const int numBins_, const int maxRadiusValue_, const int rowOffset_ = 0);
 
     Eigen::ArrayXXd findHoughSpace(const Eigen::ArrayXXd& data) const;
 
     virtual double findRadiusFromBin(const Eigen::Index bin) const;
     virtual Eigen::Index findBinFromRadius(const double radius) const;
-    
+
     virtual double findAngleFromBin(const Eigen::Index bin) const;
     virtual Eigen::Index findBinFromAngle(const double angle) const;
 

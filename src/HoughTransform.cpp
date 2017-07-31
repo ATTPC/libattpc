@@ -7,9 +7,10 @@
 namespace attpc {
 namespace cleaning {
 
-HoughTransform::HoughTransform(const int numBins_, const int maxRadiusValue_)
+HoughTransform::HoughTransform(const int numBins_, const int maxRadiusValue_, const int rowOffset_)
 : numBins(numBins_)
 , maxRadiusValue(maxRadiusValue_)
+, rowOffset(rowOffset_)
 {}
 
 Eigen::ArrayXXd HoughTransform::findHoughSpace(const Eigen::ArrayXXd& data) const {

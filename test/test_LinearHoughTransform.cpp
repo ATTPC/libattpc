@@ -69,9 +69,11 @@ TEST_CASE("Linear Hough transform finds lines", "[hough]") {
 
     SECTION("Can find one horizontal line") {
         const Eigen::Index numPts = 10;
-        Eigen::Array<double, numPts, 2> data {};
-        data.col(0).setLinSpaced(data.rows(), 0, data.rows() - 1);
-        data.col(1).setConstant(10);
+        Eigen::Array<double, Eigen::Dynamic, 2> data {};
+        for (Eigen::Index row = 0; row < data.rows(); ++row) {
+            data(row, 0) = row;
+            data(row, 1) = 10;
+        }
 
         CAPTURE(data);
 
