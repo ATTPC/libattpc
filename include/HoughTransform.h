@@ -19,8 +19,7 @@ public:
 
     virtual double findRadiusFromBin(const Eigen::Index bin) const;
     virtual Eigen::Index findBinFromRadius(const double radius) const;
-
-    // BUG: I think there's some numerical precision issues here
+    
     virtual double findAngleFromBin(const Eigen::Index bin) const;
     virtual Eigen::Index findBinFromAngle(const double angle) const;
 
