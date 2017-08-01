@@ -9,50 +9,61 @@ namespace cleaning {
 
 HoughTransform::HoughTransform(const int numBins_, const int maxRadiusValue_, const int rowOffset_)
 : numBins(numBins_)
-, maxRadiusValue(maxRadiusValue_)
 , rowOffset(rowOffset_)
+, minRadiusValue(-maxRadiusValue_)
+, maxRadiusValue(maxRadiusValue_)
+, minAngleValue(0)
+, maxAngleValue(M_PI)
 {}
 
 Eigen::ArrayXXd HoughTransform::findHoughSpace(const Eigen::ArrayXXd& data) const {
-    const double thetaStep = M_PI / numBins;  // Size of theta (angle) bins
-    const double minRadiusValue = -maxRadiusValue;
+    Eigen::ArrayXXd houghSpace = Eigen::ArrayXXd::Zero(numBins, numBins);
 
-    Eigen::ArrayXXd result = Eigen::ArrayXXd::Zero(numBins, numBins);
-
-
-    for (int thetaIdx = 0; thetaIdx < numBins; thetaIdx++) {
-        double theta = thetaIdx * thetaStep;
-        // Precompute sin and cos here so they aren't done nrows times for each theta
-        double cosTheta = std::cos(theta);
-        double sinTheta = std::sin(theta);
+    for (int angleBin = 0; angleBin < numBins; angleBin++) {
+        double angle = findAngleFromBin(angleBin);
+        // Precompute sin and cos here so they aren't done nrows times for each angle
+        double cosAngle = std::cos(angle);
+        double sinAngle = std::sin(angle);
 
         for (int xyz_idx = rowOffset; xyz_idx < data.rows(); xyz_idx++) {
-            double rad = radiusFunction(data, xyz_idx, cosTheta, sinTheta);
+            double rad = radiusFunction(data, xyz_idx, cosAngle, sinAngle);
             if (rad >= minRadiusValue && rad < maxRadiusValue) {
                 // Find and increment histogram/accumulator bin corresponding to rad
                 Eigen::Index radBin = findBinFromRadius(rad);
-                result(thetaIdx, radBin) += 1;  // TODO: Check if this is actually thread-safe...
+                houghSpace(angleBin, radBin) += 1;  // TODO: Check if this is actually thread-safe...
             }
         }
     }
 
-    return result;
+    return houghSpace;
 }
 
 double HoughTransform::findRadiusFromBin(const Eigen::Index bin) const {
-    return bin * 2 * maxRadiusValue / numBins - maxRadiusValue;
+    return findValue(bin, minRadiusValue, maxRadiusValue);
 }
 
 Eigen::Index HoughTransform::findBinFromRadius(const double radius) const {
-    return std::floor((radius + maxRadiusValue) * numBins / (2 * maxRadiusValue));
+    return findBin(radius, minRadiusValue, maxRadiusValue);
 }
 
 double HoughTransform::findAngleFromBin(const Eigen::Index bin) const {
-    return bin * M_PI / numBins;
+    return findValue(bin, minAngleValue, maxAngleValue);
 }
 
 Eigen::Index HoughTransform::findBinFromAngle(const double angle) const {
-    return std::floor(angle * (numBins / M_PI));
+    return findBin(angle, minAngleValue, maxAngleValue);
+}
+
+double HoughTransform::findBinSize(const double lowerBound, const double upperBound) const {
+    return (upperBound - lowerBound) / numBins;
+}
+
+Eigen::Index HoughTransform::findBin(const double value, const double lowerBound, const double upperBound) const {
+    return (value - lowerBound) / findBinSize(lowerBound, upperBound);
+}
+
+double HoughTransform::findValue(const Eigen::Index bin, const double lowerBound, const double upperBound) const {
+    return bin * findBinSize(lowerBound, upperBound) + lowerBound;
 }
 
 }

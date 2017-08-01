@@ -34,8 +34,8 @@ double CircularHoughTransform::radiusFunction(const Eigen::ArrayXXd& data, const
                                               const double costh, const double sinth) const {
     const double x1 = data(rowIdx, 0);
     const double y1 = data(rowIdx, 1);
-    const double x0 = data(rowIdx - rowOffset, 0);
-    const double y0 = data(rowIdx - rowOffset, 1);
+    const double x0 = data(rowIdx - getRowOffset(), 0);
+    const double y0 = data(rowIdx - getRowOffset(), 1);
 
     const double numer = (x1*x1 - x0*x0) + (y1*y1 - y0*y0);
     const double denom = 2 * ((x1 - x0) * costh + (y1 - y0) * sinth);

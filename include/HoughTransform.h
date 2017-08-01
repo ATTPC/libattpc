@@ -17,20 +17,38 @@ public:
 
     Eigen::ArrayXXd findHoughSpace(const Eigen::ArrayXXd& data) const;
 
-    virtual double findRadiusFromBin(const Eigen::Index bin) const;
-    virtual Eigen::Index findBinFromRadius(const double radius) const;
+    double findRadiusFromBin(const Eigen::Index bin) const;
+    Eigen::Index findBinFromRadius(const double radius) const;
 
-    virtual double findAngleFromBin(const Eigen::Index bin) const;
-    virtual Eigen::Index findBinFromAngle(const double angle) const;
+    double findAngleFromBin(const Eigen::Index bin) const;
+    Eigen::Index findBinFromAngle(const double angle) const;
 
+    int getNumBins() const { return numBins; }
+    int getRowOffset() const { return rowOffset; }
+    double getAngleBinSize() const { return findBinSize(minAngleValue, maxAngleValue); }
+    double getRadiusBinSize() const { return findBinSize(minRadiusValue, maxRadiusValue); }
+    double getMinRadiusValue() const { return minRadiusValue; }
+    double getMaxRadiusValue() const { return maxRadiusValue; }
+    double getMinAngleValue() const { return minAngleValue; }
+    double getMaxAngleValue() const { return maxAngleValue; }
 
 protected:
     virtual double radiusFunction(const Eigen::ArrayXXd& data, const Eigen::Index rowIdx,
                                   const double costh, const double sinth) const = 0;
 
+private:
+    double findBinSize(const double lowerBound, const double upperBound) const;
+    Eigen::Index findBin(const double value, const double lowerBound, const double upperBound) const;
+    double findValue(const Eigen::Index bin, const double lowerBound, const double upperBound) const;
+
     int numBins;
-    int maxRadiusValue;
     int rowOffset;
+
+    double minRadiusValue;
+    double maxRadiusValue;
+
+    double minAngleValue;
+    double maxAngleValue;
 };
 
 }
