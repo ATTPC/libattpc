@@ -46,3 +46,10 @@ set(TEST_SRC_FILES
 add_executable(test_attpc_cleaning EXCLUDE_FROM_ALL ${TEST_SRC_FILES})
 target_link_libraries(test_attpc_cleaning Catch attpc_cleaning)
 set_property(TARGET test_attpc_cleaning PROPERTY CXX_STANDARD 14)
+
+# Set up target for documentation
+
+add_custom_target(doc
+    COMMAND doxygen
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc
+)
