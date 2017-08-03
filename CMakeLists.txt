@@ -27,11 +27,15 @@ set(SRC_FILES
     src/HoughSpiralCleaner.cpp
 )
 
-add_library(attpc_clustering SHARED ${SRC_FILES})
-target_link_libraries(attpc_clustering ${PCL_LIBRARIES})
-set_property(TARGET attpc_clustering PROPERTY CXX_STANDARD 14)
+add_library(attpc_cleaning SHARED ${SRC_FILES})
+target_link_libraries(attpc_cleaning ${PCL_LIBRARIES})
+set_property(TARGET attpc_cleaning PROPERTY CXX_STANDARD 14)
 
 # Set up unit tests
+
+add_library(Catch INTERFACE)
+target_include_directories(Catch INTERFACE libs/catch)
+
 set(TEST_SRC_FILES
     test/catch_main.cpp
     test/test_utilities.cpp
@@ -39,6 +43,6 @@ set(TEST_SRC_FILES
     test/test_LinearHoughTransform.cpp
 )
 
-add_executable(test_attpc_clustering EXCLUDE_FROM_ALL ${TEST_SRC_FILES})
-target_link_libraries(test_attpc_clustering attpc_clustering)
-set_property(TARGET test_attpc_clustering PROPERTY CXX_STANDARD 14)
+add_executable(test_attpc_cleaning EXCLUDE_FROM_ALL ${TEST_SRC_FILES})
+target_link_libraries(test_attpc_cleaning Catch attpc_cleaning)
+set_property(TARGET test_attpc_cleaning PROPERTY CXX_STANDARD 14)
