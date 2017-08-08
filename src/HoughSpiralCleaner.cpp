@@ -7,9 +7,11 @@
 namespace attpc {
 namespace cleaning {
 
-HoughSpiralCleaner::HoughSpiralCleaner()
-: numAngleBinsToReduce(5)
-, houghSpaceSliceSize(5)
+HoughSpiralCleaner::HoughSpiralCleaner(const HoughSpiralCleanerConfig& config)
+: numAngleBinsToReduce(config.numAngleBinsToReduce)
+, houghSpaceSliceSize(config.houghSpaceSliceSize)
+, linHough(config.linearHoughNumBins, config.linearHoughMaxRadius)
+, circHough(config.circularHoughNumBins, config.circularHoughMaxRadius)
 {}
 
 Eigen::ArrayXd HoughSpiralCleaner::findArcLength(const Eigen::ArrayXXd& xy, const Eigen::Vector2d center) const {
@@ -23,21 +25,26 @@ Eigen::ArrayXd HoughSpiralCleaner::findArcLength(const Eigen::ArrayXXd& xy, cons
 }
 
 Eigen::Index HoughSpiralCleaner::findMaxAngleBin(const Eigen::ArrayXXd& houghSpace) const {
-    // Create a flattened 1D view of the Hough space
-    const Eigen::Map<const Eigen::ArrayXd> flatHoughSpace (houghSpace.data(), houghSpace.size());
-
     // Find the ordering of indices that would sort the array
-    std::vector<Eigen::Index> flatIndices (flatHoughSpace.size());
-    std::iota(flatIndices.begin(), flatIndices.end(), 0);
-    std::sort(flatIndices.begin(), flatIndices.end(), [&flatHoughSpace](auto idxA, auto idxB) {
-        return flatHoughSpace[idxA] < flatHoughSpace[idxB];
+    using coefArrayType = Eigen::Array<Eigen::Index, 2, 1>;
+    std::vector<coefArrayType> indices;
+    for (Eigen::Index i = 0; i < houghSpace.rows(); ++i) {
+        for (Eigen::Index j = 0; j < houghSpace.cols(); ++j) {
+            indices.emplace_back(i, j);
+        }
+    }
+
+    std::sort(indices.begin(), indices.end(), [&houghSpace](auto idxA, auto idxB) {
+        return houghSpace(idxA(0), idxA(1)) < houghSpace(idxB(0), idxB(1));
     });
 
     // Find the mean bin from the last few elements of the sorted list
-    double binTotal = std::accumulate(flatIndices.end() - numAngleBinsToReduce, flatIndices.end(), 0);
-    Eigen::Index meanBin = static_cast<Eigen::Index>(std::floor(binTotal / numAngleBinsToReduce));
+    // The zero element must be declared separately for std::accumulate to work
+    const coefArrayType zeroBin = coefArrayType::Zero(2, 1);
+    coefArrayType binTotal = std::accumulate(indices.end() - numAngleBinsToReduce, indices.end(), zeroBin);
+    coefArrayType meanBin = Eigen::floor(binTotal / numAngleBinsToReduce);
 
-    return meanBin;
+    return meanBin(0);
 }
 
 Eigen::ArrayXd HoughSpiralCleaner::findMaxAngleSlice(const Eigen::ArrayXXd& houghSpace,

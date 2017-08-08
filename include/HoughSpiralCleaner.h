@@ -9,15 +9,26 @@
 #include <vector>
 #include <algorithm>
 #include <numeric>
+#include <array>
 #include "CircularHoughTransform.h"
 #include "LinearHoughTransform.h"
 
 namespace attpc {
 namespace cleaning {
 
+class HoughSpiralCleanerConfig {
+public:
+    int linearHoughNumBins;
+    int linearHoughMaxRadius;
+    int circularHoughNumBins;
+    int circularHoughMaxRadius;
+    int numAngleBinsToReduce;
+    int houghSpaceSliceSize;
+};
+
 class HoughSpiralCleaner {
 public:
-    HoughSpiralCleaner();
+    HoughSpiralCleaner(const HoughSpiralCleanerConfig& config);
 
     Eigen::ArrayXd findArcLength(const Eigen::ArrayXXd& xy, const Eigen::Vector2d center) const;
     Eigen::Index findMaxAngleBin(const Eigen::ArrayXXd& houghSpace) const;
@@ -26,6 +37,9 @@ public:
 private:
     int numAngleBinsToReduce;
     int houghSpaceSliceSize;
+
+    LinearHoughTransform linHough;
+    CircularHoughTransform circHough;
 };
 
 }
