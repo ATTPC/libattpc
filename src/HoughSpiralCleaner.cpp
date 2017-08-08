@@ -12,7 +12,7 @@ HoughSpiralCleaner::HoughSpiralCleaner()
 , houghSpaceSliceSize(5)
 {}
 
-Eigen::ArrayXd HoughSpiralCleaner::findArcLength(const Eigen::Array2Xd& xy, const Eigen::Vector2d center) const {
+Eigen::ArrayXd HoughSpiralCleaner::findArcLength(const Eigen::ArrayXXd& xy, const Eigen::Vector2d center) const {
     const Eigen::ArrayXd xOffset = xy.col(0) - center(0);
     const Eigen::ArrayXd yOffset = xy.col(1) - center(1);
 

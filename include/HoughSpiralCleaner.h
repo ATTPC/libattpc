@@ -19,7 +19,7 @@ class HoughSpiralCleaner {
 public:
     HoughSpiralCleaner();
 
-    Eigen::ArrayXd findArcLength(const Eigen::Array2Xd& xy, const Eigen::Vector2d center) const;
+    Eigen::ArrayXd findArcLength(const Eigen::ArrayXXd& xy, const Eigen::Vector2d center) const;
     Eigen::Index findMaxAngleBin(const Eigen::ArrayXXd& houghSpace) const;
     Eigen::ArrayXd findMaxAngleSlice(const Eigen::ArrayXXd& houghSpace, const Eigen::Index maxAngleBin) const;
 
