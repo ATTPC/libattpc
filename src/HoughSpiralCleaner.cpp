@@ -49,7 +49,7 @@ Eigen::Index HoughSpiralCleaner::findMaxAngleBin(const Eigen::ArrayXXd& houghSpa
 
 Eigen::ArrayXd HoughSpiralCleaner::findMaxAngleSlice(const Eigen::ArrayXXd& houghSpace,
                                                      const Eigen::Index maxAngleBin) const {
-    return houghSpace.block(maxAngleBin - houghSpaceSliceSize, 0, 2 * houghSpaceSliceSize, houghSpace.rows())
+    return houghSpace.block(maxAngleBin - houghSpaceSliceSize, 0, 2 * houghSpaceSliceSize, houghSpace.cols())
                      .colwise().sum();
 }
 

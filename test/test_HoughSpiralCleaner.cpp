@@ -120,3 +120,69 @@ TEST_CASE("HoughSpiralCleaner can find max angle bin in Hough space", "[houghcle
         REQUIRE(foundBin == expectedBin);
     }
 }
+
+TEST_CASE("HoughSpiralCleaner can extract angular slice", "[houghcleaner]") {
+    auto config = makeConfig();
+    config.houghSpaceSliceSize = 5;
+    attpc::cleaning::HoughSpiralCleaner cleaner {config};
+
+    Eigen::ArrayXXd testData = Eigen::ArrayXXd::Zero(config.linearHoughNumBins, config.linearHoughNumBins);
+
+    SECTION("Slice is correct when only one angular bin is nonzero") {
+        const Eigen::Index targetRow = config.linearHoughNumBins * 0.75;
+        testData.row(targetRow) = 100;
+
+        Eigen::ArrayXd slice = cleaner.findMaxAngleSlice(testData, targetRow);
+
+        SECTION("Dimensions of extracted slice are correct") {
+            REQUIRE(slice.size() == config.linearHoughNumBins);
+        }
+
+        SECTION("Values in extracted slice are correct") {
+            Eigen::ArrayXd expected = testData.row(targetRow);
+            REQUIRE((slice == expected).all());
+        }
+    }
+
+    SECTION("Slice excludes values outside the slice region") {
+        const Eigen::Index targetRow = config.linearHoughNumBins * 0.75;
+        const Eigen::Index otherRow = config.linearHoughNumBins * 0.25;
+        const double targetVal = 100;
+        const double otherVal = 50;
+
+        testData.row(targetRow) = targetVal;
+        testData.row(otherRow) = otherVal;
+
+        Eigen::ArrayXd slice = cleaner.findMaxAngleSlice(testData, targetRow);
+
+        SECTION("Dimensions of extracted slice are correct") {
+            REQUIRE(slice.size() == config.linearHoughNumBins);
+        }
+
+        SECTION("Values in extracted slice are correct") {
+            Eigen::ArrayXd expected = testData.row(targetRow);
+            REQUIRE((slice == expected).all());
+        }
+    }
+
+    SECTION("Slice sums across slice region when multiple columns are nonzero") {
+        const Eigen::Index targetRow = config.linearHoughNumBins * 0.75;
+        const double targetVal = 100;
+
+        testData.row(targetRow - 1) = targetVal;
+        testData.row(targetRow) = targetVal;
+        testData.row(targetRow + 1) = targetVal;
+
+        Eigen::ArrayXd slice = cleaner.findMaxAngleSlice(testData, targetRow);
+
+        SECTION("Dimensions of extracted slice are correct") {
+            REQUIRE(slice.size() == config.linearHoughNumBins);
+        }
+
+        SECTION("Values in extracted slice are correct") {
+            Eigen::ArrayXd expected = testData.row(targetRow) * 3;
+            REQUIRE((slice == expected).all());
+        }
+    }
+
+}
