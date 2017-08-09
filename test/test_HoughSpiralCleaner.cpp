@@ -28,6 +28,7 @@ attpc::cleaning::HoughSpiralCleanerConfig makeConfig() {
     config.circularHoughMaxRadius = 20;
     config.numAngleBinsToReduce = 1;
     config.houghSpaceSliceSize = 5;
+    config.peakWidth = 5;
 
     return config;
 }
@@ -185,4 +186,29 @@ TEST_CASE("HoughSpiralCleaner can extract angular slice", "[houghcleaner]") {
         }
     }
 
+}
+
+TEST_CASE("HoughSpiralCleaner can find peaks in Hough space slice", "[houghcleaner]") {
+    auto config = makeConfig();
+    attpc::cleaning::HoughSpiralCleaner cleaner {config};
+
+    Eigen::ArrayXd testData = Eigen::ArrayXd::Zero(config.linearHoughNumBins);
+
+    SECTION("Can find one asymmetric peak") {
+        testData.segment(10, 5) << 5, 50, 20, 10, 5;
+
+        const std::vector<double> foundPeaks = cleaner.findPeakRadiusBins(testData);
+
+        SECTION("Found only one peak") {
+            REQUIRE(foundPeaks.size() == 1);
+        }
+
+        SECTION("Peak was at correct location") {
+            const Eigen::VectorXd peakValues = testData.segment(11 - config.peakWidth, 2*config.peakWidth + 1);
+            const Eigen::VectorXd peakIndices =
+                Eigen::VectorXd::LinSpaced(2 * config.peakWidth + 1, 11 - config.peakWidth, 11 + config.peakWidth);
+            const double expectedValue = peakValues.dot(peakIndices) / peakValues.sum();
+            REQUIRE(foundPeaks.at(0) == expectedValue);
+        }
+    }
 }

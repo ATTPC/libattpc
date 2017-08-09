@@ -10,6 +10,7 @@ namespace cleaning {
 HoughSpiralCleaner::HoughSpiralCleaner(const HoughSpiralCleanerConfig& config)
 : numAngleBinsToReduce(config.numAngleBinsToReduce)
 , houghSpaceSliceSize(config.houghSpaceSliceSize)
+, peakWidth(config.peakWidth)
 , linHough(config.linearHoughNumBins, config.linearHoughMaxRadius)
 , circHough(config.circularHoughNumBins, config.circularHoughMaxRadius)
 {}
@@ -51,6 +52,24 @@ Eigen::ArrayXd HoughSpiralCleaner::findMaxAngleSlice(const Eigen::ArrayXXd& houg
                                                      const Eigen::Index maxAngleBin) const {
     return houghSpace.block(maxAngleBin - houghSpaceSliceSize, 0, 2 * houghSpaceSliceSize, houghSpace.cols())
                      .colwise().sum();
+}
+
+std::vector<double> HoughSpiralCleaner::findPeakRadiusBins(const Eigen::ArrayXd& houghSlice) const {
+    const std::vector<Eigen::Index> maxLocs = findPeakLocations(houghSlice, 2);
+    std::vector<double> peakCtrs;
+
+    for (const Eigen::Index pkIdx : maxLocs) {
+        const Eigen::Index firstPt = std::max(pkIdx - peakWidth, Eigen::Index{0});
+        const Eigen::Index lastPt = std::max(pkIdx + peakWidth, houghSlice.rows() - 1);
+
+        const Eigen::VectorXd positions = Eigen::VectorXd::LinSpaced(lastPt - firstPt + 1, firstPt, lastPt);
+        const Eigen::VectorXd values = houghSlice.segment(firstPt, lastPt - firstPt + 1);
+        const double peakCtrOfGrav = positions.dot(values) / values.sum();
+
+        peakCtrs.push_back(peakCtrOfGrav);
+    }
+
+    return peakCtrs;
 }
 
 }
