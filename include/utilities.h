@@ -5,6 +5,8 @@
 #include <Eigen/Core>
 #include <memory>
 #include <functional>
+#include <algorithm>
+#include <numeric>
 
 namespace attpc {
 namespace cleaning {
@@ -29,6 +31,39 @@ Eigen::MatrixXf calculateDistanceMatrix(std::vector<T> const& points, const std:
     }
 
     return result;
+}
+
+template <class Derived>
+std::vector<Eigen::Index> findPeakLocations(const Eigen::DenseBase<Derived>& data, const Eigen::Index order = 1) {
+    std::vector<Eigen::Index> peakLocs;
+
+    for (Eigen::Index dataIdx = 0; dataIdx < data.rows(); ++dataIdx) {
+        const auto currentPointValue = data(dataIdx);
+        if (currentPointValue > 0) {  // Exclude zero values so the baseline doesn't count as a peak
+            // firstPt and lastPt are set here to enforce array bounds
+            const Eigen::Index firstPt = std::max(dataIdx - order, Eigen::Index{0});
+            const Eigen::Index lastPt = std::min(dataIdx + order, data.rows() - 1);
+
+            bool isPeak = true;
+            for (Eigen::Index offsetIdx = firstPt; offsetIdx <= lastPt; ++offsetIdx) {
+                isPeak &= data(offsetIdx) <= currentPointValue;
+            }
+            if (isPeak) {
+                peakLocs.push_back(dataIdx);
+            }
+        }
+    }
+
+    // Filter out duplicate peaks from flat tops
+    auto newEndIter = std::remove_if(peakLocs.begin(), peakLocs.end(), [&data](auto index) {
+        // The first part of this predicate prevents us from requesting data(-1)
+        // Also, if index zero is a peak, it should be kept since it can't be a later
+        // part of a flat-top peak.
+        return (index != 0) && (data(index) == data(index - 1));
+    });
+    peakLocs.erase(newEndIter, peakLocs.end());
+
+    return peakLocs;
 }
 
 }
