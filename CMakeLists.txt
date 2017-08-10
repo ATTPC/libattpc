@@ -4,7 +4,7 @@ project(attpc_cleaning)
 
 include(CMakeToolsHelpers OPTIONAL)
 find_package(PCL 1.2 REQUIRED COMPONENTS common kdtree io)
-include_directories(${PCL_INCLUDE_DIRS})
+include_directories(SYSTEM ${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
@@ -14,12 +14,20 @@ if (OPENMP_FOUND)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
+# Set up warnings
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything -Wno-c++98-compat -Wno-padded -Wno-weak-vtables -Wno-exit-time-destructors")
+elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra -Wfloat-equal -Wpointer-arith -Wcast-qual")
+endif()
+
 include_directories(include)
 
 set(SRC_FILES
     src/Cluster.cpp
     src/utilities.cpp
     src/HTripletClustering.cpp
+    src/HoughSpace.cpp
     src/HoughTransform.cpp
     src/LinearHoughTransform.cpp
     src/CircularHoughTransform.cpp

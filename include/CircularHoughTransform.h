@@ -12,7 +12,7 @@ namespace cleaning {
 
 class CircularHoughTransform : public HoughTransform {
 public:
-    CircularHoughTransform(const int numBins_, const int maxRadiusValue_, const int rowOffset_ = 5);
+    CircularHoughTransform(const Eigen::Index numBins_, const double maxRadiusValue_, const Eigen::Index rowOffset_ = 5);
 
     Eigen::Vector2d findCenter(const Eigen::ArrayXXd& data) const;
 

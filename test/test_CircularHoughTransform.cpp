@@ -34,8 +34,7 @@ TEST_CASE("Circular Hough fails gracefully with too few points") {
 
     attpc::cleaning::CircularHoughTransform trans {numBins, maxRadius, rowOffset};
 
-    Eigen::ArrayXXd houghSpace;
-    REQUIRE_NOTHROW(houghSpace = trans.findHoughSpace(data));
+    attpc::cleaning::HoughSpace houghSpace = trans.findHoughSpace(data);
 
-    REQUIRE(houghSpace.maxCoeff() == 0);  // Expect that no points were processed in this case.
+    REQUIRE(houghSpace.findMaximum() == 0);  // Expect that no points were processed in this case.
 }

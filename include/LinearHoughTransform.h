@@ -13,7 +13,7 @@ namespace cleaning {
 
 class LinearHoughTransform : public HoughTransform {
 public:
-    LinearHoughTransform(const int numBins_, const int maxRadiusValue_);
+    LinearHoughTransform(const Eigen::Index numBins_, const double maxRadiusValue_);
 
 protected:
     double radiusFunction(const Eigen::ArrayXXd& data, const Eigen::Index rowIdx, const double costh,

@@ -7,20 +7,20 @@
 namespace attpc {
 namespace cleaning {
 
-CircularHoughTransform::CircularHoughTransform(const int numBins_, const int maxRadiusValue_, const int rowOffset_)
+CircularHoughTransform::CircularHoughTransform(const Eigen::Index numBins_, const double maxRadiusValue_, const Eigen::Index rowOffset_)
 : HoughTransform(numBins_, maxRadiusValue_, rowOffset_)
 {}
 
 Eigen::Vector2d CircularHoughTransform::findCenter(const Eigen::ArrayXXd& data) const {
-    Eigen::ArrayXXd houghSpace = findHoughSpace(data);
+    HoughSpace hspace = findHoughSpace(data);
 
     Eigen::Index maxRow = 0;
     Eigen::Index maxCol = 0;
-    houghSpace.maxCoeff(&maxRow, &maxCol);
+    hspace.findMaximum(maxRow, maxCol);
 
     // Convert max bin to angle, radius values
-    const double maxAngle = findAngleFromBin(maxRow);
-    const double maxRadius = findRadiusFromBin(maxCol);
+    const double maxAngle = hspace.findAngleFromBin(maxRow);
+    const double maxRadius = hspace.findRadiusFromBin(maxCol);
 
     // Convert angle and radius values to positions in the data space
     Eigen::Vector2d center;

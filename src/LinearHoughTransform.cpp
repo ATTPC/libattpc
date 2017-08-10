@@ -8,7 +8,7 @@
 namespace attpc {
 namespace cleaning {
 
-LinearHoughTransform::LinearHoughTransform(const int numBins_, const int maxRadiusValue_)
+LinearHoughTransform::LinearHoughTransform(const Eigen::Index numBins_, const double maxRadiusValue_)
 : HoughTransform(numBins_, maxRadiusValue_)
 {}
 

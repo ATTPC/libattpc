@@ -12,6 +12,7 @@
 #include <array>
 #include "CircularHoughTransform.h"
 #include "LinearHoughTransform.h"
+#include "HoughSpace.h"
 #include "utilities.h"
 
 namespace attpc {
@@ -19,13 +20,13 @@ namespace cleaning {
 
 class HoughSpiralCleanerConfig {
 public:
-    int linearHoughNumBins;
-    int linearHoughMaxRadius;
-    int circularHoughNumBins;
-    int circularHoughMaxRadius;
-    int numAngleBinsToReduce;
-    int houghSpaceSliceSize;
-    int peakWidth;
+    Eigen::Index linearHoughNumBins;
+    double linearHoughMaxRadius;
+    Eigen::Index circularHoughNumBins;
+    double circularHoughMaxRadius;
+    Eigen::Index numAngleBinsToReduce;
+    Eigen::Index houghSpaceSliceSize;
+    Eigen::Index peakWidth;
 };
 
 class HoughSpiralCleaner {
@@ -33,14 +34,15 @@ public:
     HoughSpiralCleaner(const HoughSpiralCleanerConfig& config);
 
     Eigen::ArrayXd findArcLength(const Eigen::ArrayXXd& xy, const Eigen::Vector2d center) const;
-    Eigen::Index findMaxAngleBin(const Eigen::ArrayXXd& houghSpace) const;
-    Eigen::ArrayXd findMaxAngleSlice(const Eigen::ArrayXXd& houghSpace, const Eigen::Index maxAngleBin) const;
+    Eigen::Index findMaxAngleBin(const HoughSpace& houghSpace) const;
+    Eigen::Array<HoughSpace::ScalarType, Eigen::Dynamic, Eigen::Dynamic>
+        findMaxAngleSlice(const HoughSpace& houghSpace, const Eigen::Index maxAngleBin) const;
     std::vector<double> findPeakRadiusBins(const Eigen::ArrayXd& houghSlice) const;
 
 private:
-    int numAngleBinsToReduce;
-    int houghSpaceSliceSize;
-    int peakWidth;
+    Eigen::Index numAngleBinsToReduce;
+    Eigen::Index houghSpaceSliceSize;
+    Eigen::Index peakWidth;
 
     LinearHoughTransform linHough;
     CircularHoughTransform circHough;

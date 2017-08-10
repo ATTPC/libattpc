@@ -25,18 +25,18 @@ Eigen::ArrayXd HoughSpiralCleaner::findArcLength(const Eigen::ArrayXXd& xy, cons
     return rads * thetas;
 }
 
-Eigen::Index HoughSpiralCleaner::findMaxAngleBin(const Eigen::ArrayXXd& houghSpace) const {
+Eigen::Index HoughSpiralCleaner::findMaxAngleBin(const HoughSpace& houghSpace) const {
     // Find the ordering of indices that would sort the array
     using coefArrayType = Eigen::Array<Eigen::Index, 2, 1>;
     std::vector<coefArrayType> indices;
-    for (Eigen::Index i = 0; i < houghSpace.rows(); ++i) {
-        for (Eigen::Index j = 0; j < houghSpace.cols(); ++j) {
+    for (Eigen::Index i = 0; i < houghSpace.getNumBins(); ++i) {
+        for (Eigen::Index j = 0; j < houghSpace.getNumBins(); ++j) {
             indices.emplace_back(i, j);
         }
     }
 
     std::sort(indices.begin(), indices.end(), [&houghSpace](auto idxA, auto idxB) {
-        return houghSpace(idxA(0), idxA(1)) < houghSpace(idxB(0), idxB(1));
+        return houghSpace.getValueAtBin(idxA(0), idxA(1)) < houghSpace.getValueAtBin(idxB(0), idxB(1));
     });
 
     // Find the mean bin from the last few elements of the sorted list
@@ -48,9 +48,9 @@ Eigen::Index HoughSpiralCleaner::findMaxAngleBin(const Eigen::ArrayXXd& houghSpa
     return meanBin(0);
 }
 
-Eigen::ArrayXd HoughSpiralCleaner::findMaxAngleSlice(const Eigen::ArrayXXd& houghSpace,
-                                                     const Eigen::Index maxAngleBin) const {
-    return houghSpace.block(maxAngleBin - houghSpaceSliceSize, 0, 2 * houghSpaceSliceSize, houghSpace.cols())
+Eigen::Array<HoughSpace::ScalarType, Eigen::Dynamic, Eigen::Dynamic>
+    HoughSpiralCleaner::findMaxAngleSlice(const HoughSpace& houghSpace, const Eigen::Index maxAngleBin) const {
+    return houghSpace.getAngularSlice(maxAngleBin - houghSpaceSliceSize, 2 * houghSpaceSliceSize)
                      .colwise().sum();
 }
 
