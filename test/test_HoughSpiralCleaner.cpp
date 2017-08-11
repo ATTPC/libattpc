@@ -30,6 +30,7 @@ attpc::cleaning::HoughSpiralCleanerConfig makeConfig() {
     config.numAngleBinsToReduce = 1;
     config.houghSpaceSliceSize = 5;
     config.peakWidth = 5;
+    config.minPointsPerLine = 5;
 
     return config;
 }
@@ -55,6 +56,31 @@ TEST_CASE("HoughSpiralCleaner can find arc length of circle segment", "[houghcle
 
     SECTION("Last point has arc length R*Pi/2") {
         REQUIRE(arclenResult(arclenResult.size() - 1) == Approx(radius * maxAngle));
+    }
+}
+
+TEST_CASE("HoughSpiralCleaner can perform a Hough transform", "[houghcleaner]") {
+    const Eigen::Index numPts = 10;
+    const double yValue = 10;
+    Eigen::ArrayX2d data {numPts, 2};
+    data.col(0).setLinSpaced(-10, 10);
+    data.col(1).setConstant(yValue);
+
+    auto config = makeConfig();
+    attpc::cleaning::HoughSpiralCleaner cleaner {config};
+
+    attpc::cleaning::HoughSpace hspace = cleaner.findHoughSpace(data.col(0), data.col(1));
+
+    Eigen::Index maxAngleBin, maxRadBin;
+    const auto maxValue = hspace.findMaximum(maxAngleBin, maxRadBin);
+
+    SECTION("Max in Hough space has the right amplitude") {
+        REQUIRE(maxValue == numPts);
+    }
+
+    SECTION("Max in Hough space is in the right location") {
+        CHECK(maxAngleBin == Approx(hspace.findBinFromAngle(M_PI / 2)).margin(1.1));
+        CHECK(maxRadBin == Approx(hspace.findBinFromRadius(yValue)).margin(1.1));
     }
 }
 
