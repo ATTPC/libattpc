@@ -124,24 +124,29 @@ TEST_CASE("HoughSpiralCleaner can find max angle bin in Hough space", "[houghcle
 }
 
 TEST_CASE("HoughSpiralCleaner can extract angular slice", "[houghcleaner]") {
+    using attpc::cleaning::HoughSpiralCleaner;
+    using attpc::cleaning::HoughSpace;
+
     auto config = makeConfig();
     config.houghSpaceSliceSize = 5;
-    attpc::cleaning::HoughSpiralCleaner cleaner {config};
+    HoughSpiralCleaner cleaner {config};
 
-    attpc::cleaning::HoughSpace testData {config.linearHoughNumBins, config.linearHoughMaxRadius};
+    HoughSpace testData {config.linearHoughNumBins, config.linearHoughMaxRadius};
 
     SECTION("Slice is correct when only one angular bin is nonzero") {
         const Eigen::Index targetAngleBin = static_cast<Eigen::Index>(config.linearHoughNumBins * 0.75);
         testData.getAngularSlice(targetAngleBin) = 100;
 
-        auto slice = cleaner.findMaxAngleSlice(testData, targetAngleBin);
+        HoughSpiralCleaner::AngleSliceArrayType slice = cleaner.findMaxAngleSlice(testData, targetAngleBin);
 
         SECTION("Dimensions of extracted slice are correct") {
             REQUIRE(slice.size() == config.linearHoughNumBins);
         }
 
         SECTION("Values in extracted slice are correct") {
-            auto expected = testData.getAngularSlice(targetAngleBin);
+            Eigen::Array<HoughSpace::ScalarType, Eigen::Dynamic, Eigen::Dynamic> expected =
+                testData.getAngularSlice(targetAngleBin);
+            expected.resize(testData.getNumBins(), 1);
             REQUIRE((slice == expected).all());
         }
     }
@@ -155,14 +160,16 @@ TEST_CASE("HoughSpiralCleaner can extract angular slice", "[houghcleaner]") {
         testData.getAngularSlice(targetAngleBin) = targetVal;
         testData.getAngularSlice(otherAngleBin) = otherVal;
 
-        auto slice = cleaner.findMaxAngleSlice(testData, targetAngleBin);
+        HoughSpiralCleaner::AngleSliceArrayType slice = cleaner.findMaxAngleSlice(testData, targetAngleBin);
 
         SECTION("Dimensions of extracted slice are correct") {
             REQUIRE(slice.size() == config.linearHoughNumBins);
         }
 
         SECTION("Values in extracted slice are correct") {
-            auto expected = testData.getAngularSlice(targetAngleBin);
+            Eigen::Array<HoughSpace::ScalarType, Eigen::Dynamic, Eigen::Dynamic> expected =
+                testData.getAngularSlice(targetAngleBin);
+            expected.resize(testData.getNumBins(), 1);
             REQUIRE((slice == expected).all());
         }
     }
@@ -175,14 +182,16 @@ TEST_CASE("HoughSpiralCleaner can extract angular slice", "[houghcleaner]") {
         testData.getAngularSlice(targetAngleBin) = targetVal;
         testData.getAngularSlice(targetAngleBin + 1) = targetVal;
 
-        auto slice = cleaner.findMaxAngleSlice(testData, targetAngleBin);
+        HoughSpiralCleaner::AngleSliceArrayType slice = cleaner.findMaxAngleSlice(testData, targetAngleBin);
 
         SECTION("Dimensions of extracted slice are correct") {
             REQUIRE(slice.size() == config.linearHoughNumBins);
         }
 
         SECTION("Values in extracted slice are correct") {
-            auto expected = testData.getAngularSlice(targetAngleBin) * 3;
+            Eigen::Array<HoughSpace::ScalarType, Eigen::Dynamic, Eigen::Dynamic> expected =
+                testData.getAngularSlice(targetAngleBin) * 3;
+            expected.resize(testData.getNumBins(), 1);
             REQUIRE((slice == expected).all());
         }
     }
@@ -190,10 +199,12 @@ TEST_CASE("HoughSpiralCleaner can extract angular slice", "[houghcleaner]") {
 }
 
 TEST_CASE("HoughSpiralCleaner can find peaks in Hough space slice", "[houghcleaner]") {
-    auto config = makeConfig();
-    attpc::cleaning::HoughSpiralCleaner cleaner {config};
+    using attpc::cleaning::HoughSpiralCleaner;
 
-    Eigen::ArrayXd testData = Eigen::ArrayXd::Zero(config.linearHoughNumBins);
+    auto config = makeConfig();
+    HoughSpiralCleaner cleaner {config};
+
+    HoughSpiralCleaner::AngleSliceArrayType testData = decltype(testData)::Zero(config.linearHoughNumBins);
 
     SECTION("Can find one asymmetric peak") {
         testData.segment(10, 5) << 5, 50, 20, 10, 5;
@@ -205,11 +216,11 @@ TEST_CASE("HoughSpiralCleaner can find peaks in Hough space slice", "[houghclean
         }
 
         SECTION("Peak was at correct location") {
-            const Eigen::VectorXd peakValues = testData.segment(11 - config.peakWidth, 2*config.peakWidth + 1);
+            const Eigen::VectorXd peakValues = testData.segment(11 - config.peakWidth, 2*config.peakWidth + 1).cast<double>();
             const Eigen::VectorXd peakIndices =
                 Eigen::VectorXd::LinSpaced(2 * config.peakWidth + 1, 11 - config.peakWidth, 11 + config.peakWidth);
             const double expectedValue = peakValues.dot(peakIndices) / peakValues.sum();
-            REQUIRE(foundPeaks.at(0) == expectedValue);
+            REQUIRE(foundPeaks.at(0) == Approx(expectedValue));
         }
     }
 }

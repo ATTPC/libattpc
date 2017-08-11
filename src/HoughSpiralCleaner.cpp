@@ -48,13 +48,18 @@ Eigen::Index HoughSpiralCleaner::findMaxAngleBin(const HoughSpace& houghSpace) c
     return meanBin(0);
 }
 
-Eigen::Array<HoughSpace::ScalarType, Eigen::Dynamic, Eigen::Dynamic>
-    HoughSpiralCleaner::findMaxAngleSlice(const HoughSpace& houghSpace, const Eigen::Index maxAngleBin) const {
-    return houghSpace.getAngularSlice(maxAngleBin - houghSpaceSliceSize, 2 * houghSpaceSliceSize)
-                     .colwise().sum();
+auto HoughSpiralCleaner::findMaxAngleSlice(const HoughSpace& houghSpace, const Eigen::Index maxAngleBin) const -> AngleSliceArrayType {
+    HoughSpace::ConstDataBlockType block = houghSpace.getAngularSlice(maxAngleBin - houghSpaceSliceSize, 2 * houghSpaceSliceSize);
+
+    // HACK: Make sure the shape of the chunk is what's expected. This might not be the case if the order of the
+    // dimensions was changed in the internal matrix of the HoughSpace class. This should probably be done in a
+    // less ugly way.
+    assert((block.rows() == 2 * houghSpaceSliceSize) && (block.cols() == houghSpace.getNumBins()));
+
+    return block.colwise().sum();
 }
 
-std::vector<double> HoughSpiralCleaner::findPeakRadiusBins(const Eigen::ArrayXd& houghSlice) const {
+std::vector<double> HoughSpiralCleaner::findPeakRadiusBins(const AngleSliceArrayType& houghSlice) const {
     const std::vector<Eigen::Index> maxLocs = findPeakLocations(houghSlice, 2);
     std::vector<double> peakCtrs;
 
@@ -63,7 +68,7 @@ std::vector<double> HoughSpiralCleaner::findPeakRadiusBins(const Eigen::ArrayXd&
         const Eigen::Index lastPt = std::max(pkIdx + peakWidth, houghSlice.rows() - 1);
 
         const Eigen::VectorXd positions = Eigen::VectorXd::LinSpaced(lastPt - firstPt + 1, firstPt, lastPt);
-        const Eigen::VectorXd values = houghSlice.segment(firstPt, lastPt - firstPt + 1);
+        const Eigen::VectorXd values = houghSlice.segment(firstPt, lastPt - firstPt + 1).cast<double>();
         const double peakCtrOfGrav = positions.dot(values) / values.sum();
 
         peakCtrs.push_back(peakCtrOfGrav);

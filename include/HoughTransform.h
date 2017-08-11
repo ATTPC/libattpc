@@ -16,15 +16,20 @@ namespace cleaning {
  * Base class implementing the Hough transform.
  *
  * This must be used through a child class that overrides the radiusFunction.
- *
- * @param numBins_        The number of bins to use in the Hough space. The Hough space matrix will be square.
- * @param maxRadiusValue_ The scale of the Hough space.
- * @param rowOffset_      The first data point to use when calculating the Hough space. This should typically
- *                        be zero, which is the default value.
  */
 class HoughTransform {
 public:
+    /**
+     * Constructor
+     *
+     * @param numBins_        The number of bins to use in the Hough space. The Hough space matrix will be square.
+     * @param maxRadiusValue_ The scale of the Hough space.
+     * @param rowOffset_      The first data point to use when calculating the Hough space. This should typically
+     *                        be zero, which is the default value.
+     */
     HoughTransform(const Eigen::Index numBins_, const double maxRadiusValue_, const Eigen::Index rowOffset_ = 0);
+
+    virtual ~HoughTransform() = default;
 
     /**
      * Apply the Hough transform to the given dataset.
