@@ -102,18 +102,18 @@ HoughSpiralCleanerResult::HoughSpiralCleanerResult(const Eigen::Index numPts)
 {}
 
 HoughSpiralCleanerResult HoughSpiralCleaner::classifyPoints(
-        const Eigen::ArrayXXd& xyz, const Eigen::ArrayXd& arclens,
+        const Eigen::ArrayXd& zs, const Eigen::ArrayXd& arclens,
         const double maxAngle, const Eigen::ArrayXd& radii) const {
 
     const Eigen::Index numLinesFound = radii.rows();  // Each rad peak is a found line
-    const Eigen::Index numPts = xyz.rows();
+    const Eigen::Index numPts = zs.rows();
 
     HoughSpiralCleanerResult result {numPts};
     Eigen::Array<Eigen::Index, Eigen::Dynamic, 1> pointsPerLine = decltype(pointsPerLine)::Zero(numLinesFound);
 
     for (Eigen::Index lineIdx = 0; lineIdx < numLinesFound; ++lineIdx) {
         const double rad = radii(lineIdx);
-        const Eigen::ArrayXd dist = Eigen::abs(houghLineFunc(xyz.col(2), rad, maxAngle) - arclens);
+        const Eigen::ArrayXd dist = Eigen::abs(houghLineFunc(zs, rad, maxAngle) - arclens);
 
         // Iterate over each point and set its result to the current line if the
         // current line is better than the previous one.
@@ -123,7 +123,7 @@ HoughSpiralCleanerResult HoughSpiralCleaner::classifyPoints(
             if (newDist < oldDist) {
                 // Update point counts before updating results
                 const Eigen::Index oldLineIdx = result.labels(pointIdx);
-                --pointsPerLine(oldLineIdx);
+                if (oldLineIdx != -1) { --pointsPerLine(oldLineIdx); }
                 ++pointsPerLine(lineIdx);
 
                 result.labels(pointIdx) = lineIdx;

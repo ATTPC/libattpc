@@ -59,7 +59,7 @@ TEST_CASE("HoughSpiralCleaner can find arc length of circle segment", "[houghcle
     }
 }
 
-TEST_CASE("HoughSpiralCleaner can perform a Hough transform", "[houghcleaner]") {
+TEST_CASE("HoughSpiralCleaner can perform a Hough transform", "[houghcleaner][hough]") {
     const Eigen::Index numPts = 10;
     const double yValue = 10;
     Eigen::ArrayX2d data {numPts, 2};
@@ -249,4 +249,48 @@ TEST_CASE("HoughSpiralCleaner can find peaks in Hough space slice", "[houghclean
             REQUIRE(foundPeaks.at(0) == Approx(expectedValue));
         }
     }
+}
+
+TEST_CASE("HoughSpiralCleaner can classify points (simple example)", "[houghcleaner]") {
+    // Test the simple example of a set of horizontal lines in arclen-z space with points near them.
+    // This is, of course, not a realistic data set.
+    using attpc::cleaning::HoughSpiralCleaner;
+    using attpc::cleaning::HoughSpiralCleanerResult;
+
+    Eigen::Array3d radii;
+    radii << 1, 2, 3;
+
+    const int pointsPerLine = 100;
+    const double randomDistScale = 0.1;
+    const double maxAngle = M_PI / 2;
+
+    Eigen::ArrayX2d testData {pointsPerLine * radii.size(), 2};
+    for (Eigen::Index radIdx = 0; radIdx < radii.rows(); ++radIdx) {
+        testData.block<pointsPerLine, 1>(radIdx * pointsPerLine, 0).setLinSpaced(0, 1000);
+        testData.block<pointsPerLine, 1>(radIdx * pointsPerLine, 1) =
+            Eigen::ArrayXd::Constant(pointsPerLine, radii(radIdx)) +
+            Eigen::ArrayXd::Random(pointsPerLine) * randomDistScale;
+    }
+
+    auto config = makeConfig();
+    HoughSpiralCleaner cleaner {config};
+
+    HoughSpiralCleanerResult result = cleaner.classifyPoints(testData.col(0), testData.col(1), maxAngle, radii);
+
+    SECTION("Labels are correct") {
+        // Note: This depends on the order in which the function traverses the list of radii
+        for (Eigen::Index radIdx = 0; radIdx < radii.rows(); ++radIdx) {
+            CHECK((result.labels.segment(radIdx * pointsPerLine, pointsPerLine) == radIdx).all());
+        }
+    }
+
+    SECTION("Distances are correct") {
+        for (Eigen::Index radIdx = 0; radIdx < radii.rows(); ++radIdx) {
+            Eigen::ArrayXd expected =
+                Eigen::abs(testData.block<pointsPerLine, 1>(radIdx * pointsPerLine, 1) - radii(radIdx));
+            const Eigen::ArrayXd actual = result.distancesToNearestLine.segment(radIdx * pointsPerLine, pointsPerLine);
+            CHECK((Eigen::abs(actual - expected) < 1e-4).all());
+        }
+    }
+
 }

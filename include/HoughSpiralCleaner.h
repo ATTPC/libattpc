@@ -52,7 +52,7 @@ public:
     Eigen::Index findMaxAngleBin(const HoughSpace& houghSpace) const;
     AngleSliceArrayType findMaxAngleSlice(const HoughSpace& houghSpace, const Eigen::Index maxAngleBin) const;
     std::vector<double> findPeakRadiusBins(const AngleSliceArrayType& houghSlice) const;
-    HoughSpiralCleanerResult classifyPoints(const Eigen::ArrayXXd& xyz, const Eigen::ArrayXd& arclens,
+    HoughSpiralCleanerResult classifyPoints(const Eigen::ArrayXd& zs, const Eigen::ArrayXd& arclens,
                                             const double maxAngle, const Eigen::ArrayXd& radii) const;
 
 private:
