@@ -4,6 +4,14 @@
 
 #include "HoughSpiralCleaner.h"
 
+namespace {
+    template <class Derived>
+    inline Eigen::Array<typename Derived::Scalar, Derived::RowsAtCompileTime, Derived::ColsAtCompileTime>
+    houghLineFunc(const Eigen::ArrayBase<Derived>& x, const double rad, const double theta) {
+        return (rad - x * std::cos(theta)) / std::sin(theta);
+    }
+}
+
 namespace attpc {
 namespace cleaning {
 
@@ -11,6 +19,7 @@ HoughSpiralCleaner::HoughSpiralCleaner(const HoughSpiralCleanerConfig& config)
 : numAngleBinsToReduce(config.numAngleBinsToReduce)
 , houghSpaceSliceSize(config.houghSpaceSliceSize)
 , peakWidth(config.peakWidth)
+, minPointsPerLine(config.minPointsPerLine)
 , linHough(config.linearHoughNumBins, config.linearHoughMaxRadius)
 , circHough(config.circularHoughNumBins, config.circularHoughMaxRadius)
 {}
@@ -75,6 +84,57 @@ std::vector<double> HoughSpiralCleaner::findPeakRadiusBins(const AngleSliceArray
     }
 
     return peakCtrs;
+}
+
+HoughSpiralCleanerResult::HoughSpiralCleanerResult(const Eigen::Index numPts)
+: labels(decltype(labels)::Constant(numPts, -1))
+, distancesToNearestLine(decltype(distancesToNearestLine)::Constant(numPts, std::numeric_limits<double>::infinity()))
+{}
+
+HoughSpiralCleanerResult HoughSpiralCleaner::classifyPoints(
+        const Eigen::ArrayXXd& xyz, const Eigen::ArrayXd& arclens,
+        const double maxAngle, const Eigen::ArrayXd& radii) const {
+
+    const Eigen::Index numLinesFound = radii.rows();  // Each rad peak is a found line
+    const Eigen::Index numPts = xyz.rows();
+
+    HoughSpiralCleanerResult result {numPts};
+    Eigen::Array<Eigen::Index, Eigen::Dynamic, 1> pointsPerLine = decltype(pointsPerLine)::Zero(numLinesFound);
+
+    for (Eigen::Index lineIdx = 0; lineIdx < numLinesFound; ++lineIdx) {
+        const double rad = radii(lineIdx);
+        const Eigen::ArrayXd dist = Eigen::abs(houghLineFunc(xyz.col(2), rad, maxAngle) - arclens);
+
+        // Iterate over each point and set its result to the current line if the
+        // current line is better than the previous one.
+        for (Eigen::Index pointIdx = 0; pointIdx < numPts; ++pointIdx) {
+            const auto newDist = dist(pointIdx);
+            const auto oldDist = result.distancesToNearestLine(pointIdx);
+            if (newDist < oldDist) {
+                // Update point counts before updating results
+                const Eigen::Index oldLineIdx = result.labels(pointIdx);
+                --pointsPerLine(oldLineIdx);
+                ++pointsPerLine(lineIdx);
+
+                result.labels(pointIdx) = lineIdx;
+                result.distancesToNearestLine(pointIdx) = newDist;
+            }
+        }
+    }
+
+    // Eliminate lines that have too few points
+    for (Eigen::Index lineIdx = 0; lineIdx < numLinesFound; ++lineIdx) {
+        if (pointsPerLine(lineIdx) < minPointsPerLine) {
+            for (Eigen::Index pointIdx = 0; pointIdx < numPts; ++pointIdx) {
+                if (result.labels(pointIdx) == lineIdx) {
+                    result.labels(pointIdx) = -1;
+                    result.distancesToNearestLine = std::numeric_limits<double>::infinity();
+                }
+            }
+        }
+    }
+
+    return result;
 }
 
 }

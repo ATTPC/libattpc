@@ -9,6 +9,7 @@
 #include <vector>
 #include <algorithm>
 #include <numeric>
+#include <limits>
 #include <cassert>
 #include <array>
 #include "CircularHoughTransform.h"
@@ -28,6 +29,16 @@ public:
     Eigen::Index numAngleBinsToReduce;
     Eigen::Index houghSpaceSliceSize;
     Eigen::Index peakWidth;
+    int minPointsPerLine;
+};
+
+class HoughSpiralCleanerResult {
+public:
+    HoughSpiralCleanerResult() = default;
+    HoughSpiralCleanerResult(const Eigen::Index numPts);
+
+    Eigen::Array<Eigen::Index, Eigen::Dynamic, 1> labels;
+    Eigen::ArrayXd distancesToNearestLine;
 };
 
 class HoughSpiralCleaner {
@@ -40,11 +51,14 @@ public:
     Eigen::Index findMaxAngleBin(const HoughSpace& houghSpace) const;
     AngleSliceArrayType findMaxAngleSlice(const HoughSpace& houghSpace, const Eigen::Index maxAngleBin) const;
     std::vector<double> findPeakRadiusBins(const AngleSliceArrayType& houghSlice) const;
+    HoughSpiralCleanerResult classifyPoints(const Eigen::ArrayXXd& xyz, const Eigen::ArrayXd& arclens,
+                                            const double maxAngle, const Eigen::ArrayXd& radii) const;
 
 private:
     Eigen::Index numAngleBinsToReduce;
     Eigen::Index houghSpaceSliceSize;
     Eigen::Index peakWidth;
+    int minPointsPerLine;
 
     LinearHoughTransform linHough;
     CircularHoughTransform circHough;
