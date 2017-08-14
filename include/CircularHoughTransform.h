@@ -17,8 +17,7 @@ public:
     Eigen::Vector2d findCenter(const Eigen::ArrayXXd& data) const;
 
 protected:
-    double radiusFunction(const Eigen::ArrayXXd& data, const Eigen::Index rowIdx, const double costh,
-                          const double sinth) const override;
+    Eigen::ArrayXd radiusFunction(const Eigen::ArrayXXd& data, const double angle) const override;
 };
 
 }

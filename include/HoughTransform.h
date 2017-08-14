@@ -72,17 +72,17 @@ protected:
      * and the Hough space. It must be overridden in a child class to implement a specific form of the
      * Hough transform, like a linear transform or a transform for finding circles.
      *
-     * The function should take the full data set, an index pointing to the current row, and the sine
-     * and cosine of the current angle. The sine and cosine are pre-computed to improve performance.
+     * The function should take the full data set and the angle to evaluate in the Hough space. It should
+     * return an array of the radius values calculated at each data point. The length of this array may be
+     * different from the length of the data set if the rowOffset parameter is nonzero. This is useful in the
+     * circular transform, for example, where each point must be compared to its neighbors, leaving the output
+     * array a bit shorter than the input.
      *
      * @param  data   The data, in the same format as used in findHoughSpace.
-     * @param  rowIdx The index of the current row.
-     * @param  costh  The cosine of the current angle.
-     * @param  sinth  The sine of the current angle.
-     * @return        The radius value corresponding to the current data point and angle.
+     * @param  angle  The Hough space angle value.
+     * @return        An array of radius values corresponding to the data set and the given angle.
      */
-    virtual double radiusFunction(const Eigen::ArrayXXd& data, const Eigen::Index rowIdx,
-                                  const double costh, const double sinth) const = 0;
+    virtual Eigen::ArrayXd radiusFunction(const Eigen::ArrayXXd& data, const double angle) const = 0;
 
 private:
     //! The number of bins to use for the Hough space in both dimensions.

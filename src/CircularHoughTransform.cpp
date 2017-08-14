@@ -30,15 +30,19 @@ Eigen::Vector2d CircularHoughTransform::findCenter(const Eigen::ArrayXXd& data) 
     return center;
 }
 
-double CircularHoughTransform::radiusFunction(const Eigen::ArrayXXd& data, const Eigen::Index rowIdx,
-                                              const double costh, const double sinth) const {
-    const double x1 = data(rowIdx, 0);
-    const double y1 = data(rowIdx, 1);
-    const double x0 = data(rowIdx - getRowOffset(), 0);
-    const double y0 = data(rowIdx - getRowOffset(), 1);
+Eigen::ArrayXd CircularHoughTransform::radiusFunction(const Eigen::ArrayXXd& data, const double angle) const {
+    const Eigen::Index numPts = data.rows();
+    if (numPts < getRowOffset()) {
+        return Eigen::ArrayXd();  // Return null (empty) matrix
+    }
 
-    const double numer = (x1*x1 - x0*x0) + (y1*y1 - y0*y0);
-    const double denom = 2 * ((x1 - x0) * costh + (y1 - y0) * sinth);
+    const auto x1 = data.block(getRowOffset(), 0, numPts - getRowOffset(), 1);
+    const auto y1 = data.block(getRowOffset(), 1, numPts - getRowOffset(), 1);
+    const auto x0 = data.block(0, 0, numPts - getRowOffset(), 1);
+    const auto y0 = data.block(0, 1, numPts - getRowOffset(), 1);
+
+    const auto numer = (x1*x1 - x0*x0) + (y1*y1 - y0*y0);
+    const auto denom = 2 * ((x1 - x0) * std::cos(angle) + (y1 - y0) * std::sin(angle));
     return numer / denom;
 }
 
