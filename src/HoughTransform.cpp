@@ -27,7 +27,7 @@ HoughSpace HoughTransform::findHoughSpace(const Eigen::ArrayXXd& data) const {
             if (rad >= hspace.getMinRadiusValue() && rad < hspace.getMaxRadiusValue()) {
                 // Find and increment histogram/accumulator bin corresponding to rad
                 Eigen::Index radBin = hspace.findBinFromRadius(rad);
-                hspace.getValueAtBin(angleBin, radBin) += 1;  // TODO: Check if this is actually thread-safe...
+                hspace.getValueAtBin(angleBin, radBin) += 1;
             }
         }
     }

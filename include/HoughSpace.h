@@ -14,26 +14,63 @@ public:
     using DataBlockType = Eigen::Block<DataArrayType>;
     using ConstDataBlockType = const Eigen::Block<const DataArrayType>;
 
-    HoughSpace(const Eigen::Index numBins_, const double maxRadiusValue_);
+    HoughSpace(const Eigen::Index numBins_, const double maxRadiusValue_)
+    : numBins(numBins_)
+    , minRadiusValue(-maxRadiusValue_)
+    , maxRadiusValue(maxRadiusValue_)
+    , minAngleValue(0)
+    , maxAngleValue(M_PI)
+    , data(decltype(data)::Zero(numBins, numBins))
+    {}
 
-    ScalarType& getValueAtBin(const Eigen::Index angleBin, const Eigen::Index radBin);
-    ScalarType  getValueAtBin(const Eigen::Index angleBin, const Eigen::Index radBin) const;
+    inline ScalarType& getValueAtBin(const Eigen::Index angleBin, const Eigen::Index radBin) {
+        return data(angleBin, radBin);
+    }
+    inline ScalarType  getValueAtBin(const Eigen::Index angleBin, const Eigen::Index radBin) const {
+        return data(angleBin, radBin);
+    }
 
-    ScalarType& getValueAtCoords(const double angle, const double radius);
-    ScalarType  getValueAtCoords(const double angle, const double radius) const;
+    inline ScalarType& getValueAtCoords(const double angle, const double radius) {
+        const Eigen::Index angleBin = findBinFromAngle(angle);
+        const Eigen::Index radiusBin = findBinFromRadius(radius);
 
-    ScalarType findMaximum() const;
-    ScalarType findMaximum(Eigen::Index& maxAngleBin, Eigen::Index& maxRadBin) const;
+        return getValueAtBin(angleBin, radiusBin);
+    }
+    inline ScalarType  getValueAtCoords(const double angle, const double radius) const {
+        const Eigen::Index angleBin = findBinFromAngle(angle);
+        const Eigen::Index radiusBin = findBinFromRadius(radius);
 
-    DataBlockType getAngularSlice(const Eigen::Index angleBin);
-    ConstDataBlockType getAngularSlice(const Eigen::Index angleBin) const;
-    DataBlockType getAngularSlice(const Eigen::Index minAngleBin, const Eigen::Index width);
-    ConstDataBlockType getAngularSlice(const Eigen::Index minAngleBin, const Eigen::Index width) const;
+        return getValueAtBin(angleBin, radiusBin);
+    }
 
-    DataBlockType getRadialSlice(const Eigen::Index radiusBin);
-    ConstDataBlockType getRadialSlice(const Eigen::Index radiusBin) const;
-    DataBlockType getRadialSlice(const Eigen::Index minRadiusBin, const Eigen::Index width);
-    ConstDataBlockType getRadialSlice(const Eigen::Index minRadiusBin, const Eigen::Index width) const;
+    inline ScalarType findMaximum() const { return data.maxCoeff(); }
+    inline ScalarType findMaximum(Eigen::Index& maxAngleBin, Eigen::Index& maxRadBin) const {
+        return data.maxCoeff(&maxAngleBin, &maxRadBin);
+    }
+
+    inline DataBlockType getAngularSlice(const Eigen::Index angleBin) { return getAngularSlice(angleBin, 1); }
+    inline ConstDataBlockType getAngularSlice(const Eigen::Index angleBin) const {
+        return getAngularSlice(angleBin, 1);
+    }
+    inline DataBlockType getAngularSlice(const Eigen::Index minAngleBin, const Eigen::Index width) {
+        return data.block(minAngleBin, 0, width, numBins);
+    }
+    inline ConstDataBlockType getAngularSlice(const Eigen::Index minAngleBin, const Eigen::Index width) const {
+        return data.block(minAngleBin, 0, width, numBins);
+    }
+
+    inline DataBlockType getRadialSlice(const Eigen::Index radiusBin) {
+        return getRadialSlice(radiusBin, 1);
+    }
+    inline ConstDataBlockType getRadialSlice(const Eigen::Index radiusBin) const {
+        return getRadialSlice(radiusBin, 1);
+    }
+    inline DataBlockType getRadialSlice(const Eigen::Index minRadiusBin, const Eigen::Index width) {
+        return data.block(0, minRadiusBin, numBins, width);
+    }
+    inline ConstDataBlockType getRadialSlice(const Eigen::Index minRadiusBin, const Eigen::Index width) const {
+        return data.block(0, minRadiusBin, numBins, width);
+    }
 
 
     /**
@@ -41,49 +78,57 @@ public:
      * @param  bin The bin number
      * @return     The radius corresponding to the lower bound of this bin.
      */
-    double findRadiusFromBin(const Eigen::Index bin) const;
+    inline double findRadiusFromBin(const Eigen::Index bin) const {
+        return findValue(bin, minRadiusValue, maxRadiusValue);
+    }
 
     /**
      * Find the bin that contains the given radius.
      * @param  radius The radius value.
      * @return        The bin number that contains this radius.
      */
-    Eigen::Index findBinFromRadius(const double radius) const;
+    inline Eigen::Index findBinFromRadius(const double radius) const {
+        return findBin(radius, minRadiusValue, maxRadiusValue);
+    }
 
     /**
      * Find the angle corresponding to the given bin.
      * @param  bin The bin number.
      * @return     The angle corresponding to the lower bound of this bin.
      */
-    double findAngleFromBin(const Eigen::Index bin) const;
+    inline double findAngleFromBin(const Eigen::Index bin) const {
+        return findValue(bin, minAngleValue, maxAngleValue);
+    }
 
     /**
      * Find the bin corresponding to the given angle.
      * @param  angle The angle value.
      * @return       The bin number that contains this angle.
      */
-    Eigen::Index findBinFromAngle(const double angle) const;
+    inline Eigen::Index findBinFromAngle(const double angle) const {
+        return findBin(angle, minAngleValue, maxAngleValue);
+    }
 
     //! Get the number of bins.
-    Eigen::Index getNumBins() const { return numBins; }
+    inline Eigen::Index getNumBins() const { return numBins; }
 
     //! Get the size of one angle bin.
-    double getAngleBinSize() const { return findBinSize(minAngleValue, maxAngleValue); }
+    inline double getAngleBinSize() const { return findBinSize(minAngleValue, maxAngleValue); }
 
     //! Get the size of one radius bin.
-    double getRadiusBinSize() const { return findBinSize(minRadiusValue, maxRadiusValue); }
+    inline double getRadiusBinSize() const { return findBinSize(minRadiusValue, maxRadiusValue); }
 
     //! Get the radius corresponding to the lower bound of the first bin.
-    double getMinRadiusValue() const { return minRadiusValue; }
+    inline double getMinRadiusValue() const { return minRadiusValue; }
 
     //! Get the radius corresponding to the upper bound of the last bin.
-    double getMaxRadiusValue() const { return maxRadiusValue; }
+    inline double getMaxRadiusValue() const { return maxRadiusValue; }
 
     //! Get the angle corresponding to the lower bound of the first bin.
-    double getMinAngleValue() const { return minAngleValue; }
+    inline double getMinAngleValue() const { return minAngleValue; }
 
     //! Get the angle corresponding to the upper bound of the last bin.
-    double getMaxAngleValue() const { return maxAngleValue; }
+    inline double getMaxAngleValue() const { return maxAngleValue; }
 
 private:
     /**
@@ -93,7 +138,9 @@ private:
      * @param  upperBound The upper bound of the largest bin.
      * @return            The size of one bin.
      */
-    double findBinSize(const double lowerBound, const double upperBound) const;
+    inline double findBinSize(const double lowerBound, const double upperBound) const {
+        return (upperBound - lowerBound) / numBins;
+    }
 
     /**
      * Calculate the bin number corresponding to a given value based on the provided bounds and the number of
@@ -104,7 +151,9 @@ private:
      * @param  upperBound The upper bound of the largest bin.
      * @return            The corresponding bin number.
      */
-    Eigen::Index findBin(const double value, const double lowerBound, const double upperBound) const;
+    inline Eigen::Index findBin(const double value, const double lowerBound, const double upperBound) const {
+        return static_cast<Eigen::Index>(std::floor((value - lowerBound) / findBinSize(lowerBound, upperBound)));
+    }
 
     /**
      * Find the value corresponding to the lower bound of the given bin using the provided bounds and the number
@@ -115,7 +164,9 @@ private:
      * @param  upperBound The upper bound of the largest bin.
      * @return            The value corresponding to the lower bound of the given bin.
      */
-    double findValue(const Eigen::Index bin, const double lowerBound, const double upperBound) const;
+    inline double findValue(const Eigen::Index bin, const double lowerBound, const double upperBound) const {
+        return bin * findBinSize(lowerBound, upperBound) + lowerBound;
+    }
 
 private:
     //! The number of bins to use for the Hough space in both dimensions.

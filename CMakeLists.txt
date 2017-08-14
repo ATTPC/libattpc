@@ -27,7 +27,6 @@ set(SRC_FILES
     src/Cluster.cpp
     src/utilities.cpp
     src/HTripletClustering.cpp
-    src/HoughSpace.cpp
     src/HoughTransform.cpp
     src/LinearHoughTransform.cpp
     src/CircularHoughTransform.cpp
