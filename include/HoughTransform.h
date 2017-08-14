@@ -13,14 +13,14 @@ namespace attpc {
 namespace cleaning {
 
 /**
- * Base class implementing the Hough transform.
+ * @brief Base class implementing the Hough transform.
  *
  * This must be used through a child class that overrides the radiusFunction.
  */
 class HoughTransform {
 public:
     /**
-     * Constructor
+     * @brief Constructor
      *
      * @param numBins_        The number of bins to use in the Hough space. The Hough space matrix will be square.
      * @param maxRadiusValue_ The scale of the Hough space.
@@ -32,7 +32,7 @@ public:
     virtual ~HoughTransform() = default;
 
     /**
-     * Apply the Hough transform to the given dataset.
+     * @brief Apply the Hough transform to the given dataset.
      *
      * The data should be a matrix with rows corresponding to individual data points. The first
      * column should contain the x values, and the second column should contain the y values.
@@ -66,7 +66,7 @@ public:
 
 protected:
     /**
-     * The radius as a function of angle, x, and y.
+     * @brief The radius as a function of angle, x, and y.
      *
      * This represents the core of the Hough transform, and it is the mapping between the data space
      * and the Hough space. It must be overridden in a child class to implement a specific form of the
