@@ -63,3 +63,9 @@ add_custom_target(doc
     COMMAND doxygen
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc
 )
+
+# Set up targets for profiling code
+
+add_executable(prof_LinearHoughTransform EXCLUDE_FROM_ALL prof/prof_LinearHoughTransform.cpp)
+target_link_libraries(prof_LinearHoughTransform attpc_cleaning)
+set_property(TARGET prof_LinearHoughTransform PROPERTY CXX_STANDARD 14)
