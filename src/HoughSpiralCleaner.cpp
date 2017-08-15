@@ -58,6 +58,7 @@ HoughSpiralCleanerResult HoughSpiralCleaner::processEvent(const Eigen::ArrayXXd&
     const Eigen::Map<const Eigen::ArrayXd> radPeakMap {radPeaks.data(), static_cast<Eigen::Index>(radPeaks.size())};
 
     HoughSpiralCleanerResult result = classifyPoints(z, arclens, maxAngle, radPeakMap);
+    result.center = center;
     return result;
 }
 

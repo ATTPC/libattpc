@@ -39,6 +39,7 @@ public:
 
     Eigen::Array<Eigen::Index, Eigen::Dynamic, 1> labels;
     Eigen::ArrayXd distancesToNearestLine;
+    Eigen::Vector2d center;
 };
 
 class HoughSpiralCleaner {

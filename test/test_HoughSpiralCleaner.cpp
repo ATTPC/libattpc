@@ -340,4 +340,9 @@ TEST_CASE("HoughSpiralCleaner processEvent works", "[houghcleaner]") {
         CAPTURE(result.distancesToNearestLine);
         REQUIRE((Eigen::abs(result.distancesToNearestLine) < 0.2).all());
     }
+
+    SECTION("Found center is correct") {
+        CHECK(result.center(0) == Approx(arcCenter(0)).margin(0.1));
+        CHECK(result.center(1) == Approx(arcCenter(1)).margin(0.1));
+    }
 }
