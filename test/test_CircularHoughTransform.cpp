@@ -18,7 +18,7 @@ TEST_CASE("Circular Hough can find center of a circle", "[hough]") {
 
     attpc::cleaning::CircularHoughTransform trans {numBins, maxRadius};
 
-    Eigen::Vector2d foundCenter = trans.findCenter(data);
+    Eigen::Vector2d foundCenter = trans.findCenter(data.col(0), data.col(1));
 
     CHECK(foundCenter(0) == Approx(center(0)).margin(0.1));
     CHECK(foundCenter(1) == Approx(center(1)).margin(0.1));
@@ -34,7 +34,7 @@ TEST_CASE("Circular Hough fails gracefully with too few points") {
 
     attpc::cleaning::CircularHoughTransform trans {numBins, maxRadius, rowOffset};
 
-    attpc::cleaning::HoughSpace houghSpace = trans.findHoughSpace(data);
+    attpc::cleaning::HoughSpace houghSpace = trans.findHoughSpace(data.col(0), data.col(1));
 
     REQUIRE(houghSpace.findMaximum() == 0);  // Expect that no points were processed in this case.
 }

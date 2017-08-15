@@ -41,10 +41,11 @@ public:
      * and the second index (columns) corresponding to radii. The bounds of the Hough space can be found
      * using the member functions defined in this class.
      *
-     * @param  data The data to transform.
+     * @param  xs   The X values.
+     * @param  ys   The Y values.
      * @return      The Hough space.
      */
-    HoughSpace findHoughSpace(const Eigen::ArrayXXd& data) const;
+    HoughSpace findHoughSpace(const Eigen::ArrayXd& xs, const Eigen::ArrayXd& ys) const;
 
     //! Get the number of bins.
     Eigen::Index getNumBins() const { return numBins; }
@@ -82,7 +83,7 @@ protected:
      * @param  angle  The Hough space angle value.
      * @return        An array of radius values corresponding to the data set and the given angle.
      */
-    virtual Eigen::ArrayXd radiusFunction(const Eigen::ArrayXXd& data, const double angle) const = 0;
+    virtual Eigen::ArrayXd radiusFunction(const Eigen::ArrayXd& xs, const Eigen::ArrayXd& ys, const double angle) const = 0;
 
 private:
     //! The number of bins to use for the Hough space in both dimensions.

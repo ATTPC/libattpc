@@ -11,8 +11,8 @@ CircularHoughTransform::CircularHoughTransform(const Eigen::Index numBins_, cons
 : HoughTransform(numBins_, maxRadiusValue_, rowOffset_)
 {}
 
-Eigen::Vector2d CircularHoughTransform::findCenter(const Eigen::ArrayXXd& data) const {
-    HoughSpace hspace = findHoughSpace(data);
+Eigen::Vector2d CircularHoughTransform::findCenter(const Eigen::ArrayXd& xs, const Eigen::ArrayXd& ys) const {
+    HoughSpace hspace = findHoughSpace(xs, ys);
 
     Eigen::Index maxRow = 0;
     Eigen::Index maxCol = 0;
@@ -30,16 +30,16 @@ Eigen::Vector2d CircularHoughTransform::findCenter(const Eigen::ArrayXXd& data) 
     return center;
 }
 
-Eigen::ArrayXd CircularHoughTransform::radiusFunction(const Eigen::ArrayXXd& data, const double angle) const {
-    const Eigen::Index numPts = data.rows();
+Eigen::ArrayXd CircularHoughTransform::radiusFunction(const Eigen::ArrayXd& xs, const Eigen::ArrayXd& ys, const double angle) const {
+    const Eigen::Index numPts = xs.rows();
     if (numPts < getRowOffset()) {
         return Eigen::ArrayXd();  // Return null (empty) matrix
     }
 
-    const auto x1 = data.block(getRowOffset(), 0, numPts - getRowOffset(), 1);
-    const auto y1 = data.block(getRowOffset(), 1, numPts - getRowOffset(), 1);
-    const auto x0 = data.block(0, 0, numPts - getRowOffset(), 1);
-    const auto y0 = data.block(0, 1, numPts - getRowOffset(), 1);
+    const auto x1 = xs.segment(getRowOffset(), numPts - getRowOffset());
+    const auto y1 = ys.segment(getRowOffset(), numPts - getRowOffset());
+    const auto x0 = xs.segment(0, numPts - getRowOffset());
+    const auto y0 = ys.segment(0, numPts - getRowOffset());
 
     const auto numer = (x1*x1 - x0*x0) + (y1*y1 - y0*y0);
     const auto denom = 2 * ((x1 - x0) * std::cos(angle) + (y1 - y0) * std::sin(angle));

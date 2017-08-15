@@ -12,10 +12,8 @@ LinearHoughTransform::LinearHoughTransform(const Eigen::Index numBins_, const do
 : HoughTransform(numBins_, maxRadiusValue_)
 {}
 
-Eigen::ArrayXd LinearHoughTransform::radiusFunction(const Eigen::ArrayXXd& data, const double angle) const {
-    const auto x = data.col(0);
-    const auto y = data.col(1);
-    return x * std::cos(angle) + y * std::sin(angle);
+Eigen::ArrayXd LinearHoughTransform::radiusFunction(const Eigen::ArrayXd& xs, const Eigen::ArrayXd& ys, const double angle) const {
+    return xs * std::cos(angle) + ys * std::sin(angle);
 }
 
 

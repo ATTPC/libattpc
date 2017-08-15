@@ -43,12 +43,12 @@ int main(const int argc, const char** argv) {
               << numBins << " bins, and "
               << numIters << " iterations." << std::endl;
 
-    trans.findHoughSpace(testData);
+    trans.findHoughSpace(testData.col(0), testData.col(1));
 
     std::vector<clock::duration> durations;
     for (int iterNum = 0; iterNum < numIters; ++iterNum) {
         auto begin = clock::now();
-        auto result = trans.findHoughSpace(testData);
+        auto result = trans.findHoughSpace(testData.col(0), testData.col(1));
         auto end = clock::now();
         durations.push_back(end - begin);
     }

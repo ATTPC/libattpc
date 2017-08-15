@@ -19,7 +19,7 @@ TEST_CASE("Linear Hough transform finds lines", "[hough]") {
 
         CAPTURE(data);
 
-        attpc::cleaning::HoughSpace houghSpace = trans.findHoughSpace(data);
+        attpc::cleaning::HoughSpace houghSpace = trans.findHoughSpace(data.col(0), data.col(1));
 
         SECTION("Hough space max equals the number of points") {
             auto houghMax = houghSpace.findMaximum();

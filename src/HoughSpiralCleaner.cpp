@@ -36,12 +36,7 @@ Eigen::ArrayXd HoughSpiralCleaner::findArcLength(const Eigen::ArrayXXd& xy, cons
 
 HoughSpace HoughSpiralCleaner::findHoughSpace(const Eigen::ArrayXd& zs, const Eigen::ArrayXd& arclens) const {
     assert(zs.rows() == arclens.rows());
-
-    Eigen::ArrayXXd houghData {zs.rows(), 2};  // XXX: This copy might be unnecessary if the code were written better
-    houghData.col(0) = zs;
-    houghData.col(1) = arclens;
-
-    return linHough.findHoughSpace(houghData);
+    return linHough.findHoughSpace(zs, arclens);
 }
 
 Eigen::Index HoughSpiralCleaner::findMaxAngleBin(const HoughSpace& houghSpace) const {

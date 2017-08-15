@@ -13,13 +13,13 @@ HoughTransform::HoughTransform(const Eigen::Index numBins_, const double maxRadi
 , maxRadiusValue(maxRadiusValue_)
 {}
 
-HoughSpace HoughTransform::findHoughSpace(const Eigen::ArrayXXd& data) const {
+HoughSpace HoughTransform::findHoughSpace(const Eigen::ArrayXd& xs, const Eigen::ArrayXd& ys) const {
     HoughSpace hspace {numBins, maxRadiusValue};
 
     #pragma omp parallel for
     for (Eigen::Index angleBin = 0; angleBin < hspace.getNumBins(); angleBin++) {
         const double angle = hspace.findAngleFromBin(angleBin);
-        const Eigen::ArrayXd radii = radiusFunction(data, angle);
+        const Eigen::ArrayXd radii = radiusFunction(xs, ys, angle);
 
         for (Eigen::Index radIdx = 0; radIdx < radii.rows(); radIdx++) {
             const double rad = radii(radIdx);

@@ -115,7 +115,7 @@ TEST_CASE("HoughSpiralCleaner can find max angle bin in Hough space", "[houghcle
         const Eigen::ArrayX2d lineData = makeTestLineData(lineRad, lineTheta, xMin, xMax, numPts);
 
         attpc::cleaning::LinearHoughTransform trans {config.linearHoughNumBins, config.linearHoughMaxRadius};
-        attpc::cleaning::HoughSpace houghSpace = trans.findHoughSpace(lineData);
+        attpc::cleaning::HoughSpace houghSpace = trans.findHoughSpace(lineData.col(0), lineData.col(1));
 
         const Eigen::Index foundBin = cleaner.findMaxAngleBin(houghSpace);
         const Eigen::Index expectedBin = houghSpace.findBinFromAngle(lineTheta);
@@ -140,7 +140,7 @@ TEST_CASE("HoughSpiralCleaner can find max angle bin in Hough space", "[houghcle
         lineData.block(numPtsEach, 0, numPtsEach, 2) = makeTestLineData(lineRad1, lineTheta1, xMin, xMax, numPtsEach);
 
         attpc::cleaning::LinearHoughTransform trans {config.linearHoughNumBins, config.linearHoughMaxRadius};
-        attpc::cleaning::HoughSpace houghSpace = trans.findHoughSpace(lineData);
+        attpc::cleaning::HoughSpace houghSpace = trans.findHoughSpace(lineData.col(0), lineData.col(1));
 
         const Eigen::Index foundBin = cleaner.findMaxAngleBin(houghSpace);
         const double expectedAngle = (lineTheta0 + lineTheta1) / 2;
