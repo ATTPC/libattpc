@@ -47,6 +47,7 @@ set(TEST_SRC_FILES
     test/catch_main.cpp
     test/test_utilities.cpp
     test/test_metrics.cpp
+    test/test_HoughSpace.cpp
     test/test_LinearHoughTransform.cpp
     test/test_CircularHoughTransform.cpp
     test/test_HoughSpiralCleaner.cpp
