@@ -212,7 +212,8 @@ public:
      * @param  bin The bin number
      * @return     The radius corresponding to the lower bound of this bin.
      */
-    inline double findRadiusFromBin(const Eigen::Index bin) const {
+    template <class BinType>
+    inline double findRadiusFromBin(const BinType& bin) const {
         return findValue(bin, minRadiusValue, maxRadiusValue);
     }
 
@@ -232,13 +233,14 @@ public:
      * @param  bin The bin number.
      * @return     The angle corresponding to the lower bound of this bin.
      */
-    inline double findAngleFromBin(const Eigen::Index bin) const {
+    template <class BinType>
+    inline double findAngleFromBin(const BinType& bin) const {
         return findValue(bin, minAngleValue, maxAngleValue);
     }
 
     /**
      * @brief Find the bin corresponding to the given angle.
-     * 
+     *
      * @param  angle The angle value.
      * @return       The bin number that contains this angle.
      */
@@ -301,7 +303,8 @@ private:
      * @param  upperBound The upper bound of the largest bin.
      * @return            The value corresponding to the lower bound of the given bin.
      */
-    inline double findValue(const Eigen::Index bin, const double lowerBound, const double upperBound) const {
+    template <class BinType>
+    inline double findValue(const BinType& bin, const double lowerBound, const double upperBound) const {
         return bin * findBinSize(lowerBound, upperBound) + lowerBound;
     }
 
