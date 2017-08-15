@@ -127,7 +127,7 @@ public:
      * @return     The results of the cleaning algorithm. This includes the labels, the distance to each line,
      *             and the center of curvature found by the Hough transform for circles.
      */
-    HoughSpiralCleanerResult processEvent(const Eigen::ArrayXXd& xyz) const;
+    HoughSpiralCleanerResult processEvent(const Eigen::Ref<const Eigen::ArrayXXd>& xyz) const;
 
     /**
      * @brief Calculate the arc length swept by the track in the xy projection.
@@ -140,7 +140,7 @@ public:
      * @param  center The center of curvature (x, y).
      * @return        The arc lengths, a one-column array with the same number of rows as the input data.
      */
-    Eigen::ArrayXd findArcLength(const Eigen::ArrayXXd& xy, const Eigen::Vector2d center) const;
+    Eigen::ArrayXd findArcLength(const Eigen::Ref<const Eigen::ArrayXXd>& xy, const Eigen::Vector2d& center) const;
 
     /**
      * @brief Calculate the linear Hough transform.
@@ -151,7 +151,8 @@ public:
      * @param  arclens The arclength values of the track. This will be the y variable in the Hough transform.
      * @return         The Hough space.
      */
-    HoughSpace findHoughSpace(const Eigen::ArrayXd& zs, const Eigen::ArrayXd& arclens) const;
+    HoughSpace findHoughSpace(const Eigen::Ref<const Eigen::ArrayXd>& zs,
+                              const Eigen::Ref<const Eigen::ArrayXd>& arclens) const;
 
     /**
      * @brief Find the angle bin index of the largest maximum in the Hough space.
@@ -188,7 +189,7 @@ public:
      * @param  houghSlice The slice of the Hough space. This should be one-dimensional.
      * @return            The center of gravity of each peak, as a (floating-point) bin index.
      */
-    std::vector<double> findPeakRadiusBins(const AngleSliceArrayType& houghSlice) const;
+    std::vector<double> findPeakRadiusBins(const Eigen::Ref<const AngleSliceArrayType>& houghSlice) const;
 
     /**
      * @brief Find the distance to the nearest line for each point, and identify the noise points.
@@ -202,8 +203,11 @@ public:
      * @return          The result object, which contains the labels and the distances to the nearest line. Note
      *                  that this function does **not** set the center of curvature in the result object.
      */
-    HoughSpiralCleanerResult classifyPoints(const Eigen::ArrayXd& zs, const Eigen::ArrayXd& arclens,
-                                            const double maxAngle, const Eigen::ArrayXd& radii) const;
+    HoughSpiralCleanerResult classifyPoints(
+        const Eigen::Ref<const Eigen::ArrayXd>& zs,
+        const Eigen::Ref<const Eigen::ArrayXd>& arclens,
+        const double maxAngle,
+        const Eigen::Ref<const Eigen::ArrayXd>& radii) const;
 
 private:
     Eigen::Index numAngleBinsToReduce;

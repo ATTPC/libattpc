@@ -34,7 +34,9 @@ protected:
      * @return       An array of radius values computed for the data points. The length of this array will be
      *               the same as the number of rows in the data.
      */
-    Eigen::ArrayXd radiusFunction(const Eigen::ArrayXd& xs, const Eigen::ArrayXd& ys, const double angle) const override;
+     Eigen::ArrayXd radiusFunction(const Eigen::Ref<const Eigen::ArrayXd>& xs,
+                                   const Eigen::Ref<const Eigen::ArrayXd>& ys,
+                                   const double angle) const override;
 };
 
 }

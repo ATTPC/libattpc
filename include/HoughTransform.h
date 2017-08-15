@@ -84,7 +84,9 @@ protected:
      * @param  angle  The Hough space angle value.
      * @return        An array of radius values corresponding to the data set and the given angle.
      */
-    virtual Eigen::ArrayXd radiusFunction(const Eigen::ArrayXd& xs, const Eigen::ArrayXd& ys, const double angle) const = 0;
+    virtual Eigen::ArrayXd radiusFunction(const Eigen::Ref<const Eigen::ArrayXd>& xs,
+                                          const Eigen::Ref<const Eigen::ArrayXd>& ys,
+                                          const double angle) const = 0;
 
 private:
     //! The number of bins to use for the Hough space in both dimensions.

@@ -34,7 +34,7 @@ HoughSpiralCleaner::HoughSpiralCleaner(const HoughSpiralCleanerConfig& config)
 , circHough(config.circularHoughNumBins, config.circularHoughMaxRadius)
 {}
 
-HoughSpiralCleanerResult HoughSpiralCleaner::processEvent(const Eigen::ArrayXXd& xyz) const {
+HoughSpiralCleanerResult HoughSpiralCleaner::processEvent(const Eigen::Ref<const Eigen::ArrayXXd>& xyz) const {
     const auto x = xyz.col(0);
     const auto y = xyz.col(1);
     const auto xy = xyz.block(0, 0, xyz.rows(), 2);
@@ -62,7 +62,8 @@ HoughSpiralCleanerResult HoughSpiralCleaner::processEvent(const Eigen::ArrayXXd&
     return result;
 }
 
-Eigen::ArrayXd HoughSpiralCleaner::findArcLength(const Eigen::ArrayXXd& xy, const Eigen::Vector2d center) const {
+Eigen::ArrayXd HoughSpiralCleaner::findArcLength(const Eigen::Ref<const Eigen::ArrayXXd>& xy,
+                                                 const Eigen::Vector2d& center) const {
     const Eigen::ArrayXd xOffset = xy.col(0) - center(0);
     const Eigen::ArrayXd yOffset = xy.col(1) - center(1);
 
@@ -72,7 +73,8 @@ Eigen::ArrayXd HoughSpiralCleaner::findArcLength(const Eigen::ArrayXXd& xy, cons
     return rads * thetas;
 }
 
-HoughSpace HoughSpiralCleaner::findHoughSpace(const Eigen::ArrayXd& zs, const Eigen::ArrayXd& arclens) const {
+HoughSpace HoughSpiralCleaner::findHoughSpace(const Eigen::Ref<const Eigen::ArrayXd>& zs,
+                                              const Eigen::Ref<const Eigen::ArrayXd>& arclens) const {
     assert(zs.rows() == arclens.rows());
     return linHough.findHoughSpace(zs, arclens);
 }
@@ -111,7 +113,7 @@ auto HoughSpiralCleaner::findMaxAngleSlice(const HoughSpace& houghSpace, const E
     return block.colwise().sum();
 }
 
-std::vector<double> HoughSpiralCleaner::findPeakRadiusBins(const AngleSliceArrayType& houghSlice) const {
+std::vector<double> HoughSpiralCleaner::findPeakRadiusBins(const Eigen::Ref<const AngleSliceArrayType>& houghSlice) const {
     const std::vector<Eigen::Index> maxLocs = findPeakLocations(houghSlice, 2);
     std::vector<double> peakCtrs;
 
@@ -135,8 +137,10 @@ HoughSpiralCleanerResult::HoughSpiralCleanerResult(const Eigen::Index numPts)
 {}
 
 HoughSpiralCleanerResult HoughSpiralCleaner::classifyPoints(
-        const Eigen::ArrayXd& zs, const Eigen::ArrayXd& arclens,
-        const double maxAngle, const Eigen::ArrayXd& radii) const {
+        const Eigen::Ref<const Eigen::ArrayXd>& zs,
+        const Eigen::Ref<const Eigen::ArrayXd>& arclens,
+        const double maxAngle,
+        const Eigen::Ref<const Eigen::ArrayXd>& radii) const {
 
     const Eigen::Index numLinesFound = radii.rows();  // Each rad peak is a found line
     const Eigen::Index numPts = zs.rows();

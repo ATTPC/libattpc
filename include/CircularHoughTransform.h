@@ -36,7 +36,8 @@ public:
      * @param  ys   The y coordinates of the data.
      * @return      The center (x, y) of the spiral as a 2D vector.
      */
-    Eigen::Vector2d findCenter(const Eigen::ArrayXd& xs, const Eigen::ArrayXd& ys) const;
+    Eigen::Vector2d findCenter(const Eigen::Ref<const Eigen::ArrayXd>& xs,
+                               const Eigen::Ref<const Eigen::ArrayXd>& ys) const;
 
 protected:
     /**
@@ -48,7 +49,9 @@ protected:
      * @return       An array of radius values computed for the data points. The length of this array will be
      *               less than the length of the data by whatever the value of rowOffset is.
      */
-    Eigen::ArrayXd radiusFunction(const Eigen::ArrayXd& xs, const Eigen::ArrayXd& ys, const double angle) const override;
+     Eigen::ArrayXd radiusFunction(const Eigen::Ref<const Eigen::ArrayXd>& xs,
+                                   const Eigen::Ref<const Eigen::ArrayXd>& ys,
+                                   const double angle) const override;
 };
 
 }

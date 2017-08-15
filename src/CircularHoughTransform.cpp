@@ -11,7 +11,8 @@ CircularHoughTransform::CircularHoughTransform(const Eigen::Index numBins_, cons
 : HoughTransform(numBins_, maxRadiusValue_, rowOffset_)
 {}
 
-Eigen::Vector2d CircularHoughTransform::findCenter(const Eigen::ArrayXd& xs, const Eigen::ArrayXd& ys) const {
+Eigen::Vector2d CircularHoughTransform::findCenter(const Eigen::Ref<const Eigen::ArrayXd>& xs,
+                                                   const Eigen::Ref<const Eigen::ArrayXd>& ys) const {
     HoughSpace hspace = findHoughSpace(xs, ys);
 
     Eigen::Index maxRow = 0;
@@ -30,7 +31,10 @@ Eigen::Vector2d CircularHoughTransform::findCenter(const Eigen::ArrayXd& xs, con
     return center;
 }
 
-Eigen::ArrayXd CircularHoughTransform::radiusFunction(const Eigen::ArrayXd& xs, const Eigen::ArrayXd& ys, const double angle) const {
+Eigen::ArrayXd
+CircularHoughTransform::radiusFunction(const Eigen::Ref<const Eigen::ArrayXd>& xs,
+                                       const Eigen::Ref<const Eigen::ArrayXd>& ys,
+                                       const double angle) const {
     const Eigen::Index numPts = xs.rows();
     if (numPts < getRowOffset()) {
         return Eigen::ArrayXd();  // Return null (empty) matrix
