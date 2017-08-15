@@ -32,8 +32,8 @@ public:
     /**
      * @brief Find the center of a spiral.
      *
-     * @param  data The input data. The first two columns are used to find the Hough space, so they should contain
-     *              x and y values.
+     * @param  xs   The x coordinates of the data.
+     * @param  ys   The y coordinates of the data.
      * @return      The center (x, y) of the spiral as a 2D vector.
      */
     Eigen::Vector2d findCenter(const Eigen::ArrayXd& xs, const Eigen::ArrayXd& ys) const;
@@ -42,7 +42,8 @@ protected:
     /**
      * @brief The radius function for the circular transform.
      *
-     * @param  data  The (x, y, ...) data, as provided to the findCenter method.
+     * @param  xs   The x coordinates of the data.
+     * @param  ys   The y coordinates of the data.
      * @param  angle The angle in the Hough space that should be used in the calculation.
      * @return       An array of radius values computed for the data points. The length of this array will be
      *               less than the length of the data by whatever the value of rowOffset is.

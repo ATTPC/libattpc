@@ -28,7 +28,8 @@ protected:
     /**
      * @brief The radius function for the linear Hough transform.
      *
-     * @param  data  The (x, y, ...) data as provided to the findHoughSpace function.
+     * @param  xs   The x coordinates of the data.
+     * @param  ys   The y coordinates of the data.
      * @param  angle The angle value to use in the computation.
      * @return       An array of radius values computed for the data points. The length of this array will be
      *               the same as the number of rows in the data.

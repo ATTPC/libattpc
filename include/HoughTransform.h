@@ -41,8 +41,8 @@ public:
      * and the second index (columns) corresponding to radii. The bounds of the Hough space can be found
      * using the member functions defined in this class.
      *
-     * @param  xs   The X values.
-     * @param  ys   The Y values.
+     * @param  xs   The x coordinates of the data.
+     * @param  ys   The y coordinates of the data.
      * @return      The Hough space.
      */
     HoughSpace findHoughSpace(const Eigen::ArrayXd& xs, const Eigen::ArrayXd& ys) const;
@@ -79,7 +79,8 @@ protected:
      * circular transform, for example, where each point must be compared to its neighbors, leaving the output
      * array a bit shorter than the input.
      *
-     * @param  data   The data, in the same format as used in findHoughSpace.
+     * @param  xs   The x coordinates of the data.
+     * @param  ys   The y coordinates of the data.
      * @param  angle  The Hough space angle value.
      * @return        An array of radius values corresponding to the data set and the given angle.
      */
