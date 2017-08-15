@@ -10,6 +10,16 @@ namespace {
     houghLineFunc(const Eigen::ArrayBase<Derived>& x, const double rad, const double theta) {
         return (rad - x * std::cos(theta)) / std::sin(theta);
     }
+
+    template <class Derived1, class Derived2>
+    inline Eigen::ArrayXd arrayAtan2(const Eigen::ArrayBase<Derived1>& y, const Eigen::ArrayBase<Derived2>& x) {
+        assert(y.rows() == x.rows());
+        Eigen::ArrayXd result {x.rows()};
+        for (Eigen::Index i = 0; i < x.rows(); ++i) {
+            result(i) = std::atan2(y(i), x(i));
+        }
+        return result;
+    }
 }
 
 namespace attpc {
@@ -29,7 +39,7 @@ Eigen::ArrayXd HoughSpiralCleaner::findArcLength(const Eigen::ArrayXXd& xy, cons
     const Eigen::ArrayXd yOffset = xy.col(1) - center(1);
 
     Eigen::ArrayXd rads = Eigen::sqrt(xOffset.square() + yOffset.square());
-    Eigen::ArrayXd thetas = Eigen::atan(yOffset / xOffset);
+    Eigen::ArrayXd thetas = arrayAtan2(yOffset, xOffset);
 
     return rads * thetas;
 }

@@ -40,7 +40,7 @@ TEST_CASE("HoughSpiralCleaner can find arc length of circle segment", "[houghcle
     const Eigen::Vector2d center {4, 5};
     const int numPts = 100;
     const double minAngle = 0;
-    const double maxAngle = M_PI / 2;
+    const double maxAngle = M_PI;
     const double radius = 3;
 
     Eigen::ArrayX2d testData = makeTestArcData(numPts, minAngle, maxAngle, radius, center);
@@ -54,8 +54,16 @@ TEST_CASE("HoughSpiralCleaner can find arc length of circle segment", "[houghcle
         REQUIRE(arclenResult(0) == Approx(0.));
     }
 
-    SECTION("Last point has arc length R*Pi/2") {
-        REQUIRE(arclenResult(arclenResult.size() - 1) == Approx(radius * maxAngle));
+    SECTION("Last point has arc length R*Pi") {
+        REQUIRE(std::abs(arclenResult(arclenResult.size() - 1)) == Approx(radius * maxAngle));
+    }
+
+    SECTION("Branch cut is at pi / 2") {
+        CHECK((arclenResult >= 0).all());
+
+        Eigen::ArrayX2d testDataShifted = makeTestArcData(numPts, minAngle + M_PI/2, maxAngle + M_PI/2, radius, center);
+        const Eigen::ArrayXd arclenResultShifted = cleaner.findArcLength(testDataShifted, center);
+        CHECK(!(arclenResultShifted >= 0).all());
     }
 }
 
