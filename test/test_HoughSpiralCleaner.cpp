@@ -13,6 +13,17 @@ Eigen::ArrayX2d makeTestArcData(const int numPts, const double minAngle, const d
     return data;
 }
 
+Eigen::ArrayX3d makeTest3dArcData(const int numPts, const double minAngle, const double maxAngle,
+                                const double radius, const Eigen::Vector2d& center) {
+    const Eigen::ArrayXd angles = Eigen::ArrayXd::LinSpaced(numPts, minAngle, maxAngle);
+    Eigen::ArrayX3d data {numPts, 3};
+    data.col(0) = Eigen::cos(angles) * radius + center(0);
+    data.col(1) = Eigen::sin(angles) * radius + center(1);
+    data.col(2) = Eigen::ArrayXd::LinSpaced(numPts, 10, 2);
+
+    return data;
+}
+
 Eigen::ArrayX2d makeTestLineData(const double radius, const double theta,
                                  const double xmin, const double xmax, const int numPts) {
     Eigen::ArrayX2d data {numPts, 2};
@@ -301,4 +312,32 @@ TEST_CASE("HoughSpiralCleaner can classify points (simple example)", "[houghclea
         }
     }
 
+}
+
+TEST_CASE("HoughSpiralCleaner processEvent works", "[houghcleaner]") {
+    using attpc::cleaning::HoughSpiralCleaner;
+    using attpc::cleaning::HoughSpiralCleanerResult;
+
+    const double arcRadius = 4;
+    const Eigen::Vector2d arcCenter = {2, 4};
+    const Eigen::Index numPts = 100;
+    const double minAngle = 0;
+    const double maxAngle = 3 * M_PI / 4;
+
+    const Eigen::ArrayXXd testData = makeTest3dArcData(numPts, minAngle, maxAngle, arcRadius, arcCenter);
+
+    auto config = makeConfig();
+    HoughSpiralCleaner cleaner {config};
+
+    HoughSpiralCleanerResult result = cleaner.processEvent(testData);
+
+    SECTION("Point labels are correct") {
+        CAPTURE(result.labels);
+        REQUIRE((result.labels == 0).all());
+    }
+
+    SECTION("Distances are correct") {
+        CAPTURE(result.distancesToNearestLine);
+        REQUIRE((Eigen::abs(result.distancesToNearestLine) < 0.2).all());
+    }
 }

@@ -34,6 +34,33 @@ HoughSpiralCleaner::HoughSpiralCleaner(const HoughSpiralCleanerConfig& config)
 , circHough(config.circularHoughNumBins, config.circularHoughMaxRadius)
 {}
 
+HoughSpiralCleanerResult HoughSpiralCleaner::processEvent(const Eigen::ArrayXXd& xyz) const {
+    const auto x = xyz.col(0);
+    const auto y = xyz.col(1);
+    const auto xy = xyz.block(0, 0, xyz.rows(), 2);
+    const auto z = xyz.col(2);
+
+    const Eigen::Vector2d center = circHough.findCenter(x, y);
+
+    const Eigen::ArrayXd arclens = findArcLength(xy, center);
+
+    const HoughSpace hspace = findHoughSpace(z, arclens);
+
+    const Eigen::Index maxAngleBin = findMaxAngleBin(hspace);
+    const double maxAngle = hspace.findAngleFromBin(maxAngleBin);
+    const AngleSliceArrayType maxAngleSlice = findMaxAngleSlice(hspace, maxAngleBin);
+
+    std::vector<double> radPeaks = findPeakRadiusBins(maxAngleSlice);
+    std::transform(radPeaks.begin(), radPeaks.end(), radPeaks.begin(),
+        [&hspace](const double a) -> double { return hspace.findRadiusFromBin(a); });
+
+    // The explicit cast on the next line is required by C++11 to narrow size_t to Eigen::Index (aka long)
+    const Eigen::Map<const Eigen::ArrayXd> radPeakMap {radPeaks.data(), static_cast<Eigen::Index>(radPeaks.size())};
+
+    HoughSpiralCleanerResult result = classifyPoints(z, arclens, maxAngle, radPeakMap);
+    return result;
+}
+
 Eigen::ArrayXd HoughSpiralCleaner::findArcLength(const Eigen::ArrayXXd& xy, const Eigen::Vector2d center) const {
     const Eigen::ArrayXd xOffset = xy.col(0) - center(0);
     const Eigen::ArrayXd yOffset = xy.col(1) - center(1);

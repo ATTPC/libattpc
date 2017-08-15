@@ -47,6 +47,8 @@ public:
 
     HoughSpiralCleaner(const HoughSpiralCleanerConfig& config);
 
+    HoughSpiralCleanerResult processEvent(const Eigen::ArrayXXd& xyz) const;
+
     Eigen::ArrayXd findArcLength(const Eigen::ArrayXXd& xy, const Eigen::Vector2d center) const;
     HoughSpace findHoughSpace(const Eigen::ArrayXd& zs, const Eigen::ArrayXd& arclens) const;
     Eigen::Index findMaxAngleBin(const HoughSpace& houghSpace) const;
