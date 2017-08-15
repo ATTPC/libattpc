@@ -1,0 +1,5 @@
+/**
+ * @namespace attpc::cleaning
+ * @brief Data cleaning functions for the AT-TPC.
+ *
+ */

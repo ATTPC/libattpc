@@ -1,3 +1,8 @@
+/**
+ * @file
+ * @brief A set of common utility functions for the cleaning code.
+ */
+
 #ifndef ATTPC_CLEANING_CONVERSIONS_H
 #define ATTPC_CLEANING_CONVERSIONS_H
 
@@ -33,6 +38,25 @@ Eigen::MatrixXf calculateDistanceMatrix(const std::vector<T>& points, const std:
     return result;
 }
 
+/**
+ * @brief Find peaks in the given array of data.
+ *
+ * This function is based on the Python function scipy.signal.argrelmax from the SciPy library. It
+ * returns the locations of the maxima in the data that are greater than or equal to at least `order`
+ * points to each side.
+ *
+ * If the data includes flat-topped peaks, the location of the left edge of each peak will be returned (in other
+ * words, the result will be the index of the first point in the flat top).
+ *
+ * Finally, a baseline of 0 is assumed, so all peaks must be greater than 0.
+ *
+ * @param data  The input data. It must be an array consisting of a single column. This is checked using a static
+ *              assertion, so the number of columns in the array must be known at compile time.
+ * @param order The order of the peak. For example, an order 3 peak is greater than or equal to the 3 points to
+ *              either side of it.
+ *
+ * @return      The bin indices corresponding to the maxima of all of the peaks that were found.
+ */
 template <class Derived>
 std::vector<Eigen::Index> findPeakLocations(const Eigen::DenseBase<Derived>& data, const Eigen::Index order = 1) {
     static_assert(Derived::ColsAtCompileTime == 1 && Derived::RowsAtCompileTime != 1,
