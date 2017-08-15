@@ -3,6 +3,7 @@
 
 #include <Eigen/Core>
 #include <cassert>
+#include <type_traits>
 
 namespace attpc {
 namespace cleaning {
@@ -214,6 +215,7 @@ public:
      */
     template <class BinType>
     inline double findRadiusFromBin(const BinType& bin) const {
+        static_assert(std::is_arithmetic<BinType>::value, "Bin type must be a scalar value.");
         return findValue(bin, minRadiusValue, maxRadiusValue);
     }
 
@@ -235,6 +237,7 @@ public:
      */
     template <class BinType>
     inline double findAngleFromBin(const BinType& bin) const {
+        static_assert(std::is_arithmetic<BinType>::value, "Bin type must be a scalar value.");
         return findValue(bin, minAngleValue, maxAngleValue);
     }
 
@@ -305,6 +308,7 @@ private:
      */
     template <class BinType>
     inline double findValue(const BinType& bin, const double lowerBound, const double upperBound) const {
+        static_assert(std::is_arithmetic<BinType>::value, "Bin type must be a scalar value.");
         return bin * findBinSize(lowerBound, upperBound) + lowerBound;
     }
 

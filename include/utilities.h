@@ -35,6 +35,9 @@ Eigen::MatrixXf calculateDistanceMatrix(const std::vector<T>& points, const std:
 
 template <class Derived>
 std::vector<Eigen::Index> findPeakLocations(const Eigen::DenseBase<Derived>& data, const Eigen::Index order = 1) {
+    static_assert(Derived::ColsAtCompileTime == 1 && Derived::RowsAtCompileTime != 1,
+                  "This function requires an array with a single column of data.");
+
     std::vector<Eigen::Index> peakLocs;
 
     for (Eigen::Index dataIdx = 0; dataIdx < data.rows(); ++dataIdx) {
