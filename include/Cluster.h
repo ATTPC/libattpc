@@ -16,9 +16,9 @@ protected:
     void calculateRelationshipMatrixIfNecessary() const;
 
 public:
-    Cluster() {};
+    Cluster() {}
 
-    Cluster(std::vector<pcl::PointIndicesPtr> const& clusters, size_t pointIndexCount);
+    Cluster(std::vector<pcl::PointIndicesPtr> const& clusters_, size_t pointIndexCount_);
 
     std::vector<pcl::PointIndicesPtr> const& getClusters() const;
 

@@ -36,9 +36,9 @@ void Cluster::calculateRelationshipMatrixIfNecessary() const {
     }
 }
 
-Cluster::Cluster(std::vector<pcl::PointIndicesPtr> const& clusters, size_t pointIndexCount) {
-    this->clusters = clusters;
-    this->pointIndexCount = pointIndexCount;
+Cluster::Cluster(std::vector<pcl::PointIndicesPtr> const& clusters_, size_t pointIndexCount_) {
+    this->clusters = clusters_;
+    this->pointIndexCount = pointIndexCount_;
 }
 
 std::vector<pcl::PointIndicesPtr> const& Cluster::getClusters() const {
