@@ -272,6 +272,9 @@ public:
     //! Get the angle corresponding to the upper bound of the last bin.
     inline double getMaxAngleValue() const { return maxAngleValue; }
 
+    //! Get a const reference to the raw data matrix.
+    inline const DataArrayType& getData() const { return data; }
+
 private:
     /**
      * Calculate the size of a bin using the provided bounds and the numBins attribute of the class.

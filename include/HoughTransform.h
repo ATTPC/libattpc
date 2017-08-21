@@ -45,7 +45,8 @@ public:
      * @param  ys   The y coordinates of the data.
      * @return      The Hough space.
      */
-    HoughSpace findHoughSpace(const Eigen::ArrayXd& xs, const Eigen::ArrayXd& ys) const;
+    HoughSpace findHoughSpace(const Eigen::Ref<const Eigen::ArrayXd>& xs,
+                              const Eigen::Ref<const Eigen::ArrayXd>& ys) const;
 
     //! Get the number of bins.
     Eigen::Index getNumBins() const { return numBins; }

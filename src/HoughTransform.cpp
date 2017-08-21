@@ -13,7 +13,8 @@ HoughTransform::HoughTransform(const Eigen::Index numBins_, const double maxRadi
 , maxRadiusValue(maxRadiusValue_)
 {}
 
-HoughSpace HoughTransform::findHoughSpace(const Eigen::ArrayXd& xs, const Eigen::ArrayXd& ys) const {
+HoughSpace HoughTransform::findHoughSpace(const Eigen::Ref<const Eigen::ArrayXd>& xs,
+                                          const Eigen::Ref<const Eigen::ArrayXd>& ys) const {
     HoughSpace hspace {numBins, maxRadiusValue};
 
     #pragma omp parallel for
