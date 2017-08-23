@@ -98,4 +98,5 @@ cd build
 make doc
 ```
 
-The documentation is built in the directory `doc/build`.
+The documentation is built in the subdirectory `doc` of the build directory. To view it, open the file
+`build/doc/html/index.html` in a web browser.

@@ -75,10 +75,21 @@ set_property(TARGET test_attpc_cleaning PROPERTY CXX_STANDARD 14)
 
 # Set up target for documentation
 
-add_custom_target(doc
-    COMMAND doxygen
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc
-)
+find_package(Doxygen 1.8)
+if(${DOXYGEN_FOUND})
+    set(DOXYFILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in)
+    set(DOXYFILE_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+
+    configure_file(${DOXYFILE_IN} ${DOXYFILE_OUT} @ONLY)
+
+    add_custom_target(doc
+        COMMAND doxygen
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        COMMENT "Building documentation"
+    )
+else()
+    message(WARNING "Doxygen is required to build the documentation.")
+endif()
 
 # Set up targets for profiling code
 
