@@ -1,0 +1,36 @@
+namespace attpc::cleaning {
+
+/**
+@mainpage Overview
+
+This documentation covers the data cleaning components of the AT-TPC data analysis library. Currently, this
+includes two cleaning algorithms: one based on the Hough transform, and one based on hierarchical clustering.
+
+For compilation instructions, please see the README.md file in the repository.
+
+The documentation is divided into a few sections:
+- @ref hough --- Information about the Hough transform algorithms
+- Clustering [todo] --- Information about the clustering algorithm
+
+In addition, all classes and functions are documented. See the Classes and Namespaces tabs at the top.
+
+@section credits Credits
+
+The linear Hough transform algorithm, in its current form, was originally described by [Duda and Hart]. It was adapted
+for use with circles by [Illingworth and Kittler], although the version used in this library was based on the
+description given by [Heinze]. The application of the Hough transform in the context of cleaning AT-TPC spirals has been
+described briefly by [Ayyad et al], and will be described more thoroughly in a future publication.
+
+The hierarchical clustering algorithm used in this library was developed by Lukas Aymans as part of his
+master's thesis in the Faculty of Electrical Engineering and Computer Science at the [Hochschule Niederrhein].
+Questions about this algorithm should be directed to him.
+
+[Duda and Hart]: https://dx.doi.org/10.1145/361237.361242
+[Illingworth and Kittler]: https://dx.doi.org/10.1109/TPAMI.1987.4767964
+[Heinze]: https://dx.doi.org/10.3204/DESY-THESIS-2013-055
+[Ayyad et al]: https://dx.doi.org/10.1088/1742-6596/876/1/012003
+[Hochschule Niederrhein]: https://www.hs-niederrhein.de/home-en/
+
+*/
+
+}
