@@ -130,6 +130,19 @@ public:
     HoughSpiralCleanerResult processEvent(const Eigen::Ref<const Eigen::ArrayXXd>& xyz) const;
 
     /**
+     * @brief Find the center of a spiral
+     *
+     * This wraps CircularHoughTransform::findCenter.
+     *
+     * @param  xs   The x coordinates of the data.
+     * @param  ys   The y coordinates of the data.
+     * @return      The center (x, y) of the spiral as a 2D vector.
+     * @throws HoughTransform::TooFewPointsException If the number of rows in the data is less than rowOffset.
+     */
+    Eigen::Vector2d findCenter(const Eigen::Ref<const Eigen::ArrayXd>& xs,
+                               const Eigen::Ref<const Eigen::ArrayXd>& ys) const;
+
+    /**
      * @brief Calculate the arc length swept by the track in the xy projection.
      *
      * The arc length is calculated using an angle that is found with respect to the given center of curvature and

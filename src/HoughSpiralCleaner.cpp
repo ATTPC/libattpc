@@ -62,6 +62,11 @@ HoughSpiralCleanerResult HoughSpiralCleaner::processEvent(const Eigen::Ref<const
     return result;
 }
 
+Eigen::Vector2d HoughSpiralCleaner::findCenter(const Eigen::Ref<const Eigen::ArrayXd>& xs,
+                                               const Eigen::Ref<const Eigen::ArrayXd>& ys) const {
+    return circHough.findCenter(xs, ys);
+}
+
 Eigen::ArrayXd HoughSpiralCleaner::findArcLength(const Eigen::Ref<const Eigen::ArrayXXd>& xy,
                                                  const Eigen::Vector2d& center) const {
     const Eigen::ArrayXd xOffset = xy.col(0) - center(0);
