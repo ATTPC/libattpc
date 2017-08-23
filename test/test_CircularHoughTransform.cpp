@@ -3,6 +3,8 @@
 #include <Eigen/Core>
 #include <cmath>
 
+using attpc::cleaning::CircularHoughTransform;
+
 TEST_CASE("Circular Hough can find center of a circle", "[hough]") {
     const Eigen::Vector2d center {1, 2};
     const double radius = 4;
@@ -16,7 +18,7 @@ TEST_CASE("Circular Hough can find center of a circle", "[hough]") {
     const int numBins = 500;
     const int maxRadius = 20;
 
-    attpc::cleaning::CircularHoughTransform trans {numBins, maxRadius};
+    CircularHoughTransform trans {numBins, maxRadius};
 
     Eigen::Vector2d foundCenter = trans.findCenter(data.col(0), data.col(1));
 
@@ -24,7 +26,7 @@ TEST_CASE("Circular Hough can find center of a circle", "[hough]") {
     CHECK(foundCenter(1) == Approx(center(1)).margin(0.1));
 }
 
-TEST_CASE("Circular Hough fails gracefully with too few points") {
+TEST_CASE("Circular Hough throws an exception with too few points") {
     const int numPts = 5;
     const int numBins = 500;
     const int maxRadius = 20;
@@ -32,9 +34,8 @@ TEST_CASE("Circular Hough fails gracefully with too few points") {
 
     const Eigen::ArrayX2d data = Eigen::ArrayX2d::Zero(numPts, 2);  // It doesn't matter what the data is, in this case
 
-    attpc::cleaning::CircularHoughTransform trans {numBins, maxRadius, rowOffset};
+    CircularHoughTransform trans {numBins, maxRadius, rowOffset};
 
-    attpc::cleaning::HoughSpace houghSpace = trans.findHoughSpace(data.col(0), data.col(1));
-
-    REQUIRE(houghSpace.findMaximum() == 0);  // Expect that no points were processed in this case.
+    CHECK_THROWS_AS(trans.findHoughSpace(data.col(0), data.col(1)), const CircularHoughTransform::TooFewPointsException&);
+    CHECK_THROWS_AS(trans.findCenter(data.col(0), data.col(1)), const CircularHoughTransform::TooFewPointsException&);
 }

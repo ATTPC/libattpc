@@ -33,17 +33,16 @@ public:
 
     /**
      * @brief Apply the Hough transform to the given dataset.
+     * The data should be a matrix with rows corresponding to individual data points. The first column should contain
+     * the x values, and the second column should contain the y values.
      *
-     * The data should be a matrix with rows corresponding to individual data points. The first
-     * column should contain the x values, and the second column should contain the y values.
-     *
-     * The Hough space is returned as a 2D array with the first index (rows) corresponding to angles
-     * and the second index (columns) corresponding to radii. The bounds of the Hough space can be found
-     * using the member functions defined in this class.
-     *
-     * @param  xs   The x coordinates of the data.
-     * @param  ys   The y coordinates of the data.
-     * @return      The Hough space.
+     * The Hough space is returned as a 2D array with the first index (rows) corresponding to angles and the second
+     * index (columns) corresponding to radii. The bounds of the Hough space can be found using the member functions
+     * defined in this class.
+     * @param  xs                    The x coordinates of the data.
+     * @param  ys                    The y coordinates of the data.
+     * @return                       The Hough space.
+     * @throws TooFewPointsException When the number of rows in the input is less than rowOffset.
      */
     HoughSpace findHoughSpace(const Eigen::Ref<const Eigen::ArrayXd>& xs,
                               const Eigen::Ref<const Eigen::ArrayXd>& ys) const;
@@ -65,6 +64,19 @@ public:
 
     //! Set the radius corresponding to the upper bound of the last bin.
     void setMaxRadiusValue(const double newMaxRadiusValue) { maxRadiusValue = newMaxRadiusValue; }
+
+    /**
+     * @brief Indicates that the data provided to the Hough transform had too few points.
+     *
+     * Some versions of the Hough transform use the `rowOffset` parameter that allows them to compare pairs of data
+     * points that are separated by some specified distance in terms of their indices. However, if the separation is
+     * larger than the number of points, this won't work. This exception is thrown in that case.
+     */
+    class TooFewPointsException : public std::runtime_error {
+    public:
+        using std::runtime_error::runtime_error;
+        TooFewPointsException() : std::runtime_error("Number of data points must be greater than rowOffset") {}
+    };
 
 protected:
     /**

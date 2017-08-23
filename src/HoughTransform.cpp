@@ -15,6 +15,10 @@ HoughTransform::HoughTransform(const Eigen::Index numBins_, const double maxRadi
 
 HoughSpace HoughTransform::findHoughSpace(const Eigen::Ref<const Eigen::ArrayXd>& xs,
                                           const Eigen::Ref<const Eigen::ArrayXd>& ys) const {
+    if (xs.rows() < rowOffset) {
+        throw TooFewPointsException();
+    }
+
     HoughSpace hspace {numBins, maxRadiusValue};
 
     #pragma omp parallel for
