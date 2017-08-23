@@ -4,6 +4,7 @@
 #include <Eigen/Core>
 #include <cassert>
 #include <type_traits>
+#include <numeric>
 
 namespace attpc {
 namespace cleaning {
@@ -156,14 +157,14 @@ public:
      * @return             A block of the data matrix.
      */
     inline DataBlockType getAngularSlice(const Eigen::Index minAngleBin, const Eigen::Index width) {
-        return data.block(minAngleBin, 0, width, numBins);
+        return data.block(minAngleBin, 0, std::min(width, numBins - minAngleBin), numBins);
     }
 
     /**
      * @brief Const version of getAngularSlice
      */
     inline ConstDataBlockType getAngularSlice(const Eigen::Index minAngleBin, const Eigen::Index width) const {
-        return data.block(minAngleBin, 0, width, numBins);
+        return data.block(minAngleBin, 0, std::min(width, numBins - minAngleBin), numBins);
     }
 
     /**
@@ -196,14 +197,14 @@ public:
      * @return              A block of the data matrix.
      */
     inline DataBlockType getRadialSlice(const Eigen::Index minRadiusBin, const Eigen::Index width) {
-        return data.block(0, minRadiusBin, numBins, width);
+        return data.block(0, minRadiusBin, numBins, std::min(width, numBins - minRadiusBin));
     }
 
     /**
      * @brief Const version of getRadialSlice
      */
     inline ConstDataBlockType getRadialSlice(const Eigen::Index minRadiusBin, const Eigen::Index width) const {
-        return data.block(0, minRadiusBin, numBins, width);
+        return data.block(0, minRadiusBin, numBins, std::min(width, numBins - minRadiusBin));
     }
 
 

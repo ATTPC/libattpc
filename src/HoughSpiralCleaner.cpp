@@ -113,7 +113,7 @@ auto HoughSpiralCleaner::findMaxAngleSlice(const HoughSpace& houghSpace, const E
     // HACK: Make sure the shape of the chunk is what's expected. This might not be the case if the order of the
     // dimensions was changed in the internal matrix of the HoughSpace class. This should probably be done in a
     // less ugly way.
-    assert((block.rows() == 2 * houghSpaceSliceSize) && (block.cols() == houghSpace.getNumBins()));
+    assert(block.cols() == houghSpace.getNumBins());
 
     return block.colwise().sum();
 }

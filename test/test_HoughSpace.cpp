@@ -59,3 +59,59 @@ TEST_CASE("HoughSpace can transform angles into bins", "[hough][bins]") {
         }
     }
 }
+
+TEST_CASE("HoughSpace can extract an angular slice") {
+    const Eigen::Index numBins = 500;
+    const double maxRad = 2000;
+    attpc::cleaning::HoughSpace hspace {numBins, maxRad};
+
+    SECTION("Can extract a 1-bin slice") {
+        const auto slice = hspace.getAngularSlice(40);
+        CHECK(slice.rows() == 1);
+        CHECK(slice.cols() == numBins);
+    }
+
+    SECTION("Can extract a wider slice") {
+        const Eigen::Index sliceStart = 40;
+        const Eigen::Index sliceWidth = 10;
+        const auto slice = hspace.getAngularSlice(sliceStart, sliceWidth);
+        CHECK(slice.rows() == sliceWidth);
+        CHECK(slice.cols() == numBins);
+    }
+
+    SECTION("Slice is clipped if the width goes out of bounds") {
+        const Eigen::Index sliceWidth = 20;
+        const Eigen::Index sliceStart = numBins - sliceWidth / 2;
+        const auto slice = hspace.getAngularSlice(sliceStart, sliceWidth);
+        CHECK(slice.rows() == sliceWidth / 2);
+        CHECK(slice.cols() == numBins);
+    }
+}
+
+TEST_CASE("HoughSpace can extract a radial slice") {
+    const Eigen::Index numBins = 500;
+    const double maxRad = 2000;
+    attpc::cleaning::HoughSpace hspace {numBins, maxRad};
+
+    SECTION("Can extract a 1-bin slice") {
+        const auto slice = hspace.getRadialSlice(40);
+        CHECK(slice.rows() == numBins);
+        CHECK(slice.cols() == 1);
+    }
+
+    SECTION("Can extract a wider slice") {
+        const Eigen::Index sliceStart = 40;
+        const Eigen::Index sliceWidth = 10;
+        const auto slice = hspace.getRadialSlice(sliceStart, sliceWidth);
+        CHECK(slice.rows() == numBins);
+        CHECK(slice.cols() == sliceWidth);
+    }
+
+    SECTION("Slice is clipped if the width goes out of bounds") {
+        const Eigen::Index sliceWidth = 20;
+        const Eigen::Index sliceStart = numBins - sliceWidth / 2;
+        const auto slice = hspace.getRadialSlice(sliceStart, sliceWidth);
+        CHECK(slice.rows() == numBins);
+        CHECK(slice.cols() == sliceWidth / 2);
+    }
+}
