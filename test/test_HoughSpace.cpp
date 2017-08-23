@@ -75,6 +75,8 @@ TEST_CASE("HoughSpace can extract an angular slice") {
         const Eigen::Index sliceStart = 40;
         const Eigen::Index sliceWidth = 10;
         const auto slice = hspace.getAngularSlice(sliceStart, sliceWidth);
+        CAPTURE(sliceWidth);
+        CAPTURE(sliceStart);
         CHECK(slice.rows() == sliceWidth);
         CHECK(slice.cols() == numBins);
     }
@@ -83,6 +85,18 @@ TEST_CASE("HoughSpace can extract an angular slice") {
         const Eigen::Index sliceWidth = 20;
         const Eigen::Index sliceStart = numBins - sliceWidth / 2;
         const auto slice = hspace.getAngularSlice(sliceStart, sliceWidth);
+        CAPTURE(sliceWidth);
+        CAPTURE(sliceStart);
+        CHECK(slice.rows() == sliceWidth / 2);
+        CHECK(slice.cols() == numBins);
+    }
+
+    SECTION("Slice is clipped if first bin is negative") {
+        const Eigen::Index sliceWidth = 10;
+        const Eigen::Index sliceStart = -sliceWidth / 2;
+        const auto slice = hspace.getAngularSlice(sliceStart, sliceWidth);
+        CAPTURE(sliceWidth);
+        CAPTURE(sliceStart);
         CHECK(slice.rows() == sliceWidth / 2);
         CHECK(slice.cols() == numBins);
     }
@@ -103,6 +117,8 @@ TEST_CASE("HoughSpace can extract a radial slice") {
         const Eigen::Index sliceStart = 40;
         const Eigen::Index sliceWidth = 10;
         const auto slice = hspace.getRadialSlice(sliceStart, sliceWidth);
+        CAPTURE(sliceWidth);
+        CAPTURE(sliceStart);
         CHECK(slice.rows() == numBins);
         CHECK(slice.cols() == sliceWidth);
     }
@@ -111,6 +127,18 @@ TEST_CASE("HoughSpace can extract a radial slice") {
         const Eigen::Index sliceWidth = 20;
         const Eigen::Index sliceStart = numBins - sliceWidth / 2;
         const auto slice = hspace.getRadialSlice(sliceStart, sliceWidth);
+        CAPTURE(sliceWidth);
+        CAPTURE(sliceStart);
+        CHECK(slice.rows() == numBins);
+        CHECK(slice.cols() == sliceWidth / 2);
+    }
+
+    SECTION("Slice is clipped if first bin is negative") {
+        const Eigen::Index sliceWidth = 10;
+        const Eigen::Index sliceStart = -sliceWidth / 2;
+        const auto slice = hspace.getRadialSlice(sliceStart, sliceWidth);
+        CAPTURE(sliceWidth);
+        CAPTURE(sliceStart);
         CHECK(slice.rows() == numBins);
         CHECK(slice.cols() == sliceWidth / 2);
     }

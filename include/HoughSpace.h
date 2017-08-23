@@ -157,14 +157,18 @@ public:
      * @return             A block of the data matrix.
      */
     inline DataBlockType getAngularSlice(const Eigen::Index minAngleBin, const Eigen::Index width) {
-        return data.block(minAngleBin, 0, std::min(width, numBins - minAngleBin), numBins);
+        const Eigen::Index minBinClip = std::max(minAngleBin, Eigen::Index{0});
+        const Eigen::Index widthClip = std::min(width, numBins - minAngleBin) - (minBinClip - minAngleBin);
+        return data.block(minBinClip, 0, widthClip, numBins);
     }
 
     /**
      * @brief Const version of getAngularSlice
      */
     inline ConstDataBlockType getAngularSlice(const Eigen::Index minAngleBin, const Eigen::Index width) const {
-        return data.block(minAngleBin, 0, std::min(width, numBins - minAngleBin), numBins);
+        const Eigen::Index minBinClip = std::max(minAngleBin, Eigen::Index{0});
+        const Eigen::Index widthClip = std::min(width, numBins - minAngleBin) - (minBinClip - minAngleBin);
+        return data.block(minBinClip, 0, widthClip, numBins);
     }
 
     /**
@@ -197,14 +201,18 @@ public:
      * @return              A block of the data matrix.
      */
     inline DataBlockType getRadialSlice(const Eigen::Index minRadiusBin, const Eigen::Index width) {
-        return data.block(0, minRadiusBin, numBins, std::min(width, numBins - minRadiusBin));
+        const Eigen::Index minBinClip = std::max(minRadiusBin, Eigen::Index{0});
+        const Eigen::Index widthClip = std::min(width, numBins - minRadiusBin) - (minBinClip - minRadiusBin);
+        return data.block(0, minBinClip, numBins, widthClip);
     }
 
     /**
      * @brief Const version of getRadialSlice
      */
     inline ConstDataBlockType getRadialSlice(const Eigen::Index minRadiusBin, const Eigen::Index width) const {
-        return data.block(0, minRadiusBin, numBins, std::min(width, numBins - minRadiusBin));
+        const Eigen::Index minBinClip = std::max(minRadiusBin, Eigen::Index{0});
+        const Eigen::Index widthClip = std::min(width, numBins - minRadiusBin) - (minBinClip - minRadiusBin);
+        return data.block(0, minBinClip, numBins, widthClip);
     }
 
 
