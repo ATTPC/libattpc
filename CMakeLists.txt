@@ -38,6 +38,22 @@ add_library(attpc_cleaning SHARED ${SRC_FILES})
 target_link_libraries(attpc_cleaning ${PCL_LIBRARIES})
 set_property(TARGET attpc_cleaning PROPERTY CXX_STANDARD 14)
 
+install(
+    TARGETS attpc_cleaning
+    EXPORT attpc_cleaning_targets
+    LIBRARY DESTINATION lib
+)
+install(
+    DIRECTORY include/
+    DESTINATION include/attpc/cleaning
+    FILES_MATCHING PATTERN "*.h"
+)
+install(
+    EXPORT attpc_cleaning_targets
+    NAMESPACE attpc::
+    DESTINATION lib/attpc
+)
+
 # Set up unit tests
 
 add_library(Catch INTERFACE)
