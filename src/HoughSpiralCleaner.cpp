@@ -124,7 +124,7 @@ std::vector<double> HoughSpiralCleaner::findPeakRadiusBins(const Eigen::Ref<cons
 
     for (const Eigen::Index pkIdx : maxLocs) {
         const Eigen::Index firstPt = std::max(pkIdx - peakWidth, Eigen::Index{0});
-        const Eigen::Index lastPt = std::max(pkIdx + peakWidth, houghSlice.rows() - 1);
+        const Eigen::Index lastPt = std::min(pkIdx + peakWidth, houghSlice.rows() - 1);
 
         const Eigen::VectorXd positions = Eigen::VectorXd::LinSpaced(lastPt - firstPt + 1, firstPt, lastPt);
         const Eigen::VectorXd values = houghSlice.segment(firstPt, lastPt - firstPt + 1).cast<double>();

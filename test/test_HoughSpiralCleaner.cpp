@@ -268,6 +268,38 @@ TEST_CASE("HoughSpiralCleaner can find peaks in Hough space slice", "[houghclean
             REQUIRE(foundPeaks.at(0) == Approx(expectedValue));
         }
     }
+
+    SECTION("Centers of gravity of several symmetric peaks are at the maxima") {
+        const std::vector<Eigen::Index> peakLocs = {10, 30, 50, 70, 90};
+        for (const auto loc : peakLocs) {
+            testData(loc) = 100;
+            testData(loc - 1) = 50;
+            testData(loc + 1) = 50;
+        }
+
+        const std::vector<double> foundPeaks = cleaner.findPeakRadiusBins(testData);
+
+        REQUIRE(foundPeaks.size() == peakLocs.size());
+
+        CAPTURE(peakLocs);
+        CAPTURE(foundPeaks);
+
+        for (size_t i = 0; i < peakLocs.size(); ++i) {
+            REQUIRE(peakLocs.at(i) == Approx(foundPeaks.at(i)));
+        }
+    }
+
+    SECTION("Behavior at edges of array is correct") {
+        SECTION("Peak at upper bound doesn't go out of bounds") {
+            testData(testData.rows() - 1) = 100;
+            REQUIRE_NOTHROW(cleaner.findPeakRadiusBins(testData));
+        }
+
+        SECTION("Peak at lower bound doesn't go out of bounds") {
+            testData(0) = 100;
+            REQUIRE_NOTHROW(cleaner.findPeakRadiusBins(testData));
+        }
+    }
 }
 
 TEST_CASE("HoughSpiralCleaner can classify points (simple example)", "[houghcleaner]") {
