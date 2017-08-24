@@ -3,7 +3,7 @@
 //
 
 #include "catch.hpp"
-#include <Eigen/Core>
+#include "eigen_common.h"
 #include <vector>
 #include "utilities.h"
 

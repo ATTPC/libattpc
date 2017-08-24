@@ -5,7 +5,7 @@
 #ifndef ATTPC_CLEANING_HOUGHSPIRALCLEANER_H
 #define ATTPC_CLEANING_HOUGHSPIRALCLEANER_H
 
-#include <Eigen/Core>
+#include "eigen_common.h"
 #include <vector>
 #include <algorithm>
 #include <numeric>

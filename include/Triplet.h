@@ -6,7 +6,7 @@
 #define ATTPC_CLEANING_TRIPLET_H
 
 #include <cstddef>
-#include <Eigen/Core>
+#include "eigen_common.h"
 
 namespace attpc {
 namespace cleaning {

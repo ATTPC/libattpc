@@ -2,6 +2,7 @@
 #define ATTPC_CLEANING_CLUSTER_H
 
 #include <vector>
+#include "eigen_common.h"
 #include <pcl/io/io.h>
 
 namespace attpc {

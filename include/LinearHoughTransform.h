@@ -6,7 +6,7 @@
 #define ATTPC_CLEANING_LINEARHOUGHTRANSFORM_H
 
 #include "HoughTransform.h"
-#include <Eigen/Core>
+#include "eigen_common.h"
 
 namespace attpc {
 namespace cleaning {

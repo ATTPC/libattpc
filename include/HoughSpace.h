@@ -1,7 +1,7 @@
 #ifndef ATTPC_CLEANING_HOUGHSPACE_H
 #define ATTPC_CLEANING_HOUGHSPACE_H
 
-#include <Eigen/Core>
+#include "eigen_common.h"
 #include <cassert>
 #include <type_traits>
 #include <numeric>

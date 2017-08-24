@@ -1,6 +1,7 @@
 #ifndef ATTPC_CLEANING_HTRIPLETCLUSTERING_H
 #define ATTPC_CLEANING_HTRIPLETCLUSTERING_H
 
+#include "eigen_common.h"
 #include <memory>
 #include <vector>
 #include <pcl/common/common.h>

@@ -6,7 +6,7 @@
 #define ATTPC_CLEANING_HOUGHTRANSFORM_H
 
 #include <cstddef>
-#include <Eigen/Core>
+#include "eigen_common.h"
 #include "HoughSpace.h"
 
 namespace attpc {

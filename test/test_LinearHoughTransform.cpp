@@ -1,6 +1,6 @@
 #include "catch.hpp"
 #include "LinearHoughTransform.h"
-#include <Eigen/Core>
+#include "eigen_common.h"
 #include <vector>
 
 TEST_CASE("Linear Hough transform finds lines", "[hough]") {

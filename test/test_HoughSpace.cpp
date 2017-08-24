@@ -1,6 +1,6 @@
 #include "catch.hpp"
 #include "HoughSpace.h"
-#include <Eigen/Core>
+#include "eigen_common.h"
 
 TEST_CASE("HoughSpace can transform radii into bins", "[hough][bins]") {
     const Eigen::Index numBins = 500;

@@ -8,7 +8,7 @@
 #include <functional>
 #include <vector>
 #include <cstddef>
-#include <Eigen/Core>
+#include "eigen_common.h"
 #include "Triplet.h"
 
 
