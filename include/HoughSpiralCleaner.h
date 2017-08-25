@@ -1,21 +1,11 @@
-//
-// Created by Joshua Bradt on 7/28/17.
-//
-
 #ifndef ATTPC_CLEANING_HOUGHSPIRALCLEANER_H
 #define ATTPC_CLEANING_HOUGHSPIRALCLEANER_H
 
 #include "eigen_common.h"
 #include <vector>
-#include <algorithm>
-#include <numeric>
-#include <limits>
-#include <cassert>
-#include <array>
 #include "CircularHoughTransform.h"
 #include "LinearHoughTransform.h"
 #include "HoughSpace.h"
-#include "utilities.h"
 
 namespace attpc {
 namespace cleaning {

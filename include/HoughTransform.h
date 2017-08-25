@@ -1,11 +1,6 @@
-//
-// Created by Joshua Bradt on 7/27/17.
-//
-
 #ifndef ATTPC_CLEANING_HOUGHTRANSFORM_H
 #define ATTPC_CLEANING_HOUGHTRANSFORM_H
 
-#include <cstddef>
 #include "eigen_common.h"
 #include "HoughSpace.h"
 

@@ -2,8 +2,13 @@
 // Created by Joshua Bradt on 7/28/17.
 //
 
+#include <cassert>
+#include <limits>
+#include <numeric>
+#include <algorithm>
 #include "HoughSpiralCleaner.h"
 #include "neighbors.h"
+#include "utilities.h"
 
 namespace {
     template <class Derived>

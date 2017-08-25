@@ -1,7 +1,3 @@
-//
-// Created by Joshua Bradt on 7/25/17.
-//
-
 #ifndef ATTPC_CLEANING_METRICS_H
 #define ATTPC_CLEANING_METRICS_H
 

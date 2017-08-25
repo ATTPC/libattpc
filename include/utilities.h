@@ -8,7 +8,6 @@
 
 #include "eigen_common.h"
 #include <pcl/common/common.h>
-#include <memory>
 #include <functional>
 #include <algorithm>
 #include <numeric>
@@ -95,7 +94,7 @@ std::vector<Eigen::Index> findPeakLocations(const Eigen::DenseBase<Derived>& dat
 
 /**
  * @brief Set all values in an array to zero if they are below the given threshold.
- * 
+ *
  * @param data      The data array.
  * @param threshold The threshold value. Any value less than this will be set to 0.
  */

@@ -1,12 +1,8 @@
-//
-// Created by Joshua Bradt on 7/27/17.
-//
-
 #ifndef ATTPC_CLEANING_LINEARHOUGHTRANSFORM_H
 #define ATTPC_CLEANING_LINEARHOUGHTRANSFORM_H
 
-#include "HoughTransform.h"
 #include "eigen_common.h"
+#include "HoughTransform.h"
 
 namespace attpc {
 namespace cleaning {
