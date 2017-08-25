@@ -3,6 +3,7 @@
 //
 
 #include "HoughSpiralCleaner.h"
+#include "neighbors.h"
 
 namespace {
     template <class Derived>
@@ -30,17 +31,21 @@ HoughSpiralCleaner::HoughSpiralCleaner(const HoughSpiralCleanerConfig& config)
 , houghSpaceSliceSize(config.houghSpaceSliceSize)
 , peakWidth(config.peakWidth)
 , minPointsPerLine(config.minPointsPerLine)
+, neighborRadius(config.neighborRadius)
 , linHough(config.linearHoughNumBins, config.linearHoughMaxRadius)
 , circHough(config.circularHoughNumBins, config.circularHoughMaxRadius)
 {}
 
 HoughSpiralCleanerResult HoughSpiralCleaner::processEvent(const Eigen::Ref<const Eigen::ArrayXXd>& xyz) const {
-    const auto x = xyz.col(0);
-    const auto y = xyz.col(1);
     const auto xy = xyz.block(0, 0, xyz.rows(), 2);
     const auto z = xyz.col(2);
 
-    const Eigen::Vector2d center = circHough.findCenter(x, y);
+    const Eigen::ArrayXi neighborCounts = countNeighbors(xyz.matrix());
+
+    // Before finding the center, apply a nearest-neighbors cut to remove some noise.
+    // This helps find a more realistic center.
+    const Eigen::ArrayXXd centerFindingData = applyNeighborCut(xyz, neighborCounts, 2);
+    const Eigen::Vector2d center = circHough.findCenter(centerFindingData.col(0), centerFindingData.col(1));
 
     const Eigen::ArrayXd arclens = findArcLength(xy, center);
 
@@ -59,7 +64,12 @@ HoughSpiralCleanerResult HoughSpiralCleaner::processEvent(const Eigen::Ref<const
 
     HoughSpiralCleanerResult result = classifyPoints(z, arclens, maxAngle, radPeakMap);
     result.center = center;
+    result.neighborCounts = std::move(neighborCounts);
     return result;
+}
+
+Eigen::ArrayXi HoughSpiralCleaner::countNeighbors(const Eigen::Ref<const Eigen::ArrayXXd>& xyz) const {
+    return attpc::cleaning::countNeighbors(xyz.matrix(), neighborRadius);
 }
 
 Eigen::Vector2d HoughSpiralCleaner::findCenter(const Eigen::Ref<const Eigen::ArrayXd>& xs,
@@ -139,6 +149,7 @@ std::vector<double> HoughSpiralCleaner::findPeakRadiusBins(const Eigen::Ref<cons
 HoughSpiralCleanerResult::HoughSpiralCleanerResult(const Eigen::Index numPts)
 : labels(decltype(labels)::Constant(numPts, -1))
 , distancesToNearestLine(decltype(distancesToNearestLine)::Constant(numPts, std::numeric_limits<double>::infinity()))
+, neighborCounts(decltype(neighborCounts)::Constant(numPts, -1))
 {}
 
 HoughSpiralCleanerResult HoughSpiralCleaner::classifyPoints(

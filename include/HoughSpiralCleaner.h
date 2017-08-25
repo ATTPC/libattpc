@@ -48,6 +48,9 @@ public:
 
     //! The minimum number of points that must be included in each found line.
     int minPointsPerLine;
+
+    //! Neighborhood radius used when determining how many neighbors each point has.
+    double neighborRadius;
 };
 
 /**
@@ -65,7 +68,7 @@ public:
      * @brief Constructor that initializes the contained arrays.
      *
      * The labels array is initialized to -1 for each point, and the distancesToNearestLine array is initialized
-     * to +infinity for each point. The center array is not initialized.
+     * to +infinity for each point. The neighborCounts are initialized to -1. The center array is not initialized.
      *
      * @param numPts The dimension of the labels and distancesToNearestLine arrays.
      */
@@ -87,6 +90,11 @@ public:
      * reduce the amount of noise in the dataset.
      */
     Eigen::ArrayXd distancesToNearestLine;
+
+    /**
+     * @brief The number of neighbors each point has inside the neighborhood radius.
+     */
+    Eigen::ArrayXi neighborCounts;
 
     //! The center of curvature (x, y) found by the circular Hough transform.
     Eigen::Vector2d center;
@@ -128,6 +136,17 @@ public:
      *             and the center of curvature found by the Hough transform for circles.
      */
     HoughSpiralCleanerResult processEvent(const Eigen::Ref<const Eigen::ArrayXXd>& xyz) const;
+
+    /**
+     * @brief Count the number of neighbors each point has.
+     *
+     * The neighborhood radius is controlled by the neighborRadius member of this class.
+     *
+     * @param  xyz The data, with columns corresponding to variables and rows corresponding to points.
+     *             All columns will contribute to the calculation of the distance between points.
+     * @return     The number of neighbors that each point has. Points are not counted as their own neighbors.
+     */
+    Eigen::ArrayXi countNeighbors(const Eigen::Ref<const Eigen::ArrayXXd>& xyz) const;
 
     /**
      * @brief Find the center of a spiral
@@ -227,6 +246,7 @@ private:
     Eigen::Index houghSpaceSliceSize;
     Eigen::Index peakWidth;
     int minPointsPerLine;
+    double neighborRadius;
 
     LinearHoughTransform linHough;
     CircularHoughTransform circHough;

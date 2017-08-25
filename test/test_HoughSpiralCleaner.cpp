@@ -42,6 +42,7 @@ attpc::cleaning::HoughSpiralCleanerConfig makeConfig() {
     config.houghSpaceSliceSize = 5;
     config.peakWidth = 5;
     config.minPointsPerLine = 5;
+    config.neighborRadius = 100;
 
     return config;
 }

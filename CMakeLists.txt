@@ -67,6 +67,7 @@ set(TEST_SRC_FILES
     test/test_LinearHoughTransform.cpp
     test/test_CircularHoughTransform.cpp
     test/test_HoughSpiralCleaner.cpp
+    test/test_neighbors.cpp
 )
 
 add_executable(test_attpc_cleaning EXCLUDE_FROM_ALL ${TEST_SRC_FILES})
