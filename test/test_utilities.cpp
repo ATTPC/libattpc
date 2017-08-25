@@ -86,3 +86,33 @@ TEST_CASE("findPeakLocations finds flat top peaks", "[utilities][findPeakLocatio
         }
     }
 }
+
+TEST_CASE("Can apply a threshold to an array") {
+    using attpc::cleaning::applyThreshold;
+
+    SECTION("Works in one dimension") {
+        const Eigen::Index numRows = 100;
+        Eigen::ArrayXi data {numRows};
+        data.segment(0, numRows / 2) = 50;
+        data.segment(numRows / 2, numRows / 2) = 100;
+
+        applyThreshold(data, 75);
+
+        CHECK((data.segment(0, numRows / 2) == 0).all());
+        CHECK((data.segment(numRows / 2, numRows / 2) == 100).all());
+    }
+
+    SECTION("Works in two dimensions") {
+        const Eigen::Index numRows = 100;
+        const Eigen::Index numCols = 100;
+
+        Eigen::ArrayXXi data {numRows, numCols};
+        data.block(0, 0, numRows / 2, numCols) = 50;
+        data.block(numRows / 2, 0, numRows / 2, numCols) = 100;
+
+        applyThreshold(data, 75);
+
+        CHECK((data.block(0, 0, numRows / 2, numCols) == 0).all());
+        CHECK((data.block(numRows / 2, 0, numRows / 2, numCols) == 100).all());
+    }
+}

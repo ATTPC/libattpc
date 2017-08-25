@@ -29,6 +29,7 @@ namespace cleaning {
 HoughSpiralCleaner::HoughSpiralCleaner(const HoughSpiralCleanerConfig& config)
 : numAngleBinsToReduce(config.numAngleBinsToReduce)
 , houghSpaceSliceSize(config.houghSpaceSliceSize)
+, houghSpaceSliceThreshold(config.houghSpaceSliceThreshold)
 , peakWidth(config.peakWidth)
 , minPointsPerLine(config.minPointsPerLine)
 , neighborRadius(config.neighborRadius)
@@ -53,7 +54,8 @@ HoughSpiralCleanerResult HoughSpiralCleaner::processEvent(const Eigen::Ref<const
 
     const Eigen::Index maxAngleBin = findMaxAngleBin(hspace);
     const double maxAngle = hspace.findAngleFromBin(maxAngleBin);
-    const AngleSliceArrayType maxAngleSlice = findMaxAngleSlice(hspace, maxAngleBin);
+    AngleSliceArrayType maxAngleSlice = findMaxAngleSlice(hspace, maxAngleBin);
+    applyThreshold(maxAngleSlice, houghSpaceSliceThreshold);  // This helps remove peaks caused by noise
 
     std::vector<double> radPeaks = findPeakRadiusBins(maxAngleSlice);
     std::transform(radPeaks.begin(), radPeaks.end(), radPeaks.begin(),

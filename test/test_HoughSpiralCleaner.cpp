@@ -40,6 +40,7 @@ attpc::cleaning::HoughSpiralCleanerConfig makeConfig() {
     config.circularHoughMaxRadius = 20;
     config.numAngleBinsToReduce = 1;
     config.houghSpaceSliceSize = 5;
+    config.houghSpaceSliceThreshold = 0;
     config.peakWidth = 5;
     config.minPointsPerLine = 5;
     config.neighborRadius = 100;

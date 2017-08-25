@@ -93,6 +93,23 @@ std::vector<Eigen::Index> findPeakLocations(const Eigen::DenseBase<Derived>& dat
     return peakLocs;
 }
 
+/**
+ * @brief Set all values in an array to zero if they are below the given threshold.
+ * 
+ * @param data      The data array.
+ * @param threshold The threshold value. Any value less than this will be set to 0.
+ */
+template <class Derived>
+inline void applyThreshold(Eigen::DenseBase<Derived>& data, const typename Derived::Scalar threshold) {
+    for (Eigen::Index colIdx = 0; colIdx < data.cols(); ++colIdx) {
+        for (Eigen::Index rowIdx = 0; rowIdx < data.rows(); ++rowIdx) {
+            if (data(rowIdx, colIdx) < threshold) {
+                data(rowIdx, colIdx) = 0;
+            }
+        }
+    }
+}
+
 }
 }
 

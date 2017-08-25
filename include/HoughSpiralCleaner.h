@@ -43,6 +43,9 @@ public:
     //! The number of angular bins to include in the slice of the Hough space around the maximum angle.
     Eigen::Index houghSpaceSliceSize;
 
+    //! A noise threshold applied to the Hough space slice.
+    HoughSpace::ScalarType houghSpaceSliceThreshold;
+
     //! The number of radial bins in each direction to include when finding the center of gravity of each peak.
     Eigen::Index peakWidth;
 
@@ -244,6 +247,7 @@ public:
 private:
     Eigen::Index numAngleBinsToReduce;
     Eigen::Index houghSpaceSliceSize;
+    HoughSpace::ScalarType houghSpaceSliceThreshold;
     Eigen::Index peakWidth;
     int minPointsPerLine;
     double neighborRadius;
