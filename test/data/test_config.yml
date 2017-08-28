@@ -1,0 +1,6 @@
+---
+# Test configuration
+
+string_option: string value
+int_option: 5
+float_option: 4.7
