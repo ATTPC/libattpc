@@ -2,6 +2,7 @@
 #include "ConfigStore.h"
 #include <boost/optional/optional_io.hpp>
 #include <string>
+#include <Eigen/Core>
 
 using attpc::common::ConfigStore;
 using namespace std::literals::string_literals;
@@ -30,6 +31,16 @@ TEST_CASE("ConfigStore can load a YAML file") {
         boost::optional<std::string> value = config.getValue<std::string>("string_option");
         REQUIRE(value);       // Check that it's not none
         REQUIRE(value == "string value"s);  // Check the value
+    }
+
+    SECTION("Can parse an array option") {
+        boost::optional<Eigen::Vector3i> value = config.getValue<Eigen::Vector3i>("array_option");
+
+        Eigen::Vector3i expected;
+        expected << 1, 2, 3;
+
+        REQUIRE(value);  // Check that it's not none
+        REQUIRE(value == expected);
     }
 
     SECTION("Returns none for an option that is not present in the file") {

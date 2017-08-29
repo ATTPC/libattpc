@@ -4,3 +4,4 @@
 string_option: string value
 int_option: 5
 float_option: 4.7
+array_option: [1, 2, 3]

@@ -15,6 +15,9 @@ include_directories(include)
 find_package(Boost 1.63 REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 
+# Find Eigen
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+
 # Set up YAML-CPP dependency
 add_subdirectory(libs/yaml-cpp)
 include_directories(SYSTEM libs/yaml-cpp/include)
@@ -25,7 +28,7 @@ set(SRC_FILES
 )
 
 add_library(attpc_common SHARED ${SRC_FILES})
-target_link_libraries(attpc_common yaml-cpp)
+target_link_libraries(attpc_common yaml-cpp Eigen3::Eigen)
 target_compile_options(attpc_common PRIVATE ${WARNING_FLAGS})
 set_property(TARGET attpc_common PROPERTY CXX_STANDARD 14)
 
@@ -37,6 +40,7 @@ target_include_directories(Catch INTERFACE libs/catch)
 set(TEST_SRC_FILES
     test/catch_main.cpp
     test/test_ConfigStore.cpp
+    test/test_yaml_conversions.cpp
 )
 
 add_executable(test_attpc_common ${TEST_SRC_FILES})

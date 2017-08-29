@@ -4,6 +4,8 @@
 #include <string>
 #include <boost/optional.hpp>
 #include <yaml-cpp/yaml.h>
+#include <Eigen/Core>
+#include "yaml_conversions.h"
 
 namespace attpc {
 namespace common {
