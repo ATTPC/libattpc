@@ -48,3 +48,23 @@ TEST_CASE("ConfigStore can load a YAML file") {
         REQUIRE_FALSE(value);
     }
 }
+
+TEST_CASE("ConfigStore can load a subconfig") {
+    ConfigStore config {configFileName};
+    boost::optional<ConfigStore> sub = config.getSubConfig("subconfig");
+
+    bool success {sub};  // Must convert separately since REQUIRE must be able to output its argument to cout
+    REQUIRE(success);
+
+    SECTION("Subconfig has int option") {
+        boost::optional<int> value = sub->getValue<int>("sub_int_option");
+        REQUIRE(value);       // Check that it's not none
+        REQUIRE(value == 1);  // Check the value
+    }
+
+    SECTION("Subconfig has string option") {
+        boost::optional<std::string> value = sub->getValue<std::string>("sub_string_option");
+        REQUIRE(value);       // Check that it's not none
+        REQUIRE(value == "sub string"s);  // Check the value
+    }
+}

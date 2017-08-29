@@ -28,6 +28,18 @@ public:
         }
     }
 
+    boost::optional<ConfigStore> getSubConfig(const std::string& name) const {
+        YAML::Node subnode = config[name];
+        if (subnode) {
+            ConfigStore subconfig {};
+            subconfig.config = subnode;
+            return subconfig;
+        }
+        else {
+            return boost::none;
+        }
+    }
+
 private:
     YAML::Node config;
 };
