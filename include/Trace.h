@@ -14,11 +14,6 @@ public:
     Trace(const HardwareAddress& hwaddr_);
     Trace(const HardwareAddress& hwaddr_, const padid_type pad_);
     Trace(const HardwareAddress& hwaddr_, const padid_type pad_, const Eigen::Ref<Eigen::ArrayXi>& data_);
-    Trace(const Trace& other);
-    Trace(Trace&& other);
-
-    Trace& operator=(const Trace& other);
-    Trace& operator=(Trace&& other);
 
     inline Eigen::ArrayXi::Scalar& operator()(const Eigen::Index idx) { return data(idx); }
     inline const Eigen::ArrayXi::Scalar& operator()(const Eigen::Index idx) const { return data(idx); }
