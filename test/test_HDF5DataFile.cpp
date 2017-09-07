@@ -123,7 +123,7 @@ TEST_CASE("Can write event to HDF5 file", "[HDF5DataFile]") {
     REQUIRE(dims[1] == evt.begin()->getData().size() + 5);
 
     HDF5DataFile::EncodedEventArrayType fileArray {dims[0], dims[1]};
-    dset.read(fileArray.data(), H5::PredType::NATIVE_INT16);
+    dset.read(fileArray.data(), H5::PredType::STD_I16LE);
 
     HDF5DataFile::EncodedEventArrayType evtArray = HDF5DataFile::encodeEvent(evt);  // For comparison
 
@@ -137,7 +137,7 @@ TEST_CASE("Can write event to HDF5 file", "[HDF5DataFile]") {
     REQUIRE(dset.attrExists("timestamp"));
     H5::Attribute tsAttr = dset.openAttribute("timestamp");
     attpc::timestamp_type ts;
-    tsAttr.read(H5::PredType::NATIVE_UINT64, &ts);
+    tsAttr.read(H5::PredType::STD_U64LE, &ts);
     REQUIRE(ts == evt.getTimestamp());
 }
 

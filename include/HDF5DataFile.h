@@ -40,6 +40,9 @@ private:
 
     static const Eigen::Index numColsInEvent;
     static const std::string timestampAttrName;
+
+    static const H5::PredType arrayH5DataType;          // signed, 16-bit, little-endian integer
+    static const H5::PredType timestampAttrH5DataType;  // unsigned, 64-bit, little-endian integer
 };
 
 }

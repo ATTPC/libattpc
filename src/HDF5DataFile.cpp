@@ -36,6 +36,8 @@ namespace common {
 
 const Eigen::Index HDF5DataFile::numColsInEvent = 512 + 5;    // num TBs + (cobo, asad, aget, channel, pad)
 const std::string HDF5DataFile::timestampAttrName = "timestamp";
+const H5::PredType HDF5DataFile::arrayH5DataType = H5::PredType::STD_I16LE;          // signed, 16-bit, little-endian integer
+const H5::PredType HDF5DataFile::timestampAttrH5DataType = H5::PredType::STD_U64LE;  // unsigned, 64-bit, little-endian integer
 
 HDF5DataFile::HDF5DataFile(const std::string& filename, const Mode mode)
 {
@@ -75,11 +77,11 @@ boost::optional<FullTraceEvent> HDF5DataFile::read(const evtid_type eventId, con
     }
 
     EncodedEventArrayType data {dims[0], dims[1]};
-    dataset.read(data.data(), H5::PredType::NATIVE_INT16);
+    dataset.read(data.data(), arrayH5DataType);
 
     H5::Attribute tsAttr = dataset.openAttribute(timestampAttrName);
     timestamp_type timestamp;
-    tsAttr.read(H5::PredType::NATIVE_UINT64, &timestamp);
+    tsAttr.read(timestampAttrH5DataType, &timestamp);
 
     FullTraceEvent event = decodeEvent(data);
     event.setEventId(eventId);
@@ -99,13 +101,13 @@ void HDF5DataFile::write(const FullTraceEvent& event, const std::string& groupNa
 
     const std::string datasetName = std::to_string(event.getEventId());
 
-    H5::DataSet dataset = group.createDataSet(datasetName, H5::PredType::NATIVE_INT16, dataspace);
-    dataset.write(data.data(), H5::PredType::NATIVE_INT16);
+    H5::DataSet dataset = group.createDataSet(datasetName, arrayH5DataType, dataspace);
+    dataset.write(data.data(), arrayH5DataType);
 
     H5::DataSpace tsAttrDs {H5S_SCALAR};
-    H5::Attribute tsAttr = dataset.createAttribute(timestampAttrName, H5::PredType::NATIVE_UINT64, tsAttrDs);
+    H5::Attribute tsAttr = dataset.createAttribute(timestampAttrName, timestampAttrH5DataType, tsAttrDs);
     timestamp_type timestamp = event.getTimestamp();
-    tsAttr.write(H5::PredType::NATIVE_UINT64, &timestamp);
+    tsAttr.write(timestampAttrH5DataType, &timestamp);
 }
 
 auto HDF5DataFile::encodeEvent(const FullTraceEvent& event) -> EncodedEventArrayType {
