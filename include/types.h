@@ -5,11 +5,11 @@
 
 namespace attpc {
 
-using coboid_type = uint8_t;
-using asadid_type = uint8_t;
-using agetid_type = uint8_t;
-using channelid_type = uint8_t;
-using padid_type = uint16_t;
+using coboid_type = int8_t;
+using asadid_type = int8_t;
+using agetid_type = int8_t;
+using channelid_type = int8_t;
+using padid_type = int16_t;
 
 using timestamp_type = uint64_t;
 using evtid_type = uint32_t;

@@ -54,6 +54,9 @@ auto FullTraceEvent::findTrace(const HardwareAddress& hwaddr) const -> const_ite
     return traces.find(hwaddr);
 }
 
+bool FullTraceEvent::operator==(const FullTraceEvent& other) const {
+    return (eventId == other.eventId) && (timestamp == other.timestamp) && (traces == other.traces);
+}
 
 
 }

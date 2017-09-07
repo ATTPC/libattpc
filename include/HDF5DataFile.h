@@ -14,11 +14,18 @@ namespace common {
 class HDF5DataFile {
 public:
     enum class Mode { create, truncate, readonly, readwrite };
+    using EncodedEventArrayType = Eigen::Array<Trace::ScalarType, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 
     HDF5DataFile(const std::string& filename, const Mode mode = Mode::readonly);
 
+    void open(const std::string& filename, const Mode mode = Mode::readonly);
+    void close();
+
     boost::optional<FullTraceEvent> read(const evtid_type eventId, const std::string& groupName = "get");
     void write(const FullTraceEvent& event, const std::string& groupName = "get");
+
+    static EncodedEventArrayType encodeEvent(const FullTraceEvent& event);
+    static FullTraceEvent decodeEvent(const Eigen::Ref<const EncodedEventArrayType>& array);
 
     class BadData : public std::runtime_error {
     public:
@@ -30,6 +37,9 @@ protected:
 
 private:
     H5::H5File file;
+
+    static const Eigen::Index numColsInEvent;
+    static const std::string timestampAttrName;
 };
 
 }

@@ -51,6 +51,7 @@ set(TEST_SRC_FILES
     test/test_HardwareAddress.cpp
     test/test_Trace.cpp
     test/test_FullTraceEvent.cpp
+    test/test_HDF5DataFile.cpp
 )
 
 add_executable(test_attpc_common ${TEST_SRC_FILES})

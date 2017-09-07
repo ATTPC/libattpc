@@ -9,13 +9,13 @@ Trace::Trace(const HardwareAddress& hwaddr_)
 , data(decltype(data)::Zero(512))
 {}
 
-Trace::Trace(const HardwareAddress& hwaddr_, const padid_type pad_)
+Trace::Trace(const HardwareAddress& hwaddr_, const boost::optional<padid_type> pad_)
 : hwaddr(hwaddr_)
 , pad(pad_)
 , data(decltype(data)::Zero(512))
 {}
 
-Trace::Trace(const HardwareAddress& hwaddr_, const padid_type pad_, const Eigen::Ref<Eigen::ArrayXi>& data_)
+Trace::Trace(const HardwareAddress& hwaddr_, const boost::optional<padid_type> pad_, const Eigen::Ref<const ArrayType>& data_)
 : hwaddr(hwaddr_)
 , pad(pad_)
 , data(data_)
@@ -23,6 +23,10 @@ Trace::Trace(const HardwareAddress& hwaddr_, const padid_type pad_, const Eigen:
 
 bool Trace::operator<(const Trace& other) const {
     return hwaddr < other.hwaddr;
+}
+
+bool Trace::operator==(const Trace& other) const {
+    return (hwaddr == other.hwaddr) && (data == other.data).all() && (pad == other.pad);
 }
 
 }

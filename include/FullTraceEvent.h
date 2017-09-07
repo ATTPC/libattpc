@@ -41,6 +41,8 @@ public:
     timestamp_type getTimestamp() const { return timestamp; }
     void setTimestamp(const timestamp_type newTimestamp) { timestamp = newTimestamp; }
 
+    bool operator==(const FullTraceEvent& other) const;
+
 private:
     evtid_type eventId;
     timestamp_type timestamp;
