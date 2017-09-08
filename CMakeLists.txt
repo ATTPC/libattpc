@@ -39,6 +39,22 @@ target_link_libraries(attpc_common yaml-cpp Eigen3::Eigen ${HDF5_CXX_LIBRARIES})
 target_compile_options(attpc_common PRIVATE ${WARNING_FLAGS})
 set_property(TARGET attpc_common PROPERTY CXX_STANDARD 14)
 
+install(
+    TARGETS attpc_common
+    EXPORT attpc_common_targets
+    LIBRARY DESTINATION lib
+)
+install(
+    DIRECTORY include/
+    DESTINATION include/attpc/common
+    FILES_MATCHING PATTERN "*.h"
+)
+install(
+    EXPORT attpc_common_targets
+    NAMESPACE attpc::
+    DESTINATION lib/attpc
+)
+
 # Set up unit tests
 
 add_library(Catch INTERFACE)
@@ -60,6 +76,8 @@ target_compile_options(test_attpc_common PRIVATE ${WARNING_FLAGS})
 set_property(TARGET test_attpc_common PROPERTY CXX_STANDARD 14)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test/data/test_config.yml ${CMAKE_CURRENT_BINARY_DIR}/data/test_config.yml COPYONLY)
+
+
 
 # Set up target for documentation
 
