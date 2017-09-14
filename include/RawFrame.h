@@ -15,20 +15,23 @@ public:
 
     explicit RawFrame(const size_t size) : m_data(new byte_type[size]), m_size(size) {}
 
-    iterator begin() { return m_data.get(); }
-    iterator begin() const { return m_data.get(); }
+    iterator begin() { return begin_impl(); }
+    iterator begin() const { return begin_impl(); }
 
-    iterator end() { return m_data.get() + m_size + 1; }
-    iterator end() const { return m_data.get() + m_size + 1; }
+    iterator end() { return end_impl(); }
+    iterator end() const { return end_impl(); }
 
-    const_iterator cbegin() const { return m_data.get(); }
-    const_iterator cend() const { return m_data.get() + m_size + 1; }
+    const_iterator cbegin() const { return begin_impl(); }
+    const_iterator cend() const { return end_impl(); }
 
     size_t size() const { return m_size; }
 
     byte_type* getDataPtr() const { return m_data.get(); }
 
 private:
+    inline iterator begin_impl() const { return m_data.get(); }
+    inline iterator end_impl() const { return m_data.get() + m_size + 1; }
+
     std::unique_ptr<byte_type> m_data;
     const size_t m_size;
 };
