@@ -5,6 +5,7 @@
 #include <bitset>
 #include <vector>
 #include "utilities.h"
+#include "RawFrame.h"
 
 namespace attpc {
 namespace mergers {
@@ -14,14 +15,14 @@ struct GRAWHeaderField {
     static_assert(sizeof(T) >= size_, "Declared type is too small to hold a value with the given size");
 
     GRAWHeaderField() = default;
-    GRAWHeaderField(const std::vector<uint8_t>& rawFrame) : value(extractFromRawFrame(rawFrame)) {}
+    GRAWHeaderField(const RawFrame& rawFrame) : value(extractFromRawFrame(rawFrame)) {}
 
     using type = T;
     static constexpr size_t offset = offset_;
     static constexpr size_t size = size_;
     type value;
 
-    static type extractFromRawFrame(const std::vector<uint8_t>& rawFrame) {
+    static type extractFromRawFrame(const RawFrame& rawFrame) {
         const auto fieldBegin = rawFrame.begin() + offset;
         const auto fieldEnd = fieldBegin + size;
         if (fieldEnd > rawFrame.end()) {
@@ -34,7 +35,7 @@ struct GRAWHeaderField {
 class GRAWHeader {
 public:
     GRAWHeader() = default;
-    GRAWHeader(const std::vector<uint8_t>& rawFrame);
+    GRAWHeader(const RawFrame& rawFrame);
 
 public:
     GRAWHeaderField<uint8_t, 0> metaType;
@@ -85,7 +86,7 @@ struct GRAWDataItem {
 class GRAWFrame {
 public:
     GRAWFrame() = default;
-    GRAWFrame(const std::vector<uint8_t>& rawFrame);
+    GRAWFrame(const RawFrame& rawFrame);
 
     bool isFullReadout() const { return header.frameType.value == fullReadoutFrameType; }
 
@@ -95,10 +96,10 @@ public:
     std::vector<GRAWDataItem> data;
 
 private:
-    std::vector<GRAWDataItem> decodePartialReadoutData(const std::vector<uint8_t>::const_iterator& begin,
-                                                       const std::vector<uint8_t>::const_iterator& end) const;
-    std::vector<GRAWDataItem> decodeFullReadoutData(const std::vector<uint8_t>::const_iterator& begin,
-                                                    const std::vector<uint8_t>::const_iterator& end) const;
+    std::vector<GRAWDataItem> decodePartialReadoutData(const RawFrame::const_iterator& begin,
+                                                       const RawFrame::const_iterator& end) const;
+    std::vector<GRAWDataItem> decodeFullReadoutData(const RawFrame::const_iterator& begin,
+                                                    const RawFrame::const_iterator& end) const;
 
     static const uint8_t fullReadoutFrameType = 2;
 };

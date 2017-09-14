@@ -1,5 +1,6 @@
 #include "GRAWFile.h"
 #include "utilities.h"
+#include "RawFrame.h"
 
 namespace {
 using attpc::mergers::utilities::parseValue;
@@ -29,17 +30,19 @@ void GRAWFile::close() {
 }
 
 GRAWFrame GRAWFile::readFrame() {
+    using FrameSizeField = decltype(GRAWHeader::frameSize);
+
     const auto start = file.tellg();
     file.seekg(decltype(GRAWHeader::frameSize)::offset, std::ios_base::cur);
-    std::vector<uint8_t> rawSize (decltype(GRAWHeader::frameSize)::size);
-    file.read(reinterpret_cast<char*>(rawSize.data()), rawSize.size());
-    uint32_t frameSize = parseValue<uint32_t>(rawSize.begin(), rawSize.end());
+    RawFrame rawSize (FrameSizeField::size);
+    file.read(reinterpret_cast<char*>(rawSize.getDataPtr()), rawSize.size());
+    FrameSizeField::type frameSize = parseValue<FrameSizeField::type>(rawSize.begin(), rawSize.end());
     file.seekg(start);
 
-    std::vector<uint8_t> rawFrame (frameSize * 256);
-    file.read(reinterpret_cast<char*>(rawFrame.data()), rawFrame.size());
+    RawFrame rawFrame (frameSize * 256);
+    file.read(reinterpret_cast<char*>(rawFrame.getDataPtr()), rawFrame.size());
 
-    return GRAWFrame(rawFrame);
+    return GRAWFrame{rawFrame};
 }
 
 }

@@ -5,7 +5,7 @@
 namespace attpc {
 namespace mergers {
 
-GRAWHeader::GRAWHeader(const std::vector<uint8_t>& rawFrame)
+GRAWHeader::GRAWHeader(const RawFrame& rawFrame)
 : metaType(rawFrame)
 , frameSize(rawFrame)
 , dataSource(rawFrame)
@@ -31,7 +31,7 @@ GRAWHeader::GRAWHeader(const std::vector<uint8_t>& rawFrame)
 , windowOut(rawFrame)
 {}
 
-GRAWFrame::GRAWFrame(const std::vector<uint8_t>& rawFrame)
+GRAWFrame::GRAWFrame(const RawFrame& rawFrame)
 : header(rawFrame)
 {
     const auto dataBegin = rawFrame.cbegin() + header.headerSize.value * 256;
@@ -46,8 +46,8 @@ GRAWFrame::GRAWFrame(const std::vector<uint8_t>& rawFrame)
     }
 }
 
-std::vector<GRAWDataItem> GRAWFrame::decodePartialReadoutData(const std::vector<uint8_t>::const_iterator& begin,
-                                                              const std::vector<uint8_t>::const_iterator& end) const {
+std::vector<GRAWDataItem> GRAWFrame::decodePartialReadoutData(const RawFrame::const_iterator& begin,
+                                                              const RawFrame::const_iterator& end) const {
     std::vector<GRAWDataItem> parsedData;
 
     for (auto iter = begin; iter != end; iter += 4) {
@@ -65,8 +65,8 @@ std::vector<GRAWDataItem> GRAWFrame::decodePartialReadoutData(const std::vector<
     return parsedData;
 }
 
-std::vector<GRAWDataItem> GRAWFrame::decodeFullReadoutData(const std::vector<uint8_t>::const_iterator& begin,
-                                                           const std::vector<uint8_t>::const_iterator& end) const {
+std::vector<GRAWDataItem> GRAWFrame::decodeFullReadoutData(const RawFrame::const_iterator& begin,
+                                                           const RawFrame::const_iterator& end) const {
     std::vector<std::queue<uint16_t>> sampleQueues (4);
 
     for (auto iter = begin; iter != end; iter += 2) {
