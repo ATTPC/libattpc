@@ -21,3 +21,18 @@ set(SRC_FILES
 add_library(attpc_mergers SHARED ${SRC_FILES})
 target_compile_options(attpc_mergers PRIVATE ${WARNING_FLAGS})
 set_property(TARGET attpc_mergers PROPERTY CXX_STANDARD 14)
+
+# Set up unit tests
+
+add_library(Catch INTERFACE)
+target_include_directories(Catch INTERFACE libs/catch)
+
+set(TEST_SRC_FILES
+    test/catch_main.cpp
+    test/test_RawFrame.cpp
+)
+
+add_executable(test_attpc_mergers ${TEST_SRC_FILES})
+target_link_libraries(test_attpc_mergers Catch attpc_mergers)
+target_compile_options(test_attpc_mergers PRIVATE ${WARNING_FLAGS})
+set_property(TARGET test_attpc_mergers PROPERTY CXX_STANDARD 14)
