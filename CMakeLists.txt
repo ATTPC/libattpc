@@ -15,6 +15,7 @@ include_directories(include)
 set(SRC_FILES
     src/GRAWFile.cpp
     src/GRAWFrame.cpp
+    src/GRAWHeader.cpp
 )
 
 add_library(attpc_mergers SHARED ${SRC_FILES})

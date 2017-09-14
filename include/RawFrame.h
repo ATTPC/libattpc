@@ -30,7 +30,7 @@ public:
 
 private:
     inline iterator begin_impl() const { return m_data.get(); }
-    inline iterator end_impl() const { return m_data.get() + m_size + 1; }
+    inline iterator end_impl() const { return m_data.get() + m_size; }
 
     std::unique_ptr<byte_type> m_data;
     const size_t m_size;
