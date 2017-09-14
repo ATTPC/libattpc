@@ -30,6 +30,7 @@ target_include_directories(Catch INTERFACE libs/catch)
 set(TEST_SRC_FILES
     test/catch_main.cpp
     test/test_RawFrame.cpp
+    test/test_utilities.cpp
 )
 
 add_executable(test_attpc_mergers ${TEST_SRC_FILES})
