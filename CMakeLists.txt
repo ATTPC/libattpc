@@ -31,9 +31,13 @@ set(TEST_SRC_FILES
     test/catch_main.cpp
     test/test_RawFrame.cpp
     test/test_utilities.cpp
+    test/test_GRAWHeaderField.cpp
+    test/test_GRAWFile.cpp
 )
 
 add_executable(test_attpc_mergers ${TEST_SRC_FILES})
 target_link_libraries(test_attpc_mergers Catch attpc_mergers)
 target_compile_options(test_attpc_mergers PRIVATE ${WARNING_FLAGS})
 set_property(TARGET test_attpc_mergers PROPERTY CXX_STANDARD 14)
+
+configure_file(test/data/partial_readout_frame.graw test_data/partial_readout_frame.graw COPYONLY)

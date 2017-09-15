@@ -27,6 +27,10 @@ GRAWHeader::GRAWHeader(const RawFrame& rawFrame)
 , multip_2(rawFrame)
 , multip_3(rawFrame)
 , windowOut(rawFrame)
+, lastCell_0(rawFrame)
+, lastCell_1(rawFrame)
+, lastCell_2(rawFrame)
+, lastCell_3(rawFrame)
 {}
 
 }
