@@ -11,16 +11,21 @@ endif()
 
 include_directories(include)
 
+# Find dependencies
+find_package(attpc_common REQUIRED)
+
 # Set up library
 set(SRC_FILES
     src/GRAWFile.cpp
     src/GRAWFrame.cpp
     src/GRAWHeader.cpp
+    src/Merger.cpp
 )
 
 add_library(attpc_mergers SHARED ${SRC_FILES})
 target_compile_options(attpc_mergers PRIVATE ${WARNING_FLAGS})
 set_property(TARGET attpc_mergers PROPERTY CXX_STANDARD 14)
+target_link_libraries(attpc_mergers attpc::attpc_common)
 
 # Set up unit tests
 
