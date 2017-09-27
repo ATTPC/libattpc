@@ -1,27 +1,20 @@
-cmake_minimum_required(VERSION 3.1)
+# CMake Configuration for the cleaning components of libattpc
+# ===========================================================
+#
+# This is a sub-component of libattpc, and it is NOT set up to be built or used
+# independently of the complete library! Please see the master libattpc repository
+# for build instructions for the complete library.
 
-project(attpc_cleaning)
+#################################
+# Directory-level configuration #
+#################################
 
-include(CMakeToolsHelpers OPTIONAL)
-find_package(PCL 1.2 REQUIRED COMPONENTS common kdtree io)
-include_directories(SYSTEM ${PCL_INCLUDE_DIRS})
-link_directories(${PCL_LIBRARY_DIRS})
-add_definitions(${PCL_DEFINITIONS})
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 
-find_package(OpenMP)
-if (OPENMP_FOUND)
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif()
-
-# Set up warnings
-if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything -Wno-c++98-compat -Wno-padded -Wno-weak-vtables -Wno-exit-time-destructors")
-elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra -Wfloat-equal -Wpointer-arith -Wcast-qual")
-endif()
-
-include_directories(include)
+#################
+# Library setup #
+#################
 
 set(SRC_FILES
     src/Cluster.cpp
@@ -35,29 +28,31 @@ set(SRC_FILES
 )
 
 add_library(attpc_cleaning SHARED ${SRC_FILES})
+target_include_directories(attpc_cleaning PUBLIC include)
+target_include_directories(attpc_cleaning SYSTEM PUBLIC ${PCL_INCLUDE_DIRS})
 target_link_libraries(attpc_cleaning ${PCL_LIBRARIES})
+target_compile_options(attpc_cleaning PRIVATE ${WARNING_FLAGS})
 set_property(TARGET attpc_cleaning PROPERTY CXX_STANDARD 14)
 
-install(
-    TARGETS attpc_cleaning
-    EXPORT attpc_cleaning_targets
-    LIBRARY DESTINATION lib
-)
-install(
-    DIRECTORY include/
-    DESTINATION include/attpc/cleaning
-    FILES_MATCHING PATTERN "*.h"
-)
-install(
-    EXPORT attpc_cleaning_targets
-    NAMESPACE attpc::
-    DESTINATION lib/attpc
-)
+# install(
+#     TARGETS attpc_cleaning
+#     EXPORT attpc_cleaning_targets
+#     LIBRARY DESTINATION lib
+# )
+# install(
+#     DIRECTORY include/
+#     DESTINATION include/attpc/cleaning
+#     FILES_MATCHING PATTERN "*.h"
+# )
+# install(
+#     EXPORT attpc_cleaning_targets
+#     NAMESPACE attpc::
+#     DESTINATION lib/attpc
+# )
 
-# Set up unit tests
-
-add_library(Catch INTERFACE)
-target_include_directories(Catch INTERFACE libs/catch)
+###################
+# Unit test setup #
+###################
 
 set(TEST_SRC_FILES
     test/catch_main.cpp
@@ -70,11 +65,14 @@ set(TEST_SRC_FILES
     test/test_neighbors.cpp
 )
 
-add_executable(test_attpc_cleaning EXCLUDE_FROM_ALL ${TEST_SRC_FILES})
+add_executable(test_attpc_cleaning ${TEST_SRC_FILES})
 target_link_libraries(test_attpc_cleaning Catch attpc_cleaning)
+target_compile_options(test_attpc_cleaning PRIVATE ${WARNING_FLAGS})
 set_property(TARGET test_attpc_cleaning PROPERTY CXX_STANDARD 14)
 
-# Set up target for documentation
+#######################
+# Documentation setup #
+#######################
 
 find_package(Doxygen 1.8)
 if(${DOXYGEN_FOUND})
@@ -92,8 +90,11 @@ else()
     message(WARNING "Doxygen is required to build the documentation.")
 endif()
 
-# Set up targets for profiling code
+###################
+# Profiling setup #
+###################
 
 add_executable(prof_LinearHoughTransform EXCLUDE_FROM_ALL prof/prof_LinearHoughTransform.cpp)
 target_link_libraries(prof_LinearHoughTransform attpc_cleaning)
+target_compile_options(prof_LinearHoughTransform PRIVATE ${WARNING_FLAGS})
 set_property(TARGET prof_LinearHoughTransform PROPERTY CXX_STANDARD 14)
