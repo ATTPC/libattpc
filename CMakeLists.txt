@@ -1,20 +1,14 @@
-cmake_minimum_required(VERSION 3.1)
+# CMake Configuration for the merging components of libattpc
+# ==========================================================
+#
+# This is a sub-component of libattpc, and it is NOT set up to be built or used
+# independently of the complete library! Please see the master libattpc repository
+# for build instructions for the complete library.
 
-project(attpc_mergers)
+#################
+# Library setup #
+#################
 
-# Set up warnings
-if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-    set(WARNING_FLAGS -Weverything -Wno-c++98-compat -Wno-padded -Wno-weak-vtables -Wno-exit-time-destructors)
-elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
-    set(WARNING_FLAGS -Wall -pedantic -Wextra -Wfloat-equal -Wpointer-arith -Wcast-qual)
-endif()
-
-include_directories(include)
-
-# Find dependencies
-find_package(attpc_common REQUIRED)
-
-# Set up library
 set(SRC_FILES
     src/GRAWFile.cpp
     src/GRAWFrame.cpp
@@ -23,14 +17,14 @@ set(SRC_FILES
 )
 
 add_library(attpc_mergers SHARED ${SRC_FILES})
+target_include_directories(attpc_mergers PUBLIC include)
+target_link_libraries(attpc_mergers attpc_common)
 target_compile_options(attpc_mergers PRIVATE ${WARNING_FLAGS})
 set_property(TARGET attpc_mergers PROPERTY CXX_STANDARD 14)
-target_link_libraries(attpc_mergers attpc::attpc_common)
 
-# Set up unit tests
-
-add_library(Catch INTERFACE)
-target_include_directories(Catch INTERFACE libs/catch)
+###################
+# Unit test setup #
+###################
 
 set(TEST_SRC_FILES
     test/catch_main.cpp

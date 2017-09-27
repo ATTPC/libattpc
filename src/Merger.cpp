@@ -7,9 +7,9 @@ using attpc::common::FullTraceEvent;
 namespace attpc {
 namespace mergers {
 
-FullTraceEvent Merger::buildEvent(const FrameVector& frames) {
-
-}
+// FullTraceEvent Merger::buildEvent(const FrameVector& frames) {
+//
+// }
 
 }
 }

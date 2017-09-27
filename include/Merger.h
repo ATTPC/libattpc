@@ -19,7 +19,7 @@ public:
     void addFrame(const GRAWFrame& frame);
     void addFrame(GRAWFrame&& frame);
 
-    attpc::common::FullTraceEvdent buildEvent(const FrameVector& frames) const;
+    attpc::common::FullTraceEvent buildEvent(const FrameVector& frames) const;
 
 
 
