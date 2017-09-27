@@ -1,32 +1,14 @@
-cmake_minimum_required(VERSION 3.1)
+# CMake Configuration for the common components of libattpc
+# =========================================================
+#
+# This is a sub-component of libattpc, and it is NOT set up to be built or used
+# independently of the complete library! Please see the master libattpc repository
+# for build instructions for the complete library.
 
-project(attpc_common)
+#################
+# Library setup #
+#################
 
-# Set up warnings
-if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-    set(WARNING_FLAGS -Weverything -Wno-c++98-compat -Wno-padded -Wno-weak-vtables -Wno-exit-time-destructors)
-elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
-    set(WARNING_FLAGS -Wall -pedantic -Wextra -Wfloat-equal -Wpointer-arith -Wcast-qual)
-endif()
-
-include_directories(include)
-
-# Find Boost
-find_package(Boost 1.63 REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
-
-# Find Eigen
-find_package(Eigen3 3.3 REQUIRED NO_MODULE)
-
-# Find HDF5
-find_package(HDF5 1.10 REQUIRED COMPONENTS CXX)
-include_directories(SYSTEM ${HDF5_INCLUDE_DIRS})
-
-# Set up YAML-CPP dependency
-add_subdirectory(libs/yaml-cpp)
-include_directories(SYSTEM libs/yaml-cpp/include)
-
-# Build library
 set(SRC_FILES
     src/ConfigStore.cpp
     src/HDF5DataFile.cpp
@@ -35,30 +17,31 @@ set(SRC_FILES
 )
 
 add_library(attpc_common SHARED ${SRC_FILES})
+target_include_directories(attpc_common PUBLIC include)
+target_include_directories(attpc_common SYSTEM PUBLIC ${Boost_INCLUDE_DIRS} ${HDF5_INCLUDE_DIRS})
 target_link_libraries(attpc_common yaml-cpp Eigen3::Eigen ${HDF5_CXX_LIBRARIES})
 target_compile_options(attpc_common PRIVATE ${WARNING_FLAGS})
 set_property(TARGET attpc_common PROPERTY CXX_STANDARD 14)
 
-install(
-    TARGETS attpc_common
-    EXPORT attpc_common_targets
-    LIBRARY DESTINATION lib
-)
-install(
-    DIRECTORY include/
-    DESTINATION include/attpc/common
-    FILES_MATCHING PATTERN "*.h"
-)
-install(
-    EXPORT attpc_common_targets
-    NAMESPACE attpc::
-    DESTINATION lib/attpc
-)
+# install(
+#     TARGETS attpc_common
+#     EXPORT attpc_common_targets
+#     LIBRARY DESTINATION lib
+# )
+# install(
+#     DIRECTORY include/
+#     DESTINATION include/attpc/common
+#     FILES_MATCHING PATTERN "*.h"
+# )
+# install(
+#     EXPORT attpc_common_targets
+#     NAMESPACE attpc::
+#     DESTINATION lib/attpc
+# )
 
-# Set up unit tests
-
-add_library(Catch INTERFACE)
-target_include_directories(Catch INTERFACE libs/catch)
+###################
+# Unit test setup #
+###################
 
 set(TEST_SRC_FILES
     test/catch_main.cpp
@@ -77,9 +60,9 @@ set_property(TARGET test_attpc_common PROPERTY CXX_STANDARD 14)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test/data/test_config.yml ${CMAKE_CURRENT_BINARY_DIR}/data/test_config.yml COPYONLY)
 
-
-
-# Set up target for documentation
+#######################
+# Documentation setup #
+#######################
 
 # find_package(Doxygen 1.8)
 # if(${DOXYGEN_FOUND})
