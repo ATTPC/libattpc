@@ -1,9 +1,10 @@
-#include "HDF5DataFile.h"
-#include <stdexcept>
+#include "attpc/common/HDF5DataFile.h"
+#include "attpc/common/utilities.h"
 
 namespace {
 
 using H5Mode = decltype(H5F_ACC_TRUNC);
+using attpc::common::narrow_cast;
 
 H5Mode getH5AccessMode(const attpc::common::HDF5DataFile::Mode mode) {
     using Mode = attpc::common::HDF5DataFile::Mode;
@@ -17,16 +18,6 @@ H5Mode getH5AccessMode(const attpc::common::HDF5DataFile::Mode mode) {
         case Mode::create:
             return H5F_ACC_EXCL;
     }
-}
-
-template <typename Output, typename Input>
-Output narrow_cast(const Input value) {
-    auto castValue = static_cast<Output>(value);
-    if (static_cast<Input>(castValue) != value) {
-        throw std::runtime_error("narrow_cast failed");
-    }
-
-    return castValue;
 }
 
 }

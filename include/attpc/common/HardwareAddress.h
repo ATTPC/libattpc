@@ -1,7 +1,7 @@
 #ifndef ATTPC_COMMON_HARDWAREADDRESS_H
 #define ATTPC_COMMON_HARDWAREADDRESS_H
 
-#include "types.h"
+#include "attpc/common/types.h"
 #include <tuple>
 
 namespace attpc {

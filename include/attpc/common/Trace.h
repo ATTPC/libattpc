@@ -3,8 +3,8 @@
 
 #include <boost/optional.hpp>
 #include <Eigen/Core>
-#include "types.h"
-#include "HardwareAddress.h"
+#include "attpc/common/types.h"
+#include "attpc/common/HardwareAddress.h"
 
 namespace attpc {
 namespace common {

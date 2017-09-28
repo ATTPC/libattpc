@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "Trace.h"
+#include "attpc/common/Trace.h"
 
 using attpc::common::Trace;
 using attpc::common::HardwareAddress;

@@ -1,4 +1,4 @@
-#include "ConfigStore.h"
+#include "attpc/common/ConfigStore.h"
 #include <yaml-cpp/yaml.h>
 
 namespace attpc {

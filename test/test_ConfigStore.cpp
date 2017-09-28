@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "ConfigStore.h"
+#include "attpc/common/ConfigStore.h"
 #include <boost/optional/optional_io.hpp>
 #include <string>
 #include <Eigen/Core>

@@ -2,8 +2,8 @@
 #define ATTPC_COMMON_FULLTRACEEVENT_H
 
 #include <set>
-#include "Trace.h"
-#include "HardwareAddress.h"
+#include "attpc/common/Trace.h"
+#include "attpc/common/HardwareAddress.h"
 
 namespace attpc {
 namespace common {

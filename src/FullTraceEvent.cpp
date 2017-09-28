@@ -1,4 +1,4 @@
-#include "FullTraceEvent.h"
+#include "attpc/common/FullTraceEvent.h"
 #include <cassert>
 
 namespace attpc {

@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "yaml_conversions.h"
+#include "attpc/common/yaml_conversions.h"
 #include <Eigen/Core>
 
 namespace {

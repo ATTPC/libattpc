@@ -1,6 +1,6 @@
 #include "catch.hpp"
-#include "HDF5DataFile.h"
-#include "FullTraceEvent.h"
+#include "attpc/common/HDF5DataFile.h"
+#include "attpc/common/FullTraceEvent.h"
 #include <Eigen/Core>
 #include <cstdio>
 #include <H5Cpp.h>

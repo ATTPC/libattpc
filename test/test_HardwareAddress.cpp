@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "HardwareAddress.h"
+#include "attpc/common/HardwareAddress.h"
 #include <vector>
 
 using attpc::common::HardwareAddress;

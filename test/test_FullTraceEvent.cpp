@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "FullTraceEvent.h"
+#include "attpc/common/FullTraceEvent.h"
 #include <vector>
 
 using attpc::common::FullTraceEvent;

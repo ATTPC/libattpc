@@ -1,8 +1,8 @@
 #ifndef ATTPC_COMMON_HDF5DATAFILE_H
 #define ATTPC_COMMON_HDF5DATAFILE_H
 
-#include "types.h"
-#include "FullTraceEvent.h"
+#include "attpc/common/types.h"
+#include "attpc/common/FullTraceEvent.h"
 #include <string>
 #include <H5Cpp.h>
 #include <boost/optional.hpp>
