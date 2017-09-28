@@ -6,7 +6,7 @@
 #ifndef ATTPC_CLEANING_CONVERSIONS_H
 #define ATTPC_CLEANING_CONVERSIONS_H
 
-#include "eigen_common.h"
+#include "attpc/cleaning/eigen_common.h"
 #include <pcl/common/common.h>
 #include <functional>
 #include <algorithm>

@@ -3,9 +3,9 @@
 //
 
 #include "catch.hpp"
-#include "eigen_common.h"
+#include "attpc/cleaning/eigen_common.h"
 #include <vector>
-#include "utilities.h"
+#include "attpc/cleaning/utilities.h"
 
 namespace {
 float euclideanMetric(const Eigen::Vector3f& a, const Eigen::Vector3f& b) {

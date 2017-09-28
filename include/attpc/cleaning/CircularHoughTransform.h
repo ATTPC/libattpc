@@ -1,7 +1,7 @@
 #ifndef ATTPC_CLEANING_CIRCULARHOUGHTRANSFORM_H
 #define ATTPC_CLEANING_CIRCULARHOUGHTRANSFORM_H
 
-#include "HoughTransform.h"
+#include "attpc/cleaning/HoughTransform.h"
 
 namespace attpc {
 namespace cleaning {

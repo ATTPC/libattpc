@@ -1,16 +1,16 @@
 #ifndef ATTPC_CLEANING_HTRIPLETCLUSTERING_H
 #define ATTPC_CLEANING_HTRIPLETCLUSTERING_H
 
-#include "eigen_common.h"
+#include "attpc/cleaning/eigen_common.h"
 #include <memory>
 #include <vector>
 #include <pcl/common/common.h>
 #include <pcl/common/centroid.h>
 #include <pcl/kdtree/kdtree_flann.h>
-#include "Triplet.h"
-#include "Cluster.h"
-#include "metrics.h"
-#include "utilities.h"
+#include "attpc/cleaning/Triplet.h"
+#include "attpc/cleaning/Cluster.h"
+#include "attpc/cleaning/metrics.h"
+#include "attpc/cleaning/utilities.h"
 
 namespace attpc {
 namespace cleaning {

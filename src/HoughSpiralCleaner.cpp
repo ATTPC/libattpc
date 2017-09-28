@@ -6,9 +6,9 @@
 #include <limits>
 #include <numeric>
 #include <algorithm>
-#include "HoughSpiralCleaner.h"
-#include "neighbors.h"
-#include "utilities.h"
+#include "attpc/cleaning/HoughSpiralCleaner.h"
+#include "attpc/cleaning/neighbors.h"
+#include "attpc/cleaning/utilities.h"
 
 namespace {
     template <class Derived>

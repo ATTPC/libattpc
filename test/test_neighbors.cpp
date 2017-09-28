@@ -1,6 +1,6 @@
 #include "catch.hpp"
-#include "eigen_common.h"
-#include "neighbors.h"
+#include "attpc/cleaning/eigen_common.h"
+#include "attpc/cleaning/neighbors.h"
 
 using attpc::cleaning::countNeighbors;
 

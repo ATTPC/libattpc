@@ -1,6 +1,6 @@
 #include "catch.hpp"
-#include "CircularHoughTransform.h"
-#include "eigen_common.h"
+#include "attpc/cleaning/CircularHoughTransform.h"
+#include "attpc/cleaning/eigen_common.h"
 #include <cmath>
 
 using attpc::cleaning::CircularHoughTransform;

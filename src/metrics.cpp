@@ -2,7 +2,7 @@
 // Created by Joshua Bradt on 7/25/17.
 //
 
-#include "metrics.h"
+#include "attpc/cleaning/metrics.h"
 
 
 namespace attpc {

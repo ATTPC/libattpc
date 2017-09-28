@@ -3,10 +3,10 @@
 //
 
 #include "catch.hpp"
-#include "eigen_common.h"
+#include "attpc/cleaning/eigen_common.h"
 #include <limits>
-#include "metrics.h"
-#include "utilities.h"
+#include "attpc/cleaning/metrics.h"
+#include "attpc/cleaning/utilities.h"
 
 namespace atc = attpc::cleaning;
 

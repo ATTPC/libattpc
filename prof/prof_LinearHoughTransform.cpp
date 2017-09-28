@@ -1,4 +1,4 @@
-#include "LinearHoughTransform.h"
+#include "attpc/cleaning/LinearHoughTransform.h"
 #include <Eigen/Core>
 #include <iostream>
 #include <chrono>

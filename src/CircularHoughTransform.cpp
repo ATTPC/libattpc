@@ -2,7 +2,7 @@
 // Created by Joshua Bradt on 7/27/17.
 //
 
-#include "CircularHoughTransform.h"
+#include "attpc/cleaning/CircularHoughTransform.h"
 
 namespace attpc {
 namespace cleaning {

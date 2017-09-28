@@ -2,7 +2,7 @@
 // Created by Joshua Bradt on 7/27/17.
 //
 
-#include "HoughTransform.h"
+#include "attpc/cleaning/HoughTransform.h"
 
 namespace attpc {
 namespace cleaning {

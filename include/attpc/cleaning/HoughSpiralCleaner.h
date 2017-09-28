@@ -1,10 +1,10 @@
 #ifndef ATTPC_CLEANING_HOUGHSPIRALCLEANER_H
 #define ATTPC_CLEANING_HOUGHSPIRALCLEANER_H
 
-#include "eigen_common.h"
+#include "attpc/cleaning/eigen_common.h"
 #include <vector>
-#include "CircularHoughTransform.h"
-#include "LinearHoughTransform.h"
+#include "attpc/cleaning/CircularHoughTransform.h"
+#include "attpc/cleaning/LinearHoughTransform.h"
 #include "HoughSpace.h"
 
 namespace attpc {

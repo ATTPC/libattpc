@@ -1,6 +1,6 @@
 #include "catch.hpp"
-#include "HoughSpace.h"
-#include "HoughSpiralCleaner.h"
+#include "attpc/cleaning/HoughSpace.h"
+#include "attpc/cleaning/HoughSpiralCleaner.h"
 
 namespace {
 Eigen::ArrayX2d makeTestArcData(const int numPts, const double minAngle, const double maxAngle,

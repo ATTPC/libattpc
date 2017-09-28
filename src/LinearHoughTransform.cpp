@@ -2,7 +2,7 @@
 // Created by Joshua Bradt on 7/27/17.
 //
 
-#include "LinearHoughTransform.h"
+#include "attpc/cleaning/LinearHoughTransform.h"
 
 
 namespace attpc {

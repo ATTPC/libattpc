@@ -2,7 +2,7 @@
 // Created by Joshua Bradt on 7/24/17.
 //
 
-#include "HTripletClustering.h"
+#include "attpc/cleaning/HTripletClustering.h"
 
 namespace attpc {
 namespace cleaning {

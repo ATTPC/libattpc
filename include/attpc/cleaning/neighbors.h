@@ -9,7 +9,7 @@
 #ifndef ATTPC_CLEANING_NEIGHBORS_H
 #define ATTPC_CLEANING_NEIGHBORS_H
 
-#include "eigen_common.h"
+#include "attpc/cleaning/eigen_common.h"
 
 namespace attpc {
 namespace cleaning {

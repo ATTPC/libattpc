@@ -4,8 +4,8 @@
 #include <functional>
 #include <vector>
 #include <cstddef>
-#include "eigen_common.h"
-#include "Triplet.h"
+#include "attpc/cleaning/eigen_common.h"
+#include "attpc/cleaning/Triplet.h"
 
 
 namespace attpc {

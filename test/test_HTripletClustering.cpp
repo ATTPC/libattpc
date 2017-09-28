@@ -3,11 +3,11 @@
 //
 
 #include "catch.hpp"
-#include "eigen_common.h"
+#include "attpc/cleaning/eigen_common.h"
 #include <string>
 #include <pcl/io/pcd_io.h>
 #include <pcl/common/common.h>
-#include "HTripletClustering.h"
+#include "attpc/cleaning/HTripletClustering.h"
 
 static pcl::PointCloud<pcl::PointXYZI>::Ptr readTestData(const std::string& path) {
     pcl::PointCloud<pcl::PointXYZI>::Ptr cloud {new pcl::PointCloud<pcl::PointXYZI>};
