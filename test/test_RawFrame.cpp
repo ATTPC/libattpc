@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "RawFrame.h"
+#include "attpc/mergers/RawFrame.h"
 #include <iterator>
 #include <vector>
 

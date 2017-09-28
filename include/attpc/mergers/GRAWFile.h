@@ -3,7 +3,7 @@
 
 #include <fstream>
 #include <string>
-#include "GRAWFrame.h"
+#include "attpc/mergers/GRAWFrame.h"
 
 namespace attpc {
 namespace mergers {

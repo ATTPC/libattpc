@@ -2,8 +2,8 @@
 #define ATTPC_MERGERS_GRAWHEADERFIELD_H
 
 #include <cstddef>
-#include "RawFrame.h"
-#include "utilities.h"
+#include "attpc/mergers/RawFrame.h"
+#include "attpc/mergers/utilities.h"
 
 namespace attpc {
 namespace mergers {

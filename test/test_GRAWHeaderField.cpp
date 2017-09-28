@@ -1,6 +1,6 @@
 #include "catch.hpp"
-#include "GRAWHeaderField.h"
-#include "RawFrame.h"
+#include "attpc/mergers/GRAWHeaderField.h"
+#include "attpc/mergers/RawFrame.h"
 #include <vector>
 #include <algorithm>
 #include <cstdint>

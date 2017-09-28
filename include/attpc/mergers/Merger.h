@@ -1,11 +1,11 @@
 #ifndef ATTPC_MERGERS_MERGER
 #define ATTPC_MERGERS_MERGER
 
-#include "GRAWFrame.h"
-#include "LRUCache.h"
+#include "attpc/mergers/GRAWFrame.h"
+#include "attpc/mergers/LRUCache.h"
 #include <vector>
 #include <functional>
-#include <attpc/common/FullTraceEvent.h>
+#include "attpc/common/FullTraceEvent.h"
 
 namespace attpc {
 namespace mergers {

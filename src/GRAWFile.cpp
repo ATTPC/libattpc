@@ -1,6 +1,6 @@
-#include "GRAWFile.h"
-#include "utilities.h"
-#include "RawFrame.h"
+#include "attpc/mergers/GRAWFile.h"
+#include "attpc/mergers/utilities.h"
+#include "attpc/mergers/RawFrame.h"
 
 namespace {
 using attpc::mergers::utilities::parseValue;

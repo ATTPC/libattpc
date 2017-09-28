@@ -3,8 +3,8 @@
 
 #include <cstdint>
 #include <vector>
-#include "GRAWHeader.h"
-#include "GRAWDataItem.h"
+#include "attpc/mergers/GRAWHeader.h"
+#include "attpc/mergers/GRAWDataItem.h"
 
 namespace attpc {
 namespace mergers {

@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "utilities.h"
+#include "attpc/mergers/utilities.h"
 #include <vector>
 #include <bitset>
 

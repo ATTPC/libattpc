@@ -3,7 +3,7 @@
 
 #include <cstdint>
 #include <bitset>
-#include "GRAWHeaderField.h"
+#include "attpc/mergers/GRAWHeaderField.h"
 
 namespace attpc {
 namespace mergers {

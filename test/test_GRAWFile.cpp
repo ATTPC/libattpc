@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "GRAWFile.h"
+#include "attpc/mergers/GRAWFile.h"
 
 using namespace attpc::mergers;
 
