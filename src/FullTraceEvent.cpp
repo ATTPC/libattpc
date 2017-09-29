@@ -15,32 +15,34 @@ FullTraceEvent::FullTraceEvent(const evtid_type eventId_, const timestamp_type t
 {}
 
 auto FullTraceEvent::insertTrace(const Trace& trace) -> std::tuple<iterator, bool> {
-    return traces.insert(trace);
+    return traces.emplace(trace.getHardwareAddress(), trace);
 }
 
 auto FullTraceEvent::insertTrace(Trace&& trace) -> std::tuple<iterator, bool> {
-    return traces.insert(trace);
+    HardwareAddress addr = trace.getHardwareAddress();
+    return traces.emplace(addr, std::move(trace));
 }
 
 auto FullTraceEvent::insertOrReplaceTrace(const Trace& trace) -> iterator {
-    iterator insertLoc;
+    decltype(traces)::iterator insertLoc;
     bool wasInserted;
-    std::tie(insertLoc, wasInserted) = traces.insert(trace);
+    std::tie(insertLoc, wasInserted) = traces.emplace(trace.getHardwareAddress(), trace);
     if (!wasInserted) {
         traces.erase(insertLoc);
-        std::tie(insertLoc, wasInserted) = traces.insert(trace);
+        std::tie(insertLoc, wasInserted) = traces.emplace(trace.getHardwareAddress(), trace);;
         assert(wasInserted);
     }
     return insertLoc;
 }
 
 auto FullTraceEvent::insertOrReplaceTrace(Trace&& trace) -> iterator {
-    iterator insertLoc;
+    decltype(traces)::iterator insertLoc;
     bool wasInserted;
-    std::tie(insertLoc, wasInserted) = traces.insert(trace);
+    HardwareAddress addr = trace.getHardwareAddress();
+    std::tie(insertLoc, wasInserted) = traces.emplace(addr, std::move(trace));
     if (!wasInserted) {
         traces.erase(insertLoc);
-        std::tie(insertLoc, wasInserted) = traces.insert(trace);
+        std::tie(insertLoc, wasInserted) = traces.emplace(addr, std::move(trace));
         assert(wasInserted);
     }
     return insertLoc;

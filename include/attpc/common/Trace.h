@@ -29,7 +29,7 @@ public:
     const ArrayType& getData() const { return data; }
 
 private:
-    HardwareAddress hwaddr;
+    const HardwareAddress hwaddr;
     boost::optional<padid_type> pad;
     ArrayType data;
 };

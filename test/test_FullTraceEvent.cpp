@@ -80,7 +80,7 @@ TEST_CASE("Can iterate through traces in FullTraceEvent", "[FullTraceEvent]") {
 
     SECTION("Can iterate with const iterators") {
         auto traceIter = traces.cbegin();
-        for (FullTraceEvent::iterator evtIter = evt.cbegin(); evtIter != evt.cend(); ++evtIter) {
+        for (FullTraceEvent::const_iterator evtIter = evt.cbegin(); evtIter != evt.cend(); ++evtIter) {
             REQUIRE(evtIter->getHardwareAddress() == traceIter->getHardwareAddress());
             ++traceIter;
         }
