@@ -14,6 +14,7 @@ set(SRC_FILES
     src/GRAWFrame.cpp
     src/GRAWHeader.cpp
     src/Merger.cpp
+    src/FrameAccumulator.cpp
 )
 
 add_library(attpc_mergers SHARED ${SRC_FILES})
