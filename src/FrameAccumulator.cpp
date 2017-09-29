@@ -4,14 +4,17 @@
 namespace attpc {
 namespace mergers {
 
+uint64_t GetMergeKeyFromEventId(const GRAWFrame& frame) { return frame.getEventId(); }
+uint64_t GetMergeKeyFromTimestamp(const GRAWFrame& frame) { return frame.getTimestamp(); }
+
 void FrameAccumulator::addFrame(const GRAWFrame& frame) {
-    KeyType eventKey = frame.getEventId();
+    KeyType eventKey = getMergeKey(frame);
     FrameVector& frvec = getFrameVector(eventKey);
     frvec.push_back(frame);
 }
 
 void FrameAccumulator::addFrame(GRAWFrame&& frame) {
-    KeyType eventKey = frame.getEventId();
+    KeyType eventKey = getMergeKey(frame);
     FrameVector& frvec = getFrameVector(eventKey);
     frvec.push_back(frame);
 }

@@ -3,30 +3,38 @@
 #include <random>
 #include <algorithm>
 #include <iterator>
+#include <functional>
 
 using namespace attpc::mergers;
 
 namespace {
 
-FrameAccumulator::FrameVector makeTestFrameVector(unsigned evtId, int numFrames) {
+using KeySetter = std::function<void(GRAWFrame&, uint64_t)>;
+void setEventId(GRAWFrame& frame, uint64_t eventId) { frame.getEventId() = eventId; }
+void setTimestamp(GRAWFrame& frame, uint64_t timestamp) { frame.getTimestamp() = timestamp; }
+
+FrameAccumulator::FrameVector makeTestFrameVector(KeySetter setKey, uint64_t key, int numFrames) {
     FrameAccumulator::FrameVector fvec;
     for (int i = 0; i < numFrames; ++i) {
         GRAWFrame frame;
-        frame.getEventId() = evtId;
+        // Set both keys to varying values first. That way we can be sure
+        // that the correct key was merged on when we test later since the *other* key
+        // will not contain the same value for each frame.
+        frame.getEventId() = i;
+        frame.getTimestamp() = i*2;
+        setKey(frame, key);
         fvec.push_back(std::move(frame));
     }
     return fvec;
 }
 
-}
+void testAccumulation(KeySetter setkey, MergeKeyFunction getkey) {
+    FrameAccumulator::FrameVector evt0Frames = makeTestFrameVector(setkey, 0, 4);
+    FrameAccumulator::FrameVector evt1Frames = makeTestFrameVector(setkey, 1, 5);
 
-TEST_CASE("Can accumulate frames", "[FrameAccumulator]") {
-    FrameAccumulator::FrameVector evt0Frames = makeTestFrameVector(0, 4);
-    FrameAccumulator::FrameVector evt1Frames = makeTestFrameVector(1, 5);
+    FrameAccumulator accum {getkey};
 
-    FrameAccumulator accum;
-
-    SECTION("Frames with same event ID go in same event") {
+    SECTION("Frames with same key go in same event") {
         for (const auto& frame : evt0Frames) {
             accum.addFrame(frame);
             REQUIRE(accum.size() == 1);
@@ -39,18 +47,28 @@ TEST_CASE("Can accumulate frames", "[FrameAccumulator]") {
             FrameAccumulator::KeyType key;
             FrameAccumulator::FrameVector fvec;
             std::tie(key, fvec) = accum.extractOldest();
-            bool allHaveRightEventIdx = std::all_of(fvec.begin(), fvec.end(), [key](const GRAWFrame& f){
-                return f.getEventId() == key;
+            bool allHaveRightEventIdx = std::all_of(fvec.begin(), fvec.end(), [key, getkey](const GRAWFrame& f){
+                return getkey(f) == key;
             });
             REQUIRE(allHaveRightEventIdx);
         }
     }
 }
 
+}
+
+TEST_CASE("Can accumulate frames by event ID", "[FrameAccumulator]") {
+    testAccumulation(setEventId, GetMergeKeyFromEventId);
+}
+
+TEST_CASE("Can accumulate frames by timestamp", "[FrameAccumulator]") {
+    testAccumulation(setTimestamp, GetMergeKeyFromTimestamp);
+}
+
 TEST_CASE("Can extract oldest FrameVector from FrameAccumulator", "[FrameAccumulator]") {
     FrameAccumulator::FrameVector frames;
     for (unsigned evtId = 0; evtId < 4; ++evtId) {
-        auto v = makeTestFrameVector(evtId, 4);
+        auto v = makeTestFrameVector(setEventId, evtId, 4);
         for (const auto& frame : v) {
             frames.push_back(frame);
         }
@@ -58,7 +76,7 @@ TEST_CASE("Can extract oldest FrameVector from FrameAccumulator", "[FrameAccumul
     std::mt19937 rng {0};
     std::shuffle(frames.begin(), frames.end(), rng);
 
-    FrameAccumulator accum;
+    FrameAccumulator accum {GetMergeKeyFromEventId};
     for (const auto& frame : frames) {
         accum.addFrame(frame);
     }
@@ -90,7 +108,7 @@ TEST_CASE("Can extract oldest FrameVector from FrameAccumulator", "[FrameAccumul
 }
 
 TEST_CASE("FrameAccumulator keeps track of finished events", "[FrameAccumulator]") {
-    FrameAccumulator accum;
+    FrameAccumulator accum {GetMergeKeyFromEventId};
     for (unsigned evtId = 0; evtId < 4; ++evtId) {
         GRAWFrame frame;
         frame.getEventId() = evtId;
