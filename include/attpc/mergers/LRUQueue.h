@@ -18,8 +18,8 @@ public:
     using value_type = T;
     using pair_type = std::pair<key_type, value_type>;
 
-    value_type& insert(const key_type& key, value_type&& value) {
-        itemList.emplace_front(key, std::forward<value_type>(value));
+    value_type& insert(const key_type& key, const value_type& value) {
+        itemList.emplace_front(key, value);
         itemMap.emplace(key, itemList.begin());
         return itemList.front().second;
     }
@@ -52,7 +52,7 @@ public:
         assert(foundKey == key);
         typename std::list<pair_type>::iterator listIter = mapIter->second;
 
-        value_type item = std::move(listIter.second);
+        value_type item = std::move(listIter->second);
         itemList.erase(listIter);
         itemMap.erase(key);
         return item;

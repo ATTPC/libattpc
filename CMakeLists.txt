@@ -33,6 +33,7 @@ set(TEST_SRC_FILES
     test/test_utilities.cpp
     test/test_GRAWHeaderField.cpp
     test/test_GRAWFile.cpp
+    test/test_LRUQueue.cpp
 )
 
 add_executable(test_attpc_mergers ${TEST_SRC_FILES})
