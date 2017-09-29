@@ -12,7 +12,7 @@ FrameAccumulator::FrameVector makeTestFrameVector(unsigned evtId, int numFrames)
     FrameAccumulator::FrameVector fvec;
     for (int i = 0; i < numFrames; ++i) {
         GRAWFrame frame;
-        frame.header.eventIdx.value = evtId;
+        frame.getEventId() = evtId;
         fvec.push_back(std::move(frame));
     }
     return fvec;
@@ -40,7 +40,7 @@ TEST_CASE("Can accumulate frames", "[FrameAccumulator]") {
             FrameAccumulator::FrameVector fvec;
             std::tie(key, fvec) = accum.extractOldest();
             bool allHaveRightEventIdx = std::all_of(fvec.begin(), fvec.end(), [key](const GRAWFrame& f){
-                return f.header.eventIdx.value == key;
+                return f.getEventId() == key;
             });
             REQUIRE(allHaveRightEventIdx);
         }
@@ -80,10 +80,10 @@ TEST_CASE("Can extract oldest FrameVector from FrameAccumulator", "[FrameAccumul
         FrameAccumulator::FrameVector fvec;
         std::tie(evtId, fvec) = eventPair;
 
-        REQUIRE(frames.front().header.eventIdx.value == evtId);  // Asserts that the order is correct
+        REQUIRE(frames.front().getEventId() == evtId);  // Asserts that the order is correct
 
         // Remove frames from this event from `frames`
-        auto thisEventPredicate = [evtId](const GRAWFrame& f) { return f.header.eventIdx.value == evtId; };
+        auto thisEventPredicate = [evtId](const GRAWFrame& f) { return f.getEventId() == evtId; };
         auto newEnd = std::remove_if(frames.begin(), frames.end(), thisEventPredicate);
         frames.erase(newEnd, frames.end());
     }
@@ -93,7 +93,7 @@ TEST_CASE("FrameAccumulator keeps track of finished events", "[FrameAccumulator]
     FrameAccumulator accum;
     for (unsigned evtId = 0; evtId < 4; ++evtId) {
         GRAWFrame frame;
-        frame.header.eventIdx.value = evtId;
+        frame.getEventId() = evtId;
         accum.addFrame(frame);
     }
 

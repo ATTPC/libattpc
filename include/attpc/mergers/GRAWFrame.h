@@ -15,6 +15,10 @@ public:
     GRAWFrame(const RawFrame& rawFrame);
 
     bool isFullReadout() const { return header.frameType.value == fullReadoutFrameType; }
+    auto getEventId()       -> decltype(GRAWHeader::eventIdx)::type& { return header.eventIdx.value; }
+    auto getEventId() const -> decltype(GRAWHeader::eventIdx)::type  { return header.eventIdx.value; }
+    auto getTimestamp()       -> decltype(GRAWHeader::eventTime)::type& { return header.eventTime.value; }
+    auto getTimestamp() const -> decltype(GRAWHeader::eventTime)::type  { return header.eventTime.value; }
 
 
 public:

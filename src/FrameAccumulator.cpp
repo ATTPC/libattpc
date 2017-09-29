@@ -5,13 +5,13 @@ namespace attpc {
 namespace mergers {
 
 void FrameAccumulator::addFrame(const GRAWFrame& frame) {
-    KeyType eventKey = frame.header.eventIdx.value;
+    KeyType eventKey = frame.getEventId();
     FrameVector& frvec = getFrameVector(eventKey);
     frvec.push_back(frame);
 }
 
 void FrameAccumulator::addFrame(GRAWFrame&& frame) {
-    KeyType eventKey = frame.header.eventIdx.value;
+    KeyType eventKey = frame.getEventId();
     FrameVector& frvec = getFrameVector(eventKey);
     frvec.push_back(frame);
 }

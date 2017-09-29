@@ -14,8 +14,8 @@ namespace mergers {
 
 FullTraceEvent Merger::buildEvent(const FrameAccumulator::FrameVector& frames) const {
     FullTraceEvent event {};
-    event.setEventId(frames.front().header.eventIdx.value);
-    event.setTimestamp(frames.front().header.eventTime.value);
+    event.setEventId(frames.front().getEventId());
+    event.setTimestamp(frames.front().getTimestamp());
 
     for (const GRAWFrame& frame : frames) {
         for (const GRAWDataItem& item : frame.data) {
