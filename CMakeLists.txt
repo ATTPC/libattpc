@@ -15,6 +15,7 @@ set(SRC_FILES
     src/GRAWHeader.cpp
     src/Merger.cpp
     src/FrameAccumulator.cpp
+    src/MergeManager.cpp
 )
 
 add_library(attpc_mergers SHARED ${SRC_FILES})
@@ -43,3 +44,13 @@ target_compile_options(test_attpc_mergers PRIVATE ${WARNING_FLAGS})
 set_property(TARGET test_attpc_mergers PROPERTY CXX_STANDARD 14)
 
 configure_file(test/data/partial_readout_frame.graw test_data/partial_readout_frame.graw COPYONLY)
+
+########################
+# Merger utility setup #
+########################
+
+add_executable(grawmerge src/merge_main.cpp)
+target_include_directories(grawmerge PUBLIC ${Boost_INCLUDE_DIRS})
+target_link_libraries(grawmerge attpc_mergers ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_compile_options(grawmerge PRIVATE ${WARNING_FLAGS})
+set_property(TARGET grawmerge PROPERTY CXX_STANDARD 14)
