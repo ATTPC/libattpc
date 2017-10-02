@@ -57,3 +57,10 @@ TEST_CASE("Can read partial-readout frame", "[GRAWFile]") {
         REQUIRE(frame.header.itemCount.value == frame.data.size());
     }
 }
+
+TEST_CASE("GRAWFile indicates end-of-file", "[GRAWFile]") {
+    GRAWFile file {"test_data/partial_readout_frame.graw"};
+    file.readFrame();  // There's one frame in the file. Throw it away.
+
+    REQUIRE_THROWS_AS(file.readFrame(), GRAWFile::FileReadError);
+}

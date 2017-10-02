@@ -2,7 +2,6 @@
 #define ATTPC_MERGERS_MERGEMANAGER_H
 
 #include <vector>
-#include <string>
 #include "attpc/mergers/GRAWFile.h"
 #include "attpc/mergers/FrameAccumulator.h"
 #include "attpc/common/HDF5DataFile.h"
@@ -13,14 +12,13 @@ namespace mergers {
 
 class MergeManager {
 public:
-    MergeManager(const std::vector<std::string>& grawPaths, const std::string& outPath, MergeKeyFunction method,
-                 size_t maxAccumulatorNumEvents_);
+    MergeManager(MergeKeyFunction method, size_t maxAccumulatorNumEvents_);
 
-    void mergeFiles();
+    void mergeFiles(std::vector<GRAWFile>& grawFiles, common::HDF5DataFile& outFile);
 
 private:
-    std::vector<GRAWFile> grawFiles;
-    common::HDF5DataFile outFile;
+    common::FullTraceEvent buildNextEvent();
+
     FrameAccumulator accum;
     size_t maxAccumulatorNumEvents;
     Merger merger;

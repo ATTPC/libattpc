@@ -54,14 +54,24 @@ MergerArgs parseOptions(const int argc, const char** argv) {
     return args;
 }
 
+std::vector<attpc::mergers::GRAWFile> openGRAWFiles(const std::vector<std::string>& paths) {
+    std::vector<attpc::mergers::GRAWFile> files;
+    for (const auto& path : paths) {
+        files.emplace_back(path);
+    }
+    return files;
+}
+
 int main(const int argc, const char** argv) {
     using std::cout;
-    using namespace attpc::mergers;
 
     MergerArgs options = parseOptions(argc, argv);
 
     std::signal(SIGINT, attpc::mergers::mergerSignalHandler);
 
-    MergeManager mgr {options.inputPaths, options.outputPath, options.method, 20};
-    mgr.mergeFiles();
+    std::vector<attpc::mergers::GRAWFile> grawFiles = openGRAWFiles(options.inputPaths);
+    attpc::common::HDF5DataFile outFile {options.outputPath, attpc::common::HDF5DataFile::Mode::create};
+
+    attpc::mergers::MergeManager mgr {options.method, 20};
+    mgr.mergeFiles(grawFiles, outFile);
 }

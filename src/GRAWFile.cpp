@@ -35,12 +35,16 @@ GRAWFrame GRAWFile::readFrame() {
     const auto start = file.tellg();
     file.seekg(decltype(GRAWHeader::frameSize)::offset, std::ios_base::cur);
     RawFrame rawSize (FrameSizeField::size);
-    file.read(reinterpret_cast<char*>(rawSize.getDataPtr()), rawSize.size());
+    if (!file.read(reinterpret_cast<char*>(rawSize.getDataPtr()), rawSize.size())) {
+        throw FileReadError();
+    }
     FrameSizeField::type frameSize = parseValue<FrameSizeField::type>(rawSize.begin(), rawSize.end());
     file.seekg(start);
 
     RawFrame rawFrame (frameSize * 256);
-    file.read(reinterpret_cast<char*>(rawFrame.getDataPtr()), rawFrame.size());
+    if (!file.read(reinterpret_cast<char*>(rawFrame.getDataPtr()), rawFrame.size())) {
+        throw FileReadError();
+    }
 
     return GRAWFrame{rawFrame};
 }

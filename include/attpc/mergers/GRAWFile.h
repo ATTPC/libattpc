@@ -17,6 +17,11 @@ public:
 
     GRAWFrame readFrame();
 
+    class FileReadError : public std::runtime_error {
+    public:
+        FileReadError() : std::runtime_error::runtime_error("GRAW file read error") {}
+    };
+
 private:
     std::fstream file;
 };
