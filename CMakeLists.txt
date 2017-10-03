@@ -14,6 +14,8 @@ set(SRC_FILES
     src/HDF5DataFile.cpp
     src/Trace.cpp
     src/FullTraceEvent.cpp
+    src/HardwareAddress.cpp
+    src/PadLookupTable.cpp
 )
 
 add_library(attpc_common SHARED ${SRC_FILES})
@@ -51,6 +53,7 @@ set(TEST_SRC_FILES
     test/test_Trace.cpp
     test/test_FullTraceEvent.cpp
     test/test_HDF5DataFile.cpp
+    test/test_PadLookupTable.cpp
 )
 
 add_executable(test_attpc_common ${TEST_SRC_FILES})
@@ -59,6 +62,7 @@ target_compile_options(test_attpc_common PRIVATE ${WARNING_FLAGS})
 set_property(TARGET test_attpc_common PROPERTY CXX_STANDARD 14)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test/data/test_config.yml ${CMAKE_CURRENT_BINARY_DIR}/data/test_config.yml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test/data/test_lookup.csv ${CMAKE_CURRENT_BINARY_DIR}/data/test_lookup.csv COPYONLY)
 
 #######################
 # Documentation setup #
