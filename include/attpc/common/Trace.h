@@ -26,6 +26,7 @@ public:
 
     const HardwareAddress& getHardwareAddress() const { return hwaddr; }
     const boost::optional<padid_type>& getPad() const { return pad; }
+    void setPad(const boost::optional<padid_type>& value) { pad = value; }
     const ArrayType& getData() const { return data; }
 
 private:

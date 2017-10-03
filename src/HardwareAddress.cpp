@@ -29,7 +29,7 @@ std::ostream& operator<<(std::ostream& os, const HardwareAddress& addr) {
 }
 
 size_t std::hash<attpc::common::HardwareAddress>::operator()(const attpc::common::HardwareAddress& addr) const {
-    assert(addr.cobo > 0 && addr.asad > 0 && addr.aget > 0 && addr.channel > 0);
+    assert(addr.cobo >= 0 && addr.asad >= 0 && addr.aget >= 0 && addr.channel >= 0);
     uint64_t cobo = static_cast<uint64_t>(addr.cobo);
     uint64_t asad = static_cast<uint64_t>(addr.asad);
     uint64_t aget = static_cast<uint64_t>(addr.aget);
