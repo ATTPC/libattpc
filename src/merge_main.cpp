@@ -1,9 +1,12 @@
 #include "attpc/mergers/MergeManager.h"
+#include "attpc/common/PadLookupTable.h"
+#include <boost/optional.hpp>
 #include <boost/program_options.hpp>
 #include <vector>
 #include <iostream>
 #include <stdexcept>
 #include <csignal>
+#include <memory>
 
 namespace po = boost::program_options;
 
@@ -11,6 +14,7 @@ struct MergerArgs {
     std::vector<std::string> inputPaths;
     std::string outputPath;
     attpc::mergers::MergeKeyFunction method;
+    boost::optional<std::string> padLookupTablePath;
 };
 
 attpc::mergers::MergeKeyFunction parseMethodArg(const std::string& argString) {
@@ -30,6 +34,7 @@ MergerArgs parseOptions(const int argc, const char** argv) {
     desc.add_options()
         ("help,h", "produce help message")
         ("method,m", po::value<std::string>(), "merging method")
+        ("lookup,l", po::value<std::string>(), "path to pad lookup table as CSV file")
         ("output,o", po::value<std::string>()->default_value("output.h5"), "path to output file")
         ("input", po::value<std::vector<std::string>>(), "path to input file")
     ;
@@ -50,6 +55,9 @@ MergerArgs parseOptions(const int argc, const char** argv) {
     args.inputPaths = vm["input"].as<std::vector<std::string>>();
     args.outputPath = vm["output"].as<std::string>();
     args.method = parseMethodArg(vm["method"].as<std::string>());
+    if (vm.count("lookup")) {
+        args.padLookupTablePath = vm["lookup"].as<std::string>();
+    }
 
     return args;
 }
@@ -69,9 +77,14 @@ int main(const int argc, const char** argv) {
 
     std::signal(SIGINT, attpc::mergers::mergerSignalHandler);
 
+    std::shared_ptr<attpc::common::PadLookupTable> lookupPtr;
+    if (options.padLookupTablePath) {
+        lookupPtr = std::make_shared<attpc::common::PadLookupTable>(*options.padLookupTablePath);
+    }
+
     std::vector<attpc::mergers::GRAWFile> grawFiles = openGRAWFiles(options.inputPaths);
     attpc::common::HDF5DataFile outFile {options.outputPath, attpc::common::HDF5DataFile::Mode::create};
 
-    attpc::mergers::MergeManager mgr {options.method, 20};
+    attpc::mergers::MergeManager mgr {options.method, 20, lookupPtr};
     mgr.mergeFiles(grawFiles, outFile);
 }

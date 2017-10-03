@@ -12,9 +12,11 @@ namespace {
 namespace attpc {
 namespace mergers {
 
-MergeManager::MergeManager(MergeKeyFunction method, size_t maxAccumulatorNumEvents_)
+MergeManager::MergeManager(MergeKeyFunction method, size_t maxAccumulatorNumEvents_,
+                           std::shared_ptr<common::PadLookupTable> lookupPtr_)
 : accum(method)
 , maxAccumulatorNumEvents(maxAccumulatorNumEvents_)
+, lookupPtr(std::move(lookupPtr_))
 {}
 
 void MergeManager::mergeFiles(std::vector<GRAWFile>& grawFiles, common::HDF5DataFile& outFile) {
@@ -68,10 +70,22 @@ common::FullTraceEvent MergeManager::buildNextEvent() {
 
     common::FullTraceEvent event = merger.buildEvent(frames);
 
+    if (lookupPtr) {
+        setPadNumbers(event);
+    }
+
     return event;
 }
 
-extern "C" void mergerSignalHandler(int signal) {
+void MergeManager::setPadNumbers(common::FullTraceEvent& event) {
+    if (lookupPtr) {
+        for (common::Trace& trace : event) {
+            trace.setPad(lookupPtr->find(trace.getHardwareAddress()));
+        }
+    }
+}
+
+extern "C" void mergerSignalHandler(int) {
     signalFlag = 1;
 }
 
