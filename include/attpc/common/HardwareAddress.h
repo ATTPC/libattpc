@@ -2,7 +2,10 @@
 #define ATTPC_COMMON_HARDWAREADDRESS_H
 
 #include "attpc/common/types.h"
+#include "attpc/common/utilities.h"
 #include <tuple>
+#include <cassert>
+#include <functional>
 
 namespace attpc {
 namespace common {
@@ -33,5 +36,20 @@ struct HardwareAddress {
 
 }
 }
+
+template <>
+struct std::hash<attpc::common::HardwareAddress> {
+    size_t operator()(const attpc::common::HardwareAddress& addr) const {
+        assert(addr.cobo > 0 && addr.asad > 0 && addr.aget > 0 && addr.channel > 0);
+        uint64_t cobo = static_cast<uint64_t>(addr.cobo);
+        uint64_t asad = static_cast<uint64_t>(addr.asad);
+        uint64_t aget = static_cast<uint64_t>(addr.aget);
+        uint64_t channel = static_cast<uint64_t>(addr.channel);
+
+        uint64_t combined = channel | (aget << 8) | (asad << 16) | (cobo << 24);
+
+        return std::hash<uint64_t>()(combined);
+    }
+};
 
 #endif /* end of include guard: ATTPC_COMMON_HARDWAREADDRESS_H */

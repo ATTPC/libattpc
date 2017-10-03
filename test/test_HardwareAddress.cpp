@@ -1,6 +1,7 @@
 #include "catch.hpp"
 #include "attpc/common/HardwareAddress.h"
 #include <vector>
+#include <algorithm>
 
 using attpc::common::HardwareAddress;
 
@@ -48,4 +49,25 @@ TEST_CASE("HardwareAddress instances can be compared with less-than operator", "
         REQUIRE_FALSE((base < HardwareAddress{1, 1, 1, 0}));
         REQUIRE      ((base < HardwareAddress{1, 1, 1, 2}));
     }
+}
+
+TEST_CASE("HardwareAddress hash is unique for all relevant values", "[FullTraceEvent][HardwareAddress]") {
+    using namespace attpc;
+
+    std::vector<size_t> hashValues;
+
+    for (coboid_type cobo = 0; cobo < 20; cobo++) {
+        for (asadid_type asad = 0; asad < 4; asad++) {
+            for (agetid_type aget = 0; aget < 3; aget++) {
+                for (channelid_type channel = 0; channel < 68; channel++) {
+                    HardwareAddress addr {cobo, asad, aget, channel};
+                    hashValues.push_back(std::hash<HardwareAddress>()(addr));
+                }
+            }
+        }
+    }
+
+    std::sort(hashValues.begin(), hashValues.end());
+    auto firstRepeatedElement = std::adjacent_find(hashValues.begin(), hashValues.end());
+    REQUIRE(firstRepeatedElement == hashValues.end());
 }
