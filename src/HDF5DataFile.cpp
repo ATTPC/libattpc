@@ -32,10 +32,6 @@ const H5::PredType HDF5DataFile::timestampAttrH5DataType = H5::PredType::STD_U64
 
 HDF5DataFile::HDF5DataFile(const std::string& filename, const Mode mode)
 {
-    open(filename, mode);
-}
-
-void HDF5DataFile::open(const std::string& filename, const Mode mode) {
     H5Mode hmode = getH5AccessMode(mode);
     file = H5::H5File(filename, hmode);
 }

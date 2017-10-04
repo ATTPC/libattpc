@@ -18,7 +18,6 @@ public:
 
     HDF5DataFile(const std::string& filename, const Mode mode = Mode::readonly);
 
-    void open(const std::string& filename, const Mode mode = Mode::readonly);
     void close();
 
     boost::optional<FullTraceEvent> read(const evtid_type eventId, const std::string& groupName = "get");
