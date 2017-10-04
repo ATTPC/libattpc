@@ -94,6 +94,9 @@ public:
             return result;
         }
 
+        //! Get the base iterator
+        BaseIterator getBase() const { return base; }
+
     private:
         BaseIterator base;
     };
@@ -155,6 +158,20 @@ public:
     iterator findTrace(const HardwareAddress& hwaddr);
     //! @overload
     const_iterator findTrace(const HardwareAddress& hwaddr) const;
+
+    /**
+     * @brief Erase the element pointed to by iterator `pos`.
+     * @param  pos The element to erase.
+     * @return     The iterator following the removed element.
+     */
+    iterator erase(iterator pos) { return traces.erase(pos.getBase()); }
+    /**
+     * @brief Erase the elements between the two given iterators.
+     * @param  first The first element to erase.
+     * @param  last  The element after the last element to erase.
+     * @return       The iterator following the last element removed.
+     */
+    iterator erase(iterator first, iterator last) { return traces.erase(first.getBase(), last.getBase()); }
 
     //! Get an iterator to the first Trace in the event.
     iterator begin() noexcept { return traces.begin(); }
