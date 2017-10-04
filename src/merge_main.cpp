@@ -15,6 +15,7 @@ struct MergerArgs {
     std::string outputPath;
     attpc::mergers::MergeKeyFunction method;
     boost::optional<std::string> padLookupTablePath;
+    bool keepFPN;
 };
 
 attpc::mergers::MergeKeyFunction parseMethodArg(const std::string& argString) {
@@ -35,6 +36,7 @@ MergerArgs parseOptions(const int argc, const char** argv) {
         ("help,h", "produce help message")
         ("method,m", po::value<std::string>(), "merging method")
         ("lookup,l", po::value<std::string>(), "path to pad lookup table as CSV file")
+        ("keep-fpn", po::value<bool>()->default_value(false), "do not discard FPN channels")
         ("output,o", po::value<std::string>()->default_value("output.h5"), "path to output file")
         ("input", po::value<std::vector<std::string>>(), "path to input file")
     ;
@@ -58,6 +60,7 @@ MergerArgs parseOptions(const int argc, const char** argv) {
     if (vm.count("lookup")) {
         args.padLookupTablePath = vm["lookup"].as<std::string>();
     }
+    args.keepFPN = vm["keep-fpn"].as<bool>();
 
     return args;
 }
@@ -85,6 +88,6 @@ int main(const int argc, const char** argv) {
     std::vector<attpc::mergers::GRAWFile> grawFiles = openGRAWFiles(options.inputPaths);
     attpc::common::HDF5DataFile outFile {options.outputPath, attpc::common::HDF5DataFile::Mode::create};
 
-    attpc::mergers::MergeManager mgr {options.method, 20, lookupPtr};
+    attpc::mergers::MergeManager mgr {options.method, 20, lookupPtr, options.keepFPN};
     mgr.mergeFiles(grawFiles, outFile);
 }

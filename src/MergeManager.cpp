@@ -12,11 +12,14 @@ namespace {
 namespace attpc {
 namespace mergers {
 
+const std::vector<channelid_type> MergeManager::fpnChannels = {11, 22, 45, 56};
+
 MergeManager::MergeManager(MergeKeyFunction method, size_t maxAccumulatorNumEvents_,
-                           std::shared_ptr<common::PadLookupTable> lookupPtr_)
+                           std::shared_ptr<common::PadLookupTable> lookupPtr_, bool keepFPN_)
 : accum(method)
 , maxAccumulatorNumEvents(maxAccumulatorNumEvents_)
 , lookupPtr(std::move(lookupPtr_))
+, keepFPN(keepFPN_)
 {}
 
 void MergeManager::mergeFiles(std::vector<GRAWFile>& grawFiles, common::HDF5DataFile& outFile) {
@@ -70,11 +73,24 @@ common::FullTraceEvent MergeManager::buildNextEvent() {
 
     common::FullTraceEvent event = merger.buildEvent(frames);
 
+    if (!keepFPN) {
+        discardFPN(event);
+    }
     if (lookupPtr) {
         setPadNumbers(event);
     }
 
     return event;
+}
+
+void MergeManager::discardFPN(common::FullTraceEvent& event) {
+    auto newEnd = std::remove_if(event.begin(), event.end(), [](const common::Trace& tr) {
+        // Predicate returns True if channel number is in the list of FPN channels.
+        auto begin = MergeManager::fpnChannels.begin();
+        auto end = MergeManager::fpnChannels.end();
+        return std::find(begin, end, tr.getHardwareAddress().channel) != end;
+    });
+    event.erase(newEnd, event.end());
 }
 
 void MergeManager::setPadNumbers(common::FullTraceEvent& event) {
