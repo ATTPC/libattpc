@@ -3,9 +3,10 @@
 
 namespace {
 
-using H5Mode = decltype(H5F_ACC_TRUNC);
+using H5Mode = decltype(H5F_ACC_TRUNC);  //! An access mode in the HDF5 library
 using attpc::common::narrow_cast;
 
+//! Map the file access mode onto one of the options provided by HDF5.
 H5Mode getH5AccessMode(const attpc::common::HDF5DataFile::Mode mode) {
     using Mode = attpc::common::HDF5DataFile::Mode;
     switch (mode) {
@@ -56,7 +57,7 @@ boost::optional<FullTraceEvent> HDF5DataFile::read(const evtid_type eventId, con
     if (dataspace.getSimpleExtentNdims() != 2) {
         throw BadData("Invalid number of dimensions in event read from HDF5 file.");
     }
-    hsize_t dims[2];
+    hsize_t dims[2];  // Dataset dimensions: [number of rows, number of columns]
     dataspace.getSimpleExtentDims(&dims[0]);
 
     if (dims[1] != numColsInEvent) {
@@ -64,7 +65,7 @@ boost::optional<FullTraceEvent> HDF5DataFile::read(const evtid_type eventId, con
     }
 
     EncodedEventArrayType data {dims[0], dims[1]};
-    dataset.read(data.data(), arrayH5DataType);
+    dataset.read(data.data(), arrayH5DataType);  // Read directly into Eigen array
 
     H5::Attribute tsAttr = dataset.openAttribute(timestampAttrName);
     timestamp_type timestamp;

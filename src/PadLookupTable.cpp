@@ -4,6 +4,8 @@
 #include <sstream>
 
 namespace {
+    // Implementation of the find function. This is separate since it's the same for both the forward and
+    // reverse cases, and only the types vary.
     template <class MapType>
     boost::optional<typename MapType::mapped_type>
     findImpl(const MapType& map, const typename MapType::key_type& key) {
@@ -58,11 +60,11 @@ void PadLookupTable::insert(const HardwareAddress& addr, padid_type pad) {
 }
 
 boost::optional<padid_type> PadLookupTable::find(const HardwareAddress& addr) const {
-    return findImpl(forwardTable, addr);
+    return findImpl(forwardTable, addr);  // See implementation above
 }
 
 boost::optional<HardwareAddress> PadLookupTable::reverseFind(padid_type pad) const {
-    return findImpl(reverseTable, pad);
+    return findImpl(reverseTable, pad);  // See implementation above
 }
 
 size_t PadLookupTable::size() const {

@@ -1,4 +1,5 @@
 #include "attpc/common/HardwareAddress.h"
+#include <cassert>
 
 namespace attpc {
 namespace common {
@@ -17,6 +18,7 @@ bool HardwareAddress::operator==(const HardwareAddress& other) const {
 }
 
 bool HardwareAddress::operator<(const HardwareAddress& other) const {
+    // std::tie creates a std::tuple, and tuple objects are lexicographically ordered.
     return std::tie(cobo, asad, aget, channel) < std::tie(other.cobo, other.asad, other.aget, other.channel);
 }
 
@@ -29,6 +31,9 @@ std::ostream& operator<<(std::ostream& os, const HardwareAddress& addr) {
 }
 
 size_t std::hash<attpc::common::HardwareAddress>::operator()(const attpc::common::HardwareAddress& addr) const {
+    // NOTE: The values *must* be converted to unsigned integers before left-shifting to avoid
+    // potentially undefined behavior. This implementation works since the four values are stored
+    // in 8-bit integers currently. If this is changed, this hash function might not perform well.
     assert(addr.cobo >= 0 && addr.asad >= 0 && addr.aget >= 0 && addr.channel >= 0);
     uint64_t cobo = static_cast<uint64_t>(addr.cobo);
     uint64_t asad = static_cast<uint64_t>(addr.asad);
