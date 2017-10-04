@@ -89,7 +89,14 @@ void HDF5DataFile::write(const FullTraceEvent& event, const std::string& groupNa
 
     const std::string datasetName = std::to_string(event.getEventId());
 
-    H5::DataSet dataset = group.createDataSet(datasetName, arrayH5DataType, dataspace);
+    // Set up properties of the dataset (chunking, compression, filters)
+    H5::DSetCreatPropList cparams;
+    hsize_t chunkDims[2] = {1, numColsInEvent};  // Chunk size == one row
+    cparams.setChunk(2, chunkDims);  // Chunked storage is required for compression
+    cparams.setShuffle();   // The shuffle filter can enhance the compression ratio
+    cparams.setDeflate(4);  // Compress the data with GZIP at level 4
+
+    H5::DataSet dataset = group.createDataSet(datasetName, arrayH5DataType, dataspace, cparams);
     dataset.write(data.data(), arrayH5DataType);
 
     H5::DataSpace tsAttrDs {H5S_SCALAR};
