@@ -1,25 +1,39 @@
 #include "attpc/mergers/MergeManager.h"
+#include "attpc/mergers/ThreadsafeQueue.h"
+#include "attpc/mergers/Worker.h"
 #include <queue>
 #include <csignal>
 #include <iostream>
 #include <algorithm>
 #include <cassert>
+#include <mutex>
+#include <future>
+#include <functional>
+#include <memory>
 
 namespace {
     volatile std::sig_atomic_t signalFlag = 0;
+
+    std::mutex coutMutex;
+
+    void writeEvent(attpc::common::HDF5DataFile& file, std::shared_future<attpc::common::FullTraceEvent> future) {
+        auto event = future.get();
+        file.write(event);
+        {
+            std::unique_lock<std::mutex> coutLock {coutMutex};
+            std::cout << "Wrote event " << event.getEventId() << std::endl;
+        }
+    }
 }
 
 namespace attpc {
 namespace mergers {
 
-const std::vector<channelid_type> MergeManager::fpnChannels = {11, 22, 45, 56};
-
 MergeManager::MergeManager(MergeKeyFunction method, size_t maxAccumulatorNumEvents_,
                            std::shared_ptr<common::PadLookupTable> lookupPtr_, bool keepFPN_)
 : accum(method)
 , maxAccumulatorNumEvents(maxAccumulatorNumEvents_)
-, lookupPtr(std::move(lookupPtr_))
-, keepFPN(keepFPN_)
+, merger(lookupPtr_, keepFPN_)
 {}
 
 void MergeManager::mergeFiles(std::vector<GRAWFile>& grawFiles, common::HDF5DataFile& outFile) {
@@ -30,6 +44,14 @@ void MergeManager::mergeFiles(std::vector<GRAWFile>& grawFiles, common::HDF5Data
     for (auto iter = grawFiles.begin(); iter != grawFiles.end(); ++iter) {
         unfinishedFiles.push_back(iter);
     }
+
+    using BuildTask = std::packaged_task<common::FullTraceEvent()>;
+    auto buildQueue = std::make_shared<ThreadsafeQueue<BuildTask>>();
+    Worker<BuildTask> builder {buildQueue};
+
+    using WriteTask = std::packaged_task<void()>;
+    auto writeQueue = std::make_shared<ThreadsafeQueue<WriteTask>>();
+    Worker<WriteTask> writer {writeQueue};
 
     while (signalFlag == 0 && !unfinishedFiles.empty()) {
         assert(finishedFiles.size() + unfinishedFiles.size() == grawFiles.size());
@@ -53,52 +75,30 @@ void MergeManager::mergeFiles(std::vector<GRAWFile>& grawFiles, common::HDF5Data
         }
 
         while (accum.size() > maxAccumulatorNumEvents) {
-            common::FullTraceEvent event = buildNextEvent();
-            outFile.write(event);
-            std::cout << "Wrote event " << event.getEventId() << "\n";
+            FrameAccumulator::KeyType key;
+            FrameAccumulator::FrameVector frames;
+            std::tie(key, frames) = accum.extractOldest();
+
+            BuildTask btask {std::bind(&Merger::mergeAndProcessEvent, &merger, std::move(frames))};
+            WriteTask wtask {std::bind(&writeEvent, std::ref(outFile), btask.get_future().share())};
+            writeQueue->push(std::move(wtask));
+            buildQueue->push(std::move(btask));
         }
     }
 
     while (accum.size() > 0) {
-        common::FullTraceEvent event = buildNextEvent();
-        outFile.write(event);
-        std::cout << "Wrote event " << event.getEventId() << "\n";
-    }
-}
+        FrameAccumulator::KeyType key;
+        FrameAccumulator::FrameVector frames;
+        std::tie(key, frames) = accum.extractOldest();
 
-common::FullTraceEvent MergeManager::buildNextEvent() {
-    FrameAccumulator::KeyType key;
-    FrameAccumulator::FrameVector frames;
-    std::tie(key, frames) = accum.extractOldest();
-
-    common::FullTraceEvent event = merger.buildEvent(frames);
-
-    if (!keepFPN) {
-        discardFPN(event);
-    }
-    if (lookupPtr) {
-        setPadNumbers(event);
+        BuildTask btask {std::bind(&Merger::mergeAndProcessEvent, &merger, std::move(frames))};
+        WriteTask wtask {std::bind(&writeEvent, std::ref(outFile), btask.get_future().share())};
+        writeQueue->push(std::move(wtask));
+        buildQueue->push(std::move(btask));
     }
 
-    return event;
-}
-
-void MergeManager::discardFPN(common::FullTraceEvent& event) {
-    auto newEnd = std::remove_if(event.begin(), event.end(), [](const common::Trace& tr) {
-        // Predicate returns True if channel number is in the list of FPN channels.
-        auto begin = MergeManager::fpnChannels.begin();
-        auto end = MergeManager::fpnChannels.end();
-        return std::find(begin, end, tr.getHardwareAddress().channel) != end;
-    });
-    event.erase(newEnd, event.end());
-}
-
-void MergeManager::setPadNumbers(common::FullTraceEvent& event) {
-    if (lookupPtr) {
-        for (common::Trace& trace : event) {
-            trace.setPad(lookupPtr->find(trace.getHardwareAddress()));
-        }
-    }
+    buildQueue->finish();
+    writeQueue->finish();
 }
 
 extern "C" void mergerSignalHandler(int) {

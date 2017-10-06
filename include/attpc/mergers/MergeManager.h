@@ -21,16 +21,9 @@ public:
     void mergeFiles(std::vector<GRAWFile>& grawFiles, common::HDF5DataFile& outFile);
 
 private:
-    common::FullTraceEvent buildNextEvent();
-    void discardFPN(common::FullTraceEvent& event);
-    void setPadNumbers(common::FullTraceEvent& event);
-
     FrameAccumulator accum;
     size_t maxAccumulatorNumEvents;
     Merger merger;
-    std::shared_ptr<common::PadLookupTable> lookupPtr;
-    static const std::vector<channelid_type> fpnChannels;
-    bool keepFPN;
 };
 
 extern "C" void mergerSignalHandler(int signal);

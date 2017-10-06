@@ -12,7 +12,30 @@ using attpc::common::Trace;
 namespace attpc {
 namespace mergers {
 
-FullTraceEvent Merger::buildEvent(const FrameAccumulator::FrameVector& frames) const {
+const std::vector<channelid_type> Merger::fpnChannels = {11, 22, 45, 56};
+
+Merger::Merger()
+: lookupPtr(nullptr)
+, keepFPN(false)
+{}
+
+Merger::Merger(std::shared_ptr<common::PadLookupTable> lookupPtr_, bool keepFPN_)
+: lookupPtr(std::move(lookupPtr_))
+, keepFPN(keepFPN_)
+{}
+
+FullTraceEvent Merger::mergeAndProcessEvent(const FrameAccumulator::FrameVector& frames) const {
+    common::FullTraceEvent event = mergeFrames(frames);
+    if (!keepFPN) {
+        discardFPN(event);
+    }
+    if (lookupPtr) {
+        setPadNumbers(event);
+    }
+    return event;
+}
+
+FullTraceEvent Merger::mergeFrames(const FrameAccumulator::FrameVector& frames) const {
     FullTraceEvent event {};
     event.setEventId(frames.front().getEventId());
     event.setTimestamp(frames.front().getTimestamp());
@@ -37,6 +60,24 @@ FullTraceEvent Merger::buildEvent(const FrameAccumulator::FrameVector& frames) c
     }
 
     return event;
+}
+
+void Merger::discardFPN(common::FullTraceEvent& event) const {
+    auto newEnd = std::remove_if(event.begin(), event.end(), [](const common::Trace& tr) {
+        // Predicate returns True if channel number is in the list of FPN channels.
+        auto begin = Merger::fpnChannels.begin();
+        auto end = Merger::fpnChannels.end();
+        return std::find(begin, end, tr.getHardwareAddress().channel) != end;
+    });
+    event.erase(newEnd, event.end());
+}
+
+void Merger::setPadNumbers(common::FullTraceEvent& event) const {
+    if (lookupPtr) {
+        for (common::Trace& trace : event) {
+            trace.setPad(lookupPtr->find(trace.getHardwareAddress()));
+        }
+    }
 }
 
 }
