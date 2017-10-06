@@ -1,28 +1,22 @@
 #include "attpc/mergers/MergeManager.h"
 #include "attpc/mergers/ThreadsafeQueue.h"
 #include "attpc/mergers/Worker.h"
+#include "attpc/mergers/GuardedThread.h"
+#include "attpc/mergers/signal_handling.h"
 #include <queue>
-#include <csignal>
 #include <iostream>
 #include <algorithm>
 #include <cassert>
-#include <mutex>
 #include <future>
 #include <functional>
 #include <memory>
+#include <chrono>
 
 namespace {
-    volatile std::sig_atomic_t signalFlag = 0;
-
-    std::mutex coutMutex;
-
-    void writeEvent(attpc::common::HDF5DataFile& file, std::shared_future<attpc::common::FullTraceEvent> future) {
-        auto event = future.get();
-        file.write(event);
-        {
-            std::unique_lock<std::mutex> coutLock {coutMutex};
-            std::cout << "Wrote event " << event.getEventId() << std::endl;
-        }
+    template <class R>
+    bool future_is_ready(const std::future<R>& future) {
+        using namespace std::literals::chrono_literals;
+        return future.wait_for(0s) == std::future_status::ready;
     }
 }
 
@@ -36,7 +30,7 @@ MergeManager::MergeManager(MergeKeyFunction method, size_t maxAccumulatorNumEven
 , merger(lookupPtr_, keepFPN_)
 {}
 
-void MergeManager::mergeFiles(std::vector<GRAWFile>& grawFiles, common::HDF5DataFile& outFile) {
+void MergeManager::readFiles(std::vector<GRAWFile>& grawFiles, std::promise<void>& doneReading) {
     using grawIterType = decltype(grawFiles.begin());
     std::vector<grawIterType> finishedFiles;
     std::vector<grawIterType> unfinishedFiles;
@@ -45,15 +39,7 @@ void MergeManager::mergeFiles(std::vector<GRAWFile>& grawFiles, common::HDF5Data
         unfinishedFiles.push_back(iter);
     }
 
-    using BuildTask = std::packaged_task<common::FullTraceEvent()>;
-    auto buildQueue = std::make_shared<ThreadsafeQueue<BuildTask>>();
-    Worker<BuildTask> builder {buildQueue};
-
-    using WriteTask = std::packaged_task<void()>;
-    auto writeQueue = std::make_shared<ThreadsafeQueue<WriteTask>>();
-    Worker<WriteTask> writer {writeQueue};
-
-    while (signalFlag == 0 && !unfinishedFiles.empty()) {
+    while (!abortWasCalled() && !unfinishedFiles.empty()) {
         assert(finishedFiles.size() + unfinishedFiles.size() == grawFiles.size());
 
         std::vector<grawIterType> filesToProcess;
@@ -62,47 +48,93 @@ void MergeManager::mergeFiles(std::vector<GRAWFile>& grawFiles, common::HDF5Data
 
         assert(finishedFiles.size() + filesToProcess.size() == grawFiles.size());
 
-        for (auto file : filesToProcess) {
-            try {
-                accum.addFrame(file->readFrame());
+        {
+            std::unique_lock<std::mutex> accumLock {accumMutex};
+            accumCond.wait(accumLock, [this](){ return accum.size() < maxAccumulatorNumEvents; });
+
+            for (auto file : filesToProcess) {
+                try {
+                    accum.addFrame(file->readFrame());
+                }
+                catch (const GRAWFile::FileReadError&) {
+                    finishedFiles.push_back(file);
+                    continue;
+                }
+
+                unfinishedFiles.push_back(file);
             }
-            catch (const GRAWFile::FileReadError&) {
-                finishedFiles.push_back(file);
-                continue;
-            }
 
-            unfinishedFiles.push_back(file);
-        }
-
-        while (accum.size() > maxAccumulatorNumEvents) {
-            FrameAccumulator::KeyType key;
-            FrameAccumulator::FrameVector frames;
-            std::tie(key, frames) = accum.extractOldest();
-
-            BuildTask btask {std::bind(&Merger::mergeAndProcessEvent, &merger, std::move(frames))};
-            WriteTask wtask {std::bind(&writeEvent, std::ref(outFile), btask.get_future().share())};
-            writeQueue->push(std::move(wtask));
-            buildQueue->push(std::move(btask));
+            accumCond.notify_all();
         }
     }
 
-    while (accum.size() > 0) {
+    doneReading.set_value();
+    accumCond.notify_all();
+}
+
+void MergeManager::processAccumulatedFrames(
+        size_t numToLeaveBehind,
+        std::shared_ptr<ThreadsafeQueue<BuildTask>> buildQueue,
+        std::shared_ptr<ThreadsafeQueue<WriteTask>> writeQueue,
+        common::HDF5DataFile& outFile
+) {
+    auto accumFullPredicate = [this, numToLeaveBehind](){ return accum.size() >= numToLeaveBehind; };
+
+    std::unique_lock<std::mutex> accumLock {accumMutex};
+    accumCond.wait(accumLock, accumFullPredicate);
+
+    while (accumFullPredicate()) {
         FrameAccumulator::KeyType key;
         FrameAccumulator::FrameVector frames;
         std::tie(key, frames) = accum.extractOldest();
 
         BuildTask btask {std::bind(&Merger::mergeAndProcessEvent, &merger, std::move(frames))};
-        WriteTask wtask {std::bind(&writeEvent, std::ref(outFile), btask.get_future().share())};
+        WriteTask wtask {std::bind(&MergeManager::writeEventFromFuture, this, std::ref(outFile), btask.get_future().share())};
         writeQueue->push(std::move(wtask));
         buildQueue->push(std::move(btask));
     }
 
-    buildQueue->finish();
-    writeQueue->finish();
+    accumCond.notify_all();
 }
 
-extern "C" void mergerSignalHandler(int) {
-    signalFlag = 1;
+void MergeManager::writeEventFromFuture(attpc::common::HDF5DataFile& file, std::shared_future<attpc::common::FullTraceEvent> future) {
+    auto event = future.get();
+    file.write(event);
+    {
+        std::unique_lock<std::mutex> coutLock {coutMutex};
+        std::cout << "Wrote event " << event.getEventId() << std::endl;
+    }
+}
+
+void MergeManager::mergeFiles(std::vector<GRAWFile>& grawFiles, common::HDF5DataFile& outFile) {
+    std::promise<void> doneReading;
+    GuardedThread reader {std::bind(&MergeManager::readFiles, this, std::ref(grawFiles), std::ref(doneReading))};
+
+    auto buildQueue = std::make_shared<ThreadsafeQueue<BuildTask>>();
+    Worker<BuildTask> builder {buildQueue};
+
+    auto writeQueue = std::make_shared<ThreadsafeQueue<WriteTask>>();
+    Worker<WriteTask> writer {writeQueue};
+
+    auto doneReadingFuture = doneReading.get_future();
+    while (!abortWasCalled() && !future_is_ready(doneReadingFuture)) {
+        processAccumulatedFrames(maxAccumulatorNumEvents, buildQueue, writeQueue, outFile);
+    }
+
+    doneReadingFuture.get();
+
+    const bool shouldWriteRemaining = !abortWasCalled();
+
+    if (shouldWriteRemaining) {
+        processAccumulatedFrames(0, buildQueue, writeQueue, outFile);
+    }
+    else {
+        std::unique_lock<std::mutex> coutLock {coutMutex};
+        std::cout << "Aborting merge. Remaining events will not be written.\n";
+    }
+
+    buildQueue->finish(shouldWriteRemaining);
+    writeQueue->finish(shouldWriteRemaining);
 }
 
 }

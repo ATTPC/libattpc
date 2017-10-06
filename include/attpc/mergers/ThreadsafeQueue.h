@@ -43,9 +43,11 @@ public:
         return item;
     }
 
-    void finish() {
+    void finish(bool waitUntilEmpty = true) {
         std::unique_lock<std::mutex> lock {queueMutex};
-        condVar.wait(lock, [this](){ return contents.empty(); });
+        if (waitUntilEmpty) {
+            condVar.wait(lock, [this](){ return contents.empty(); });
+        }
         finished = true;
         condVar.notify_all();
     }

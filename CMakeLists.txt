@@ -16,6 +16,7 @@ set(SRC_FILES
     src/Merger.cpp
     src/FrameAccumulator.cpp
     src/MergeManager.cpp
+    src/signal_handling.cpp
 )
 
 add_library(attpc_mergers SHARED ${SRC_FILES})

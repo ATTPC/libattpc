@@ -2,9 +2,9 @@
 #define ATTPC_MERGERS_WORKER_H
 
 #include "attpc/mergers/ThreadsafeQueue.h"
+#include "attpc/mergers/GuardedThread.h"
 #include <memory>
 #include <functional>
-#include <thread>
 
 namespace attpc {
 namespace mergers {
@@ -17,17 +17,10 @@ public:
 
     Worker(std::shared_ptr<taskqueue_type> taskQueuePtr)
     : tasks(std::move(taskQueuePtr))
-    {
-        thread = std::thread { std::bind(&Worker::run, this) };
-    }
+    , thread(std::bind(&Worker::run, this))
+    {}
 
     Worker(const Worker&) = delete;
-
-    ~Worker() {
-        if (thread.joinable()) {
-            thread.join();
-        }
-    }
 
     void run() {
         while (true) {
@@ -45,7 +38,7 @@ public:
 
 private:
     std::shared_ptr<taskqueue_type> tasks;
-    std::thread thread;
+    GuardedThread thread;
 };
 
 }

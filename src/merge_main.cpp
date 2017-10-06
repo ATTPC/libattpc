@@ -1,5 +1,6 @@
 #include "attpc/mergers/MergeManager.h"
 #include "attpc/common/PadLookupTable.h"
+#include "attpc/mergers/signal_handling.h"
 #include <boost/optional.hpp>
 #include <boost/program_options.hpp>
 #include <vector>
@@ -78,7 +79,7 @@ int main(const int argc, const char** argv) {
 
     MergerArgs options = parseOptions(argc, argv);
 
-    std::signal(SIGINT, attpc::mergers::mergerSignalHandler);
+    std::signal(SIGINT, abortHandler);
 
     std::shared_ptr<attpc::common::PadLookupTable> lookupPtr;
     if (options.padLookupTablePath) {
