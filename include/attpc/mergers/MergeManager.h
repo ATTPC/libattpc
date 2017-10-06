@@ -16,6 +16,16 @@
 namespace attpc {
 namespace mergers {
 
+/**
+ * @brief Controls a multi-threaded file merge procedure.
+ *
+ * This class is, unfortunately, rather complicated. Its purpose is to coordinate the merging of a
+ * set of GRAW files using multiple threads of execution. It therefore contains a lot of machinery to
+ * synchronize threads and generate tasks for those threads.
+ *
+ * The main method of this class is mergeFiles. This merges the frames from the files you provide to it and
+ * writes the results to the output file provided.
+ */
 class MergeManager {
 public:
     MergeManager(MergeKeyFunction method, size_t maxAccumulatorNumEvents_,
