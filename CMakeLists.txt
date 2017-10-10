@@ -16,7 +16,7 @@ project(libattpc)
 # the level of individual targets.
 
 find_package(OpenMP REQUIRED)
-find_package(Boost 1.63 REQUIRED)
+find_package(Boost 1.63 REQUIRED COMPONENTS program_options)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 find_package(HDF5 1.10 REQUIRED COMPONENTS CXX)
 find_package(PCL 1.2 REQUIRED COMPONENTS common kdtree io)
