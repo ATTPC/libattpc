@@ -1,0 +1,164 @@
+namespace attpc::cleaning {
+/**
+@page hough Cleaning with the Hough transform
+
+This library includes several classes that use the Hough transform to remove noise from data. This page gives a brief overview of how these can be used.
+
+@section overview Overview of the code
+
+There are currently two types of Hough transform implemented in the library: one for finding circles and one for finding straight lines. Both inherit from a common base class called HoughTransform which implements a generic version of the algorithm. The two child classes, CircularHoughTransform and LinearHoughTransform, implement their respective versions of the Hough transform by overriding the HoughTransform::radiusFunction method from the base class. New versions of the algorithm could be added in the future by inheriting from HoughTransform and implementing this method in a different way.
+
+The transform itself is performed by the HoughTransform::findHoughSpace method which is inherited by the two implementations. This returns a HoughSpace object, which is just a wrapper around a 2D Eigen array that contains the Hough space accumulator array. The HoughSpace object also provides methods for transforming between coordinates and bin numbers, finding the maximum, and taking slices of the data. A `const` reference to the raw matrix can also be retrieved using the method HoughSpace::getData.
+
+Finally, the library includes a class called HoughSpiralCleaner that implements a data cleaning algorithm based on the two Hough transforms. This algorithm is implemented as a series of several steps that each correspond to a method of this class. The steps can therefore be run independently for troubleshooting purposes. However, the intended way to use this class is through the method HoughSpiralCleaner::processEvent, which performs the whole algorithm at once. This is shown below.
+
+@section transform Finding lines
+
+As described above, the LinearHoughTransform can be used to find lines in the data. Imagine that we had a dataset consisting of one horizontal line that we wanted to identify:
+
+~~~cpp
+Eigen::Array<double, 100, 2> data {};  // An array of doubles with 100 rows and 2 columns
+const double dataY = 10;
+for (Eigen::Index row = 0; row < data.rows(); ++row) {
+    // Fill the array with data
+    data(row, 0) = row;
+    data(row, 1) = dataY;
+}
+~~~
+
+This line can be found using the LinearHoughTransform. The constructor takes two parameters: the number of bins to use in each dimension of the Hough space (which is a square matrix), and the value of the upper bound of the largest radius bin. Then, the Hough space can be found:
+
+~~~cpp
+const int numBins = 500;
+const int maxRad = 20;
+attpc::cleaning::LinearHoughTransform transform {numBins, maxRad};    // Create the transform object
+attpc::cleaning::HoughSpace hspace = transform.findHoughSpace(data);  // Perform the transform
+~~~
+
+The transform returns a HoughSpace object, which is described below.
+
+@section houghspace Working with the HoughSpace object
+
+@subsection max Finding the maximum
+
+The HoughSpace object contains the accumulator array from the Hough transform. We can do a few different things with this. The location and value of the maximum bin can be found easily:
+
+~~~cpp
+Eigen::Index radMaxBin = 0;
+Eigen::Index thetaMaxBin = 0;
+const HoughSpace::ScalarType maxValue = hspace.findMaximum(thetaMaxBin, radMaxBin);
+~~~
+
+The method HoughSpace::findMaximum returns the value stored in the maximum bin. It also sets its two arguments to the bin index of the maximum in each direction. There is also a second version of this method that does not take any arguments and simply returns the value in the maximum bin.
+
+@subsection conversion Converting between bins and coordinates
+
+The HoughSpace class can also take care of conversions between bin numbers and the corresponding coordinates in each dimension. There are four functions for this:
+
+| Function                      | Input             | Output            |
+| ----------------------------- | ----------------- | ----------------- |
+| HoughSpace::findBinFromAngle  | Angle coordinate  | Angle bin         |
+| HoughSpace::findAngleFromBin  | Angle bin         | Angle coordinate  |
+| HoughSpace::findBinFromRadius | Radius coordinate | Radius bin        |
+| HoughSpace::findRadiusFromBin | Radius bin        | Radius coordinate |
+
+@note The coordinate corresponding to each bin is taken to be the *lower bound* of that bin. Coordinates converted from a bin number therefore carry an uncertainty equal to the bin size.
+
+The class also provides methods for retrieving the bin widths in each dimension and the upper and lower coordinate bounds in each dimension. See the @ref HoughSpace "class documentation" for details.
+
+@subsection access Accessing values in the accumulator array
+
+There are a few methods that allow easy access to values in the accumulator array. These methods should preferably be used instead of directly accessing the data array since they prevent you from having to remember which dimensions of the array correspond to the radius and the angle.
+
+A single bin in the array can be addressed by bin number as follows:
+
+~~~cpp
+const Eigen::Index angleBinNumber = 20;
+const Eigen::Index radiusBinNumber = 30;
+
+// Reading the current value
+const HoughSpace::ScalarType value = hspace.getValueAtBin(angleBinNumber, radiusBinNumber);
+
+// You can also write a new value to this bin
+hspace.getValueAtBin(angleBinNumber, radiusBinNumber) = 100;
+~~~
+
+Bins can also be addressed by coordinate value using the method HoughSpace::getValueAtCoords. This method will automatically convert the provided values into the appropriate bin numbers. Otherwise, it works the same as HoughSpace::getValueAtBin.
+
+@warning For the sake of speed, **no explicit boundary checks are performed by these functions!** That being said, the underlying Eigen library *does* check boundaries when built in debug mode, but for actual usage, the code will usually be built in release mode, so this doesn't help. Therefore, it's best to ensure that the bin number you are accessing is valid before trying to access it.
+
+In addition to accessing single bins, the HoughSpace class also contains methods that extract slices of the accumulator array along either dimension. Two types of slices are available: radial slices and angular slices. A radial slice covers only a subset of the radial bins, while an angular slice covers a subset of the angular bins. For example, assume the full accumulator array has dimension N by N, where the angular dimension is listed first. A radial slice of width 5 would have dimension N by 5, and an angular slice of width 5 would have dimension 5 by N. These slicing functions are documented in the HoughSpace class.
+
+@subsection rawdata Accessing the raw data
+
+Finally, if none of the methods described above suit your problem, you can always access the full accumulator array using HoughSpace::getData. This returns a `const` reference to the underlying Eigen array object. The array is square, with angle bins along the first dimension (rows) and radius bins along the second dimension (columns).
+
+@section center Finding the center of a spiral
+
+The center of a spiral-shaped track can be found using the CircularHoughTransform. In addition to the general Hough transform methods, this class has an extra method called CircularHoughTransform::findCenter that returns the center of the spiral as identified by the Hough transform. This can be used by simply providing the data to the function:
+
+~~~cpp
+Eigen::ArrayX2d data {};
+
+// Fill the array somehow, or read an event into your program.
+// We'll assume it has 2 columns corresponding to x and y coordinates.
+
+const int numBins = 500;
+const int maxRadius = 20;
+
+attpc::cleaning::CircularHoughTransform transform {numBins, maxRadius};
+
+Eigen::Vector2d center = transform.findCenter(data.col(0), data.col(1));
+~~~
+
+The center is returned as the 2D vector (x, y).
+
+This method uses the Hough transform internally to find the center. The Hough space can be found separately, if desired, using CircularHoughTransform::findHoughSpace as usual.
+
+One parameter of note for the CircularHoughTransform is the `rowOffset`. This is an optional third parameter to the constructor which has a default value of 5. The `rowOffset` controls the separation between the pairs of points used to find the center. If the `rowOffset` is 5, for example, points N and N-5 will be compared for all N less than the number of points in the data set. If N is 1, adjacent points will be used. Larger values may help reduce the influence of noise in the data.
+
+@note If the number of points in the data is less than `rowOffset`, the exception HoughTransform::TooFewPointsException will be thrown.
+
+@section spiralcleaner Cleaning the data
+
+Finally, spiral-shaped tracks can be cleaned using the HoughSpiralCleaner class. This works by finding the center of the spiral, unwrapping it into a set of parallel lines, identifying the lines with the Hough transform, and discarding any points that are not near a line.
+
+Since the HoughSpiralCleaner depends on a lot of parameters, the configuration is contained in a separate class called the HoughSpiralCleanerConfig. Please see the documentation of that class for a list of parameters. The effect of each of these parameters will be discussed below where they are relevant. Using the configuration class, the HoughSpiralCleaner can be constructed very simply:
+
+~~~cpp
+attpc::cleaning::HoughSpiralCleanerConfig config;
+config.linearHoughNumBins = 500;
+config.linearHoughMaxRadius = 20;
+config.circularHoughNumBins = 500;
+config.circularHoughMaxRadius = 20;
+config.numAngleBinsToReduce = 5;
+config.houghSpaceSliceSize = 5;
+config.peakWidth = 5;
+config.minPointsPerLine = 5;
+
+attpc::cleaning::HoughSpiralCleaner cleaner {config};
+~~~
+
+If desired, the spiral cleaning process can then be performed one step at a time. The steps are the following:
+
+1. Find the center of the circle with HoughSpiralCleaner::findCenter. This is just a wrapper around CircularHoughTransform::findCenter. The CircularHoughTransform object is configured using the HoughSpiralCleanerConfig::circularHoughNumBins and HoughSpiralCleanerConfig::circularHoughMaxRadius parameters from the configuration object. The center might be more accurate if you apply a nearest-neighbor cut before finding it; this can be done with the functions attpc::cleaning::countNeighbors and attpc::cleaning::applyNeighborCut. The radius parameter is stored in HoughSpiralCleanerConfig::neighborRadius and a good threshold for the number of neighbors is 2.
+2. Using the center and the (x, y) data, find the arc length coordinates with HoughSpiralCleaner::findArcLength.
+3. Find the linear Hough space using HoughSpiralCleaner::findHoughSpace. Use the z coordinates as the "x" variable and the arc length coordinates as the "y" variable for the Hough transform. The LinearHoughTransform object is configured using the values in HoughSpiralCleanerConfig::linearHoughNumBins and HoughSpiralCleanerConfig::linearHoughMaxRadius.
+4. Find the angular bin containing the maximum value in the Hough space using HoughSpiralCleaner::findMaxAngleBin. To account for slight variations in angle between Hough space lines, this function averages over a few angular bins when finding the maximum. The number of bins to average over is controlled by HoughSpiralCleanerConfig::numAngleBinsToReduce.
+5. Extract a slice of the Hough space around the maximum with HoughSpiralCleaner::findMaxAngleSlice. The size of the slice is controlled by HoughSpiralCleanerConfig::houghSpaceSliceSize. The slice is automatically summed along the angle dimension, so it should be a 1D array. You may want to apply a threshold to this slice to eliminate peaks caused by noise. This can be done with the function attpc::cleaning::applyThreshold and the threshold value stored in HoughSpiralCleanerConfig::houghSpaceSliceThreshold.
+6. Find the peaks in the 1D array using HoughSpiralCleaner::findPeakRadiusBins. Each of these corresponds to a line in the Hough space. The peak "bins" are actually the center of gravity of each peak. The centers of gravity are found by considering a region around each maximum of the array whose width in each direction is set by HoughSpiralCleanerConfig::peakWidth.
+7. Transform the peak bins into actual radius coordinates using the HoughSpace::findRadiusFromBin method of the HoughSpace object you found earlier. An easy way to do this is by using `std::transform` from the standard library header `algorithm` (that is, you need to `#include <algorithm>`). Assuming the peak bins are in the vector `radPeaks` and the HoughSpace object is called `hspace`, the values can be transformed in-place like this:
+@code{.cpp}
+std::transform(radPeaks.begin(), radPeaks.end(), radPeaks.begin(),
+    [&hspace](const double a) -> double { return hspace.findRadiusFromBin(a); });
+@endcode
+8. The radii found in the previous step are stored in a `std::vector`. The next step requires an Eigen array instead, so either copy the data into a new array or use an `Eigen::Map` object to view the vector as an Eigen array. The latter option is safe since vectors have guaranteed contiguous storage of elements since C++03. Assuming the vector of peaks is called `radPeaks`, a map can be constructed like this:
+@code{.cpp}
+const Eigen::Map<const Eigen::ArrayXd> radPeakMap {radPeaks.data(), static_cast<Eigen::Index>(radPeaks.size())};
+@endcode
+9. Identify which points correspond to each line in the Hough space, and tag the points that don't correspond to any line. This is done with the method HoughSpiralCleaner::classifyPoints. This returns a HoughSpiralCleanerResult object that contains the distance between each point and the nearest line and a set of labels that identify which line each point belongs to. Points that are not associated with any line get a label of -1. In addition, any line with fewer than HoughSpiralCleanerConfig::minPointsPerLine is discarded, so any points associated with that line are also labeled -1.
+
+Alternatively, the entire process can be done in one step by calling HoughSpiralCleaner::processEvent. This returns a HoughSpiralCleanerResult object that contains the labels and distances described above and the center of the spiral. The step-by-step process can be useful for debugging or for producing figures, however, so both options are available.
+
+*/
+}
