@@ -32,7 +32,7 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           = "libattpc-cleaning"
+PROJECT_NAME           = "libattpc"
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
@@ -44,7 +44,7 @@ PROJECT_NAME           = "libattpc-cleaning"
 # for a project that appears at the top of each page and should give viewer a
 # quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          = "Cleaning component of the AT-TPC analysis library"
+PROJECT_BRIEF          = "Cross-platform AT-TPC analysis library"
 
 # With the PROJECT_LOGO tag one can specify an logo or icon that is included in
 # the documentation. The maximum height of the logo should not exceed 55 pixels
@@ -58,7 +58,7 @@ PROJECT_BRIEF          = "Cleaning component of the AT-TPC analysis library"
 # entered, it will be relative to the location where doxygen was started. If
 # left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = @CMAKE_CURRENT_BINARY_DIR@/doc
+OUTPUT_DIRECTORY       = @CMAKE_CURRENT_BINARY_DIR@/docs
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create 4096 sub-
 # directories (in 2 levels) under the output directory of each output format and
@@ -754,7 +754,13 @@ WARN_LOGFILE           =
 # spaces.
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/doc @CMAKE_CURRENT_SOURCE_DIR@/include @CMAKE_CURRENT_SOURCE_DIR@/src
+INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/docs \
+                         @CMAKE_CURRENT_SOURCE_DIR@/cleaning/include \
+                         @CMAKE_CURRENT_SOURCE_DIR@/cleaning/src \
+                         @CMAKE_CURRENT_SOURCE_DIR@/common/include \
+                         @CMAKE_CURRENT_SOURCE_DIR@/common/src \
+                         @CMAKE_CURRENT_SOURCE_DIR@/mergers/include \
+                         @CMAKE_CURRENT_SOURCE_DIR@/mergers/src
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -780,7 +786,7 @@ FILE_PATTERNS          =
 # be searched for input files as well.
 # The default value is: NO.
 
-RECURSIVE              = NO
+RECURSIVE              = YES
 
 # The EXCLUDE tag can be used to specify files and/or directories that should be
 # excluded from the INPUT source files. This way you can easily exclude a

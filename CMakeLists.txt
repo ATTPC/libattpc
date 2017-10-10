@@ -44,3 +44,23 @@ add_subdirectory(external)  # Third-party dependencies
 add_subdirectory(common)
 add_subdirectory(mergers)
 add_subdirectory(cleaning)
+
+#######################
+# Documentation setup #
+#######################
+
+find_package(Doxygen 1.8)
+if(${DOXYGEN_FOUND})
+    set(DOXYFILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in)
+    set(DOXYFILE_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+
+    configure_file(${DOXYFILE_IN} ${DOXYFILE_OUT} @ONLY)
+
+    add_custom_target(doc
+        COMMAND doxygen
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        COMMENT "Building documentation"
+    )
+else()
+    message(WARNING "Doxygen is required to build the documentation.")
+endif()

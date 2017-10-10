@@ -1,0 +1,5 @@
+/**
+ * @namespace attpc::common
+ * @brief Shared components of the library.
+ *
+ */
