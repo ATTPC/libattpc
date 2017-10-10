@@ -43,6 +43,4 @@ add_subdirectory(external)  # Third-party dependencies
 
 add_subdirectory(common)
 add_subdirectory(mergers)
-add_subdirectory(transform)
 add_subdirectory(cleaning)
-add_subdirectory(fitters)
