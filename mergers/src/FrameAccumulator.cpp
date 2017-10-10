@@ -16,7 +16,7 @@ void FrameAccumulator::addFrame(const GRAWFrame& frame) {
 void FrameAccumulator::addFrame(GRAWFrame&& frame) {
     KeyType eventKey = getMergeKey(frame);
     FrameVector& frvec = getFrameVector(eventKey);
-    frvec.push_back(frame);
+    frvec.push_back(std::move(frame));
 }
 
 auto FrameAccumulator::extractOldest() -> std::pair<KeyType, FrameVector> {
