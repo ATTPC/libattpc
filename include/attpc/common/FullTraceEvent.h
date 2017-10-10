@@ -1,7 +1,7 @@
 #ifndef ATTPC_COMMON_FULLTRACEEVENT_H
 #define ATTPC_COMMON_FULLTRACEEVENT_H
 
-#include <map>
+#include <unordered_map>
 #include <iterator>
 #include <type_traits>
 #include "attpc/common/Trace.h"
@@ -102,9 +102,9 @@ public:
     };
 
     //! An iterator over the Traces in the event
-    using iterator = MapIteratorAdapter<std::map<HardwareAddress, Trace>::iterator, false>;
+    using iterator = MapIteratorAdapter<std::unordered_map<HardwareAddress, Trace>::iterator, false>;
     //! A constant iterator over the Traces in the event
-    using const_iterator = MapIteratorAdapter<std::map<HardwareAddress, Trace>::const_iterator, true>;
+    using const_iterator = MapIteratorAdapter<std::unordered_map<HardwareAddress, Trace>::const_iterator, true>;
 
     /**
      * @brief Default constructor
@@ -215,7 +215,7 @@ public:
 private:
     evtid_type eventId;
     timestamp_type timestamp;
-    std::map<HardwareAddress, Trace> traces;
+    std::unordered_map<HardwareAddress, Trace> traces;
 };
 
 }
