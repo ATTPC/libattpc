@@ -11,10 +11,26 @@
 namespace attpc {
 namespace mergers {
 
+/**
+ * @brief A method for merging events.
+ *
+ * This type describes a function that can extract a merging key from a GRAWFrame. Two examples are defined:
+ * - GetMergeKeyFromEventId: returns the event ID
+ * - GetMergeKeyFromTimestamp: returns the timestamp
+ * The choice between these two functions controls whether the events will be merged based on event ID or based
+ * on timestamp.
+ */
 using MergeKeyFunction = std::function<uint64_t(const GRAWFrame&)>;
+//! Returns the event ID, to merge based on event ID
 uint64_t GetMergeKeyFromEventId(const GRAWFrame& frame);
+//! Returns the event timestamp, to merge based on timestamp
 uint64_t GetMergeKeyFromTimestamp(const GRAWFrame& frame);
 
+/**
+ * @brief Collects and sorts GRAW frames based on a merge key (i.e. event ID or timestamp)
+ *
+ * This class does the actual "merging," in some sense. It maintains a cache of vectors of frames (FrameVector)
+ */
 class FrameAccumulator {
 public:
     using KeyType = uint64_t;
