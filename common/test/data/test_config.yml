@@ -1,0 +1,11 @@
+---
+# Test configuration
+
+string_option: string value
+int_option: 5
+float_option: 4.7
+array_option: [1, 2, 3]
+
+subconfig:
+    sub_int_option: 1
+    sub_string_option: sub string
