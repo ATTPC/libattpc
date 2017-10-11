@@ -10,10 +10,6 @@ namespace attpc {
 namespace mergers {
 
 GRAWFile::GRAWFile(const std::string& filename, const bool readonly) {
-    open(filename, readonly);
-}
-
-void GRAWFile::open(const std::string& filename, const bool readonly) {
     std::ios_base::openmode flags;
     if (readonly) {
         flags = std::ios_base::binary | std::ios_base::in;
@@ -23,10 +19,6 @@ void GRAWFile::open(const std::string& filename, const bool readonly) {
     }
 
     file = std::fstream(filename, flags);
-}
-
-void GRAWFile::close() {
-    file.close();
 }
 
 GRAWFrame GRAWFile::readFrame() {

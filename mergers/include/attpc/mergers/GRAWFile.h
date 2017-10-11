@@ -11,9 +11,8 @@ namespace mergers {
 class GRAWFile {
 public:
     GRAWFile(const std::string& filename, const bool readonly = true);
-
-    void open(const std::string& filename, const bool readonly = true);
-    void close();
+    GRAWFile(const GRAWFile&) = delete;
+    GRAWFile(GRAWFile&&) = default;
 
     GRAWFrame readFrame();
 
