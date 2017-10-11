@@ -6,8 +6,22 @@
 namespace attpc {
 namespace mergers {
 
+/**
+ * @brief Represents a single data item (sample) from a GRAWFrame.
+ *
+ * This most closely models a data item from partial readout mode, but this class is also used when
+ * unpacking full-readout-mode data items for consistency.
+ */
 struct GRAWDataItem {
+    //! @brief Default constructor.
     GRAWDataItem() = default;
+    /**
+     * @brief Construct a data item with the given values
+     * @param aget_       The AGET index
+     * @param channel_    The channel number
+     * @param timeBucket_ The time bucket index
+     * @param sample_     The sample value
+     */
     GRAWDataItem(uint8_t aget_, uint8_t channel_, uint16_t timeBucket_, uint16_t sample_)
     : aget(aget_)
     , channel(channel_)
@@ -15,10 +29,10 @@ struct GRAWDataItem {
     , sample(sample_)
     {}
 
-    uint8_t aget;
-    uint8_t channel;
-    uint16_t timeBucket;
-    uint16_t sample;
+    uint8_t aget;          //! The AGET index
+    uint8_t channel;       //! The channel number
+    uint16_t timeBucket;   //! The time bucket index
+    uint16_t sample;       //! The sample value
 };
 
 }
