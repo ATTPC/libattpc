@@ -80,6 +80,8 @@ private:
      */
     void readFiles(std::vector<GRAWFile>& grawFiles, std::promise<void>& doneReading);
 
+    void waitUntilAccumIsFull(const std::function<bool()>& interruptFunc);
+
     /**
      * @brief Pulls groups of frames out of the accumulator and creates tasks for them.
      *

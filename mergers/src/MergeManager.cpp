@@ -92,18 +92,26 @@ void MergeManager::readFiles(std::vector<GRAWFile>& grawFiles, std::promise<void
     accumCond.notify_all();   // Must unblock any waiting threads before returning
 }
 
+void MergeManager::waitUntilAccumIsFull(const std::function<bool()>& interruptFunc) {
+    // This predicate is true when there are events to process or the program should quit.
+    // When true, we should stop waiting and return from this function.
+    auto readyPredicate = [this, &interruptFunc]() {
+        return (accum.size() >= maxAccumulatorNumEvents) || interruptFunc();
+    };
+
+    std::unique_lock<std::mutex> accumLock {accumMutex};
+    accumCond.wait(accumLock, readyPredicate);
+}
+
 void MergeManager::processAccumulatedFrames(
         size_t numToLeaveBehind,
         std::shared_ptr<ThreadsafeQueue<BuildTask>> buildQueue,
         std::shared_ptr<ThreadsafeQueue<WriteTask>> writeQueue,
         common::HDF5DataFile& outFile
 ) {
-    auto accumFullPredicate = [this, numToLeaveBehind](){ return accum.size() >= numToLeaveBehind; };
-
     std::unique_lock<std::mutex> accumLock {accumMutex};
-    accumCond.wait(accumLock, accumFullPredicate);  // Wait if the accumulator is not full
 
-    while (accumFullPredicate()) {
+    while (accum.size() >= numToLeaveBehind) {
         FrameAccumulator::KeyType key;
         FrameAccumulator::FrameVector frames;
         std::tie(key, frames) = accum.extractOldest();
@@ -144,7 +152,11 @@ void MergeManager::mergeFiles(std::vector<GRAWFile>& grawFiles, common::HDF5Data
     // This thread keeps track of the accumulator. If it gets full, take some events out of it
     // and create build and write tasks for them.
     auto doneReadingFuture = doneReading.get_future();  // This will be "ready" when the reader is done
-    while (!abortWasCalled() && !future_is_ready(doneReadingFuture)) {
+    auto shouldFinish = [&doneReadingFuture]() {
+        return future_is_ready(doneReadingFuture) || abortWasCalled();
+    };
+    while (!shouldFinish()) {
+        waitUntilAccumIsFull(shouldFinish); // Block before calling processAccumulatedFrames to prevent race condition
         processAccumulatedFrames(maxAccumulatorNumEvents, buildQueue, writeQueue, outFile);
     }
 
