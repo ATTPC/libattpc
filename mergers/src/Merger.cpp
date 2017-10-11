@@ -37,6 +37,7 @@ FullTraceEvent Merger::mergeAndProcessEvent(const FrameAccumulator::FrameVector&
 
 FullTraceEvent Merger::mergeFrames(const FrameAccumulator::FrameVector& frames) const {
     FullTraceEvent event {};
+    // NOTE: This assumes that the frames all have the same event ID and timestamp
     event.setEventId(frames.front().getEventId());
     event.setTimestamp(frames.front().getTimestamp());
 
@@ -50,12 +51,13 @@ FullTraceEvent Merger::mergeFrames(const FrameAccumulator::FrameVector& frames) 
             };
             FullTraceEvent::iterator traceIter = event.findTrace(addr);
             if (traceIter == event.end()) {
+                // In this case, the trace was not yet present in the event, so we have to create it
                 bool wasInserted;
                 std::tie(traceIter, wasInserted) = event.insertTrace(Trace{addr});
                 assert(wasInserted && (traceIter != event.end()));
             }
 
-            (*traceIter)(item.timeBucket) = item.sample;
+            (*traceIter)(item.timeBucket) = item.sample;  // calls operator() on the Trace
         }
     }
 
