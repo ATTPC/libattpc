@@ -6,9 +6,9 @@ namespace attpc {
 namespace mergers {
 
 GRAWFrame::GRAWFrame(const RawFrame& rawFrame)
-: header(rawFrame)
+: header(rawFrame)  // The header handles its own parsing
 {
-    const auto dataBegin = rawFrame.cbegin() + header.headerSize.value * 256;
+    const auto dataBegin = rawFrame.cbegin() + header.headerSize.value * 256;  // size is in units of 256 bytes
     const auto dataEnd = dataBegin + header.itemSize.value * header.itemCount.value;
     assert(dataEnd <= rawFrame.cend());
 
@@ -25,7 +25,7 @@ std::vector<GRAWDataItem> GRAWFrame::decodePartialReadoutData(const RawFrame::co
     std::vector<GRAWDataItem> parsedData;
 
     for (auto iter = begin; iter != end; iter += 4) {
-        const uint32_t encodedItem = utilities::parseValue<uint32_t>(iter, iter+4);
+        const uint32_t encodedItem = utilities::parseValue<uint32_t>(iter, iter+4);  // byte-swap
 
         GRAWDataItem item;
         item.aget       = (encodedItem & 0xC0000000) >> 30;
@@ -41,6 +41,12 @@ std::vector<GRAWDataItem> GRAWFrame::decodePartialReadoutData(const RawFrame::co
 
 std::vector<GRAWDataItem> GRAWFrame::decodeFullReadoutData(const RawFrame::const_iterator& begin,
                                                            const RawFrame::const_iterator& end) const {
+    /* This version is a bit more complicated since in full-readout mode, the channel and time bucket
+     * indices are determined by the order in which the samples are recorded in the frame. That being
+     * said, the samples from each aget can be interleaved, so we start by sorting the samples by aget
+     * into a set of four queues. Then, the samples are removed from each queue in order and assigned
+     * the correct time bucket and channel numbers.
+     */
     std::vector<std::queue<uint16_t>> sampleQueues (4);
 
     for (auto iter = begin; iter != end; iter += 2) {
