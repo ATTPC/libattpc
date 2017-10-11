@@ -8,8 +8,7 @@ namespace mergers {
 
 struct GRAWDataItem {
     GRAWDataItem() = default;
-    GRAWDataItem(const uint8_t aget_, const uint8_t channel_,
-                 const uint16_t timeBucket_, const uint16_t sample_)
+    GRAWDataItem(uint8_t aget_, uint8_t channel_, uint16_t timeBucket_, uint16_t sample_)
     : aget(aget_)
     , channel(channel_)
     , timeBucket(timeBucket_)
