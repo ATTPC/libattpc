@@ -9,7 +9,7 @@ namespace mergers {
 class GuardedThread : public std::thread {
 public:
     using std::thread::thread;
-    ~GuardedThread() {
+    virtual ~GuardedThread() {
         if (joinable()) {
             join();
         }
