@@ -1,4 +1,6 @@
-#include <csignal>
+#ifndef ATTPC_MERGERS_SIGNAL_HANDLING_H
+#define ATTPC_MERGERS_SIGNAL_HANDLING_H
+
 /**
  * @file
  * @brief A basic signal handler for the merger.
@@ -10,6 +12,8 @@
  * If you improve this signal handler later, note that signal handlers can only perform an extremely
  * restricted set of operations according to the standard, and doing much more could be undefined behavior.
  */
+
+#include <csignal>
 
 /**
  * @brief A signal handler that sets a flag when it is called.
@@ -25,3 +29,5 @@ extern "C" void abortHandler(int signal);
  * @return True if the signal was received and the program should abort.
  */
 bool abortWasCalled();
+
+#endif /* end of include guard: ATTPC_MERGERS_SIGNAL_HANDLING_H */
