@@ -1,0 +1,58 @@
+namespace attpc::mergers {
+/**
+@page merging Merging GRAW files
+
+The namespace attpc::mergers contains classes and functions that can be used to merge GRAW files into more usable formats. The goal of this part of the library is to provide an adaptable set of classes that either be incorporated into an analysis framework or used independently through a simple main program. This leads to the slightly unorthodox structure of the code as it stands currently. On this page, the structure and the intentions behind it will be explained.
+
+@section graw Modeling the GRAW files
+
+GRAW files feature a hierarchical structure that maps nicely onto a set of classes in C++. The main interface to a GRAW file is, unsurprisingly, through the class GRAWFile. This class implements a method GRAWFile::readFrame that will fetch the next frame from the file and return it in its fully processed and unpacked form. Currently, files can only be read sequentially from start to finish, but random access could be added in the future without too much work.
+
+Although GRAWFile::readFrame returns a processed GRAWFrame, the GRAWFile class doesn't actually do very much. It reads the binary data from the file into a RawFrame object, which is simply a chunk of memory with an iterator interface, and passes it along to the GRAWFrame class for parsing. The GRAWFrame owns a GRAWHeader---which contains the information from the frame header like the CoBo index and the timestamp---and a vector of GRAWDataItem objects---which contain the actual sample values, time bucket indices, and so on. The GRAWFrame decodes the packed data items from the RawFrame, but the GRAWHeader handles its own construction.
+
+The GRAWHeader consists of a set of GRAWHeaderField objects, which each independently examine the RawFrame to find their values. The GRAWHeaderField is a class template that stores the type, size (in bytes), offset, and value of each field in the GRAW header. Although this is more complex than storing plain values in the GRAWHeader, it allows all of the information about each field to be stored in one place in the program, which should make future maintenance easier. Since GRAWHeaderField is a template, the offset, size, and type of each field are known at compile time. The value of the field can be accessed through GRAWHeaderField::value.
+
+@section merge Merging frames into events
+
+The merging is handled by two separate classes: the FrameAccumulator and the Merger. The FrameAccumulator is a container that sorts and groups frames based on either event ID or timestamp, while the Merger builds the actual events from the sorted frames.
+
+@subsection accum The FrameAccumulator
+
+Frames in a GRAW file are, for the most part, in order of increasing event ID and timestamp. When merging multiple files, then, it is safe to assume that frames from a given event will be located in a similar place in each file. The FrameAccumulator exploits this assumption to allow files to be merged without indexing them first to find where each frame is. As frames are read in order from each file, they can be added to the FrameAccumulator using FrameAccumulator::addFrame. This method groups the frame with others from the same event and stores it inside the accumulator. The FrameAccumulator keeps track of which events were seen most recently, and the frames from the least-recently seen event can be extracted using FrameAccumulator::extractOldest. The least-recently seen event is the event that is most likely to be complete (or to have all of its frames) since it is most likely that the position in all files is past the position of the frames from that event. Of course, this assumption is only valid if enough events are kept in the accumulator at a time. Keep in mind that each GRAW file may contain up to 4 frames per event, and that frames from different events may be interleaved in the files, so to be safe, it is best to keep 10 or 20 events in the accumulator at a time, removing events only when its size rises above this threshold.
+
+The FrameAccumulator can sort frames based on either their event IDs or their timestamps. This allows events to be merged using either method. The merging method is set using the MergeKeyFunction passed to the FrameAccumulator constructor. Use GetMergeKeyFromEventId to merge by event ID, or use GetMergeKeyFromTimestamp to merge by timestamp. If another merging method is devised in the future, another MergeKeyFunction could be added.
+
+When an event is removed from the FrameAccumulator, it records that event's merging key, and it will not let you add frames from that event anymore. This way, if a rogue frame from an earlier event shows up much later in a GRAW file, you can be made aware of that problem and decide how to handle it.
+
+@subsection merger The Merger
+
+The other half of the merging process is done by the Merger. This class takes a FrameAccumulator::FrameVector (vector of GRAWFrame objects) as produced by the FrameAccumulator and processes it to create a merged common::FullTraceEvent. In addition to event building (with Merger::mergeFrames), the Merger can also drop the fixed-pattern noise channels from the event (Merger::discardFPN) and set the pad numbers for each trace from a common::PadLookupTable (Merger::setPadNumbers). If you want to do all of the above, simply call Merger::mergeAndProcessEvent. It will perform the additional processing steps based on what arguments you used to construct it. See the Merger documentation for details.
+
+In the future, more processing steps could be added to the merger class as additional methods. These might include things like fixed-pattern noise corrections (as opposed to just throwing it away) or verification of the data with respect to some standard.
+
+@section parallel Merging in parallel
+
+The merging classes mentioned above can be used to merge events in one thread or as part of a larger analysis process, but to merge events and write them to a file more efficiently, the library also contains some parallel processing infrastructure. By design, these components are somewhat independent of the basic merging classes described above so that merging does not *have* to be performed in parallel.
+
+The main parallel merging class is the MergeManager. It creates and uses a FrameAccumulator and a Merger to build the events, but it does so using multiple threads. When MergeManager::mergeFiles is called with a set of GRAWFile objects and an output file, the MergeManager spawns three worker threads: one that reads events from the files, one that builds the events, and one that writes the merged events to the output file. This allows the slower I/O procedures to happen at the same time as the event building, so the program can run a bit faster (although it will still generally be bottlenecked by the hard disk I/O, which is quite slow).
+
+Parallelism is accomplished in a fairly low-level way. The GRAW reading thread is an instance of GuardedThread (a thread that automatically waits for its tasks to finish before it is destroyed), and the builder and writer threads are instances of Worker (a thread that runs tasks from a queue). The tasks for the Worker threads are created in the main thread and communicated to the workers through a ThreadsafeQueue of std::packaged_task objects, which are essentially functions bundled with a std::promise/std::future pair, which allows results to be communicated across threads. All of this parallelism is achieved using C++11 standard library classes like `thread`, `mutex`, `condition_variable`, `promise`, `future`, and `packaged_task`. A description of these classes is beyond the scope of this document, but can be found in any good reference for C++11 or later (such as <a href="https://en.cppreference.com/">cppreference.com</a>).
+
+@section signal Signal handling
+
+A small but important detail that should be considered in a merger is what to do when your program is killed unexpectedly. This could include something as simple as the user pressing control-C to stop the merge, or a task scheduler on a computer cluster killing the program when it runs out of resources. This is *especially* important when merging to an HDF5 file since those files **will be corrupted** if they are not closed correctly.
+
+A very basic signal handler is provided in the header signal_handling.h. This function (abortHandler) can be set as a signal handler like this:
+~~~cpp
+#include <csignal>
+#include "attpc/mergers/signal_handling.h"
+
+int main() {
+    std::signal(SIGINT, abortHandler);  // This sets the signal handler for SIGINT, or control-C
+    // Add the rest of your program afterwards
+}
+~~~
+Once the handler is set up, you can check to see if the signal was received using abortWasCalled. If that returns `true`, then you can clean up and quit. Separate handlers could be added for other signals like SIGTERM or SIGQUIT. All these handlers really do is set a flag in a global variable, and according to the standard, that's all they're really allowed to do. Therefore, a signal handler can detect a signal, but it's up to you to clean up and quit afterwards.
+
+*/
+}
